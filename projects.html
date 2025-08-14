@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Thanisorn J.</title>
+    <style>
+        /* Common styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 3;
+            background: rgba(10, 10, 20, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #00eeff;
+            transition: width 0.4s ease;
+        }
+        .logo:hover::after {
+            width: 100%;
+        }
+        nav a {
+            margin-left: 40px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            position: relative;
+            padding-bottom: 5px;
+            transition: color 0.3s ease;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #00eeff;
+            transition: width 0.4s ease;
+        }
+        nav a:hover {
+            color: white;
+        }
+        nav a:hover::after {
+            width: 100%;
+        }
+        nav a.active {
+            color: white;
+            font-weight: 500;
+        }
+        nav a.active::after {
+            width: 100%;
+            background: #00eeff;
+        }
+        
+        /* Page-specific styles */
+        .page-container {
+            padding: 150px 10% 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .page-title {
+            font-size: 4rem;
+            text-shadow: 0 0 10px #00eeff;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #00eeff;
+            padding-bottom: 10px;
+            display: inline-block;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .project-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 238, 255, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 238, 255, 0.2);
+        }
+        .project-card h3 {
+            color: #00eeff;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+        .project-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+        .project-card a {
+            color: #000;
+            background: linear-gradient(135deg, #00eeff, #00aaff);
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .project-card a:hover {
+            box-shadow: 0 0 15px rgba(0, 238, 255, 0.8);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .page-container {
+                padding: 150px 5% 50px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 30px;
+            }
+            nav a {
+                margin-left: 25px;
+                font-size: 1rem;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            .page-title {
+                font-size: 3rem;
+            }
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">THANISORN J.</a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="projects.html" class="active">Projects</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="page-container">
+        <h1 class="page-title">My Projects</h1>
+        <div class="projects-grid">
+            <div class="project-card">
+                <h3>Interactive 3D Robot Portfolio</h3>
+                <p>The very website you are on! A personal portfolio featuring a 3D robot model that tracks cursor movements, built with Three.js and GSAP. Includes dynamic lighting, animations, and a custom GLB model.</p>
+                <a href="index.html" target="_blank">View Live</a>
+            </div>
+            <div class="project-card">
+                <h3>HearthVoice</h3>
+                <p>A compassionate digital companion for elder people, designed to combat isolation through AI-powered conversations, voice cloning, and animated avatars. 💬 Supports multilingual, personalized interactions that recreate the warmth of family presence.</p>
+                <a href="https://github.com/Book15011/HearthVoice" target="_blank">View on GitHub</a>
+            </div>
+            <div class="project-card">
+                <h3>GVHMR2PBHC</h3>
+                <p>A specialized motion processing pipeline that converts GVHMR's SMPL outputs (.pt) into retargeted PBHC-compatible motions (.pkl), featuring advanced motion stabilization through selective DOF freezing (support for hyperextended robotic motions beyond human limits.</p>
+                <a href="https://github.com/Book15011/GVHMR2PBHC" target="_blank">View on GitHub</a>
+            </div>
+            <div class="project-card">
+                <h3>Minigame_ML</h3>
+                <p>This project 🧠🎯 uses reinforcement learning to train an AI bot for a simplified Chinese Checkers game. The bot learns through self-play, strategic adjustments, and a dynamic reward system 🤖📈 to master optimal moves with Q-learning. Key features include continuous learning, smart decision-making, and adaptive gameplay.</p>
+                <a href="https://github.com/Book15011/Minigame_ML" target="_blank">View on GitHub</a>
+            </div>
+            <div class="project-card">
+                <h3>HandTremors_Project</h3>
+                <p>Robotic arm with an active ball joint that mimics shoulder movement to assist patients with hand tremors. Sensors and control algorithms filter out tremors for smoother motion, offering an alternative to traditional treatments. 🤖💡 </p>
+                <a href="https://github.com/Book15011/HandTremors_Project" target="_blank">View on GitHub</a>
+            </div>
+            <div class="project-card">
+                <h3>VERITAS</h3>
+                <p>VERITAS is an inclusive education app supporting SDG #4, offering Braille learning, multilingual tools, quizzes, and scholarship searches for students with disabilities or financial barriers. Designed for primary to secondary levels globally, it empowers marginalized learners through accessible, personalized education.</p>
+                <a href="https://github.com/Book15011/VERITAS" target="_blank">View on GitHub</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
