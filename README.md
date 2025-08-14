@@ -1,6 +1,8 @@
 # 🤖 Interactive 3D Robot Portfolio
 
-![3D Robot Demo](https://via.placeholder.com/800x400.png?text=3D+Robot+Following+Cursor)
+**Demo**
+https://github.com/user-attachments/assets/4e68ece5-7eed-4db8-8394-c982b7169673
+
 
 A cutting-edge personal portfolio featuring a responsive 3D robot model that dynamically follows cursor movements, built with Three.js and GSAP animations.
 
