@@ -224,7 +224,7 @@
                 this.el = element;
                 this.originalText = this.el.dataset.text;
                 this.words = this.originalText.split(/(\s+)/); // Split by spaces/newlines, keeping them
-                this.chars = '!<>-_\\/[]{}—=+*^?#@~';
+                this.chars = '01';
                 this.isRevealing = false;
 
                 this.init();
@@ -268,13 +268,17 @@
             animateWord(span, word) {
                 return new Promise(async (resolve) => {
                     const len = word.length;
-                    const typingSpeed = 3;
-                    const backspaceSpeed = 30;
-                    const revealSpeed = 70;
+                    const typingSpeed = 0.001;
+                    const backspaceSpeed = 0.00001;
+                    const revealSpeed = 0.00001;
 
                     // 1. Type gibberish
                     for (let i = 0; i < len; i++) {
-                        span.textContent += this.randomChar();
+                        const gibberishChar = this.randomChar();
+                        const gibberishSpan = document.createElement('span');
+                        gibberishSpan.textContent = gibberishChar;
+                        gibberishSpan.style.color = '#636368';
+                        span.appendChild(gibberishSpan);
                         await this.sleep(typingSpeed);
                     }
 
