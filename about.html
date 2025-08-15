@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Me - Thanisorn J.</title>
+    <title>Interactive Scramble Text - Thanisorn J.</title>
     <style>
         /* Common styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,6 +14,7 @@
             font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
             color: white;
             overflow-x: hidden;
+            padding-bottom: 50px;
         }
         
         header {
@@ -105,6 +106,7 @@
             display: inline-block;
             font-weight: 300;
             letter-spacing: 2px;
+            position: relative;
         }
         .about-content {
             display: flex;
@@ -120,6 +122,7 @@
             line-height: 1.8;
             color: rgba(255, 255, 255, 0.85);
             margin-bottom: 20px;
+            position: relative;
         }
         .profile-pic {
             width: 400px;
@@ -129,6 +132,37 @@
             border: 5px solid #3e93fa;
             box-shadow: 0 0 25px #3e93fa;
             flex-shrink: 0;
+        }
+
+        /* Scramble text styles */
+        .scrambled-text {
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.3s ease;
+            max-width: 600px;
+            white-space: pre-line; /* Allows newlines from data-text to render */
+            word-break: break-word;
+            min-height: 1.2em; /* Prevent layout shift on init */
+        }
+        .scrambled-text .word {
+            display: inline-block;
+        }
+        .scrambled-text .cursor {
+            color: #00eeff;
+            animation: blink 1s infinite;
+            display: inline-block;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .scrambled-text.revealed {
+            cursor: default;
+        }
+        .scrambled-text.revealing {
+            cursor: wait;
         }
 
         @media (max-width: 1024px) {
@@ -176,12 +210,107 @@
         <h1 class="page-title">About Me</h1>
         <div class="about-content">
             <div class="about-text">
-                <p>Hello! I'm Thanisorn, a passionate and driven Mechanical Engineering student Year 2 with a passion for ROBOTIC and AI.</p>
-                <p>My engineering background has equipped me with robust problem-solving skills and a solid foundation in mechanics and design. Complementing this, I possess a keen interest in computer science, particularly in developing interactive web applications, exploring artificial intelligence concepts (If you want to know more  VISIT my GITHUB).</p>
-                <p>This website is my digital playground—a place to showcase my projects, share my learnings, and connect with like-minded individuals. When I'm not studying or coding, you can find me on the some game or bed haha.</p>
+                <p>
+                    <span class="scrambled-text" data-text="Hello! I'm Thanisorn, a passionate and driven Mechanical Engineering student (Year 2) with a passion for Robotics and AI.&#10;&#10;My engineering background has equipped me with robust problem-solving skills and a solid foundation in mechanics and design. Complementing this, I possess a keen interest in computer science, particularly in developing interactive web applications and exploring artificial intelligence concepts (If you want to know more, visit my GitHub!).&#10;&#10;This website is my digital playground—a place to showcase my projects, share my learnings, and connect with like-minded individuals. When I'm not studying or coding, you can find me gaming or taking a well-deserved break."></span>
+                </p>
             </div>
             <img src="My_pic.jpg" alt="A photo of Thanisorn J." class="profile-pic">
         </div>
     </div>
+
+    <script>
+        class TextScrambler {
+            constructor(element) {
+                this.el = element;
+                this.originalText = this.el.dataset.text;
+                this.words = this.originalText.split(/(\s+)/); // Split by spaces/newlines, keeping them
+                this.chars = '!<>-_\\/[]{}—=+*^?#@~';
+                this.isRevealing = false;
+
+                this.init();
+            }
+
+            init() {
+                this.el.innerHTML = 'Click to reveal my story... <span class="cursor">|</span>';
+                this.el.addEventListener('click', () => this.start(), { once: true }); // Only allow one click to start
+            }
+
+            async start() {
+                if (this.isRevealing) return;
+                this.isRevealing = true;
+                this.el.classList.add('revealing');
+                this.el.classList.remove('revealed');
+                this.el.innerHTML = ''; // Clear content
+
+                const cursor = document.createElement('span');
+                cursor.className = 'cursor';
+                cursor.textContent = '|';
+
+                for (const word of this.words) {
+                    if (/\s+/.test(word)) { // If it's whitespace
+                        this.el.insertAdjacentText('beforeend', word);
+                    } else {
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'word';
+                        this.el.appendChild(wordSpan);
+                        this.el.appendChild(cursor); // Move cursor after the current word span
+                        await this.animateWord(wordSpan, word);
+                        await this.sleep(120); // Pause between words
+                    }
+                }
+
+                this.el.removeChild(cursor); // Remove cursor at the end
+                this.isRevealing = false;
+                this.el.classList.remove('revealing');
+                this.el.classList.add('revealed');
+            }
+
+            animateWord(span, word) {
+                return new Promise(async (resolve) => {
+                    const len = word.length;
+                    const typingSpeed = 3;
+                    const backspaceSpeed = 30;
+                    const revealSpeed = 70;
+
+                    // 1. Type gibberish
+                    for (let i = 0; i < len; i++) {
+                        span.textContent += this.randomChar();
+                        await this.sleep(typingSpeed);
+                    }
+
+                    // 2. Backspace
+                    await this.sleep(100);
+                    for (let i = 0; i < len; i++) {
+                        span.textContent = span.textContent.slice(0, -1);
+                        await this.sleep(backspaceSpeed);
+                    }
+
+                    // 3. Type correct word
+                    for (let i = 0; i < len; i++) {
+                        span.textContent += word[i];
+                        await this.sleep(revealSpeed);
+                    }
+
+                    resolve();
+                });
+            }
+
+            randomChar() {
+                return this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        // Initialize all scramblers on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const scramblerEl = document.querySelector('.scrambled-text');
+            if (scramblerEl) {
+                new TextScrambler(scramblerEl);
+            }
+        });
+    </script>
 </body>
 </html>
