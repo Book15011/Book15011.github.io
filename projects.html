@@ -379,28 +379,50 @@
             pointer-events: auto;
         }
 
-        body.modal-active .layer.is-modal {
+        .modal-content {
             position: fixed;
-            width: 80vw;
-            max-width: 800px;
-            height: auto;
-            max-height: 80vh;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) !important; /* Remove scale and rotation */
-            z-index: 1001 !important;
+            transform: translate(-50%, -50%);
+            width: 90vw; /* Better for mobile */
+            max-width: 700px; /* More balanced on desktop */
+            height: auto;
+            max-height: 80vh;
+            border-radius: 15px;
+            padding: 30px;
+            background: inherit;
+            z-index: 1001;
             cursor: default;
             overflow-y: auto;
-            /* Reset 3D properties */
-            transform-style: flat !important;
-            backface-visibility: visible !important;
-            perspective: none !important;
-            /* Improve text rendering */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+            transition: background 0.4s ease;
         }
-        .layer.is-modal {
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        
+        .modal-content.active {
+            display: block;
+        }
+        
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            border-radius: 15px;
+            z-index: -1;
+        }
+        
+        .modal-layer-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+            letter-spacing: 1px;
         }
 
         .modal-close-btn {
@@ -689,7 +711,7 @@
                     <div class="layer-title">HearthVoice</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A compassionate AI companion for the elderly, using voice cloning and animated avatars to combat isolation. 💬
+                        A compassionate AI companion for the elderly, using voice cloning and animated avatars to combat isolation. 
                         <a href="https://github.com/Book15011/HearthVoice" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -709,7 +731,7 @@
                     <div class="layer-title">Minigame_ML</div>
                     <div class="divider"></div>
                     <div class="content">
-                        An AI bot trained with reinforcement learning for a simplified Chinese Checkers game, mastering moves with Q-learning. 🧠🎯
+                        An AI bot trained with reinforcement learning for a simplified Chinese Checkers game, mastering moves with Q-learning. 
                         <a href="https://github.com/Book15011/Minigame_ML" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -719,7 +741,7 @@
                     <div class="layer-title">HandTremors Project</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A robotic arm with an active ball joint to assist patients with hand tremors by filtering out unwanted movements. 🤖💡
+                        A robotic arm with an active ball joint to assist patients with hand tremors by filtering out unwanted movements. 
                         <a href="https://github.com/Book15011/HandTremors_Project" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -747,6 +769,9 @@
     </div>
 
     <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal-content" id="modalContent">
+        <!-- Modal content will be injected here -->
+    </div>
     <div class="instructions">← Scroll or use buttons to explore projects | Hover for details | Click to expand</div>
 
     <script>
@@ -759,6 +784,7 @@
             const depthValue = document.getElementById('depthValue');
             const depthProgress = document.getElementById('depthProgress');
             const modalOverlay = document.getElementById('modalOverlay');
+            const modalContent = document.getElementById('modalContent');
             const depthCursor = document.getElementById('depthCursor');
             const depthShadow = document.getElementById('depthShadow');
             
@@ -918,50 +944,47 @@
                 }
             });
             
-            // Modal Logic
+            // NEW MODAL LOGIC
+            function openModal(layer) {
+                // Set the modal's background to match the clicked layer
+                modalContent.style.background = layer.style.background;
+
+                // Populate the modal with the layer's inner content
+                modalContent.innerHTML = layer.innerHTML;
+
+                // Re-query for elements inside the new modal content to adjust them
+                const title = modalContent.querySelector('.layer-title');
+                if (title) title.className = 'modal-layer-title';
+
+                const hoverIndicator = modalContent.querySelector('.hover-indicator');
+                if (hoverIndicator) hoverIndicator.remove();
+                
+                // Add a close button to the modal
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'modal-close-btn';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.addEventListener('click', closeModal);
+                modalContent.appendChild(closeBtn);
+                
+                // Activate the modal view
+                document.body.classList.add('modal-active');
+                modalContent.classList.add('active');
+            }
+
             function closeModal() {
                 document.body.classList.remove('modal-active');
-                const modalLayer = document.querySelector('.layer.is-modal');
-                if (modalLayer) {
-                    modalLayer.classList.remove('is-modal');
-                    const closeBtn = modalLayer.querySelector('.modal-close-btn');
-                    if (closeBtn) closeBtn.remove();
-
-                    // After closing, immediately reposition all layers to restore the stack view.
-                    // The transition on the .layer will handle the animation back to its place.
-                    positionLayers();
-                }
+                modalContent.classList.remove('active');
+                // Reset background for the next modal
+                modalContent.style.background = '';
             }
 
             layers.forEach(layer => {
-                // Click to open modal
                 layer.addEventListener('click', function(event) {
-                    // Don't open the modal if a link inside the card was clicked, or if a modal is already open.
+                    // Don't open modal if a link was clicked or if a modal is already active
                     if (event.target.closest('a') || document.body.classList.contains('modal-active')) {
                         return;
                     }
-
-                    console.log("DEBUG: Opening modal for card ->", this.querySelector('.layer-title').textContent.trim());
-
-                    document.body.classList.add('modal-active');
-                    this.classList.add('is-modal');
-
-                    // This is the key fix: By removing the inline transform, we let the CSS `.is-modal`
-                    // class take full control. This is more reliable than trying to override complex 3D
-                    // transforms with !important and prevents rendering glitches.
-                    this.style.transform = '';
-                    this.style.zIndex = '1001';
-
-                    const closeBtn = document.createElement('button');
-                    closeBtn.className = 'modal-close-btn';
-                    closeBtn.innerHTML = '&times;';
-                    this.appendChild(closeBtn);
-
-                    closeBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        // The closeModal function handles everything.
-                        closeModal();
-                    });
+                    openModal(this);
                 });
             });
             
