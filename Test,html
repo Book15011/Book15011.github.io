@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Tilted Bookshelf UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            perspective: 1200px;
+            scroll-behavior: smooth;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            z-index: 10;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+        
+        .shelf-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            perspective: 2000px;
+        }
+        
+        .layer {
+            position: absolute;
+            width: 80%;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), 
+                        opacity 0.8s ease, 
+                        box-shadow 0.5s ease;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            cursor: pointer;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform-origin: center center;
+        }
+        
+        .layer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.7));
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
+        .layer:hover {
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+        }
+        
+        .layer-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            transition: transform 0.5s ease;
+        }
+        
+        .layer-subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            line-height: 1.5;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            opacity: 0.9;
+        }
+        
+        .divider {
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #e94560, transparent);
+            margin: 30px 0;
+            border: none;
+        }
+        
+        .content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            max-width: 700px;
+            margin-top: 20px;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+        
+        /* Layer-specific styles */
+        .layer:nth-child(1) {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.15) 0%, rgba(142, 45, 226, 0.15) 100%);
+            z-index: 5;
+        }
+        
+        .layer:nth-child(2) {
+            background: linear-gradient(135deg, rgba(0, 168, 150, 0.15) 0%, rgba(0, 82, 212, 0.15) 100%);
+            z-index: 4;
+        }
+        
+        .layer:nth-child(3) {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.15) 0%, rgba(255, 0, 144, 0.15) 100%);
+            z-index: 3;
+        }
+        
+        .layer:nth-child(4) {
+            background: linear-gradient(135deg, rgba(0, 199, 229, 0.15) 0%, rgba(0, 82, 212, 0.15) 100%);
+            z-index: 2;
+        }
+        
+        .layer:nth-child(5) {
+            background: linear-gradient(135deg, rgba(123, 31, 162, 0.15) 0%, rgba(32, 76, 255, 0.15) 100%);
+            z-index: 1;
+        }
+        
+        .instructions {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            z-index: 10;
+        }
+        
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            .layer {
+                width: 90%;
+                height: 350px;
+                padding: 30px;
+            }
+            
+            .layer-title {
+                font-size: 2.5rem;
+            }
+            
+            .layer-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .stats {
+                gap: 20px;
+            }
+            
+            .stat-value {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UNICEPT</h1>
+            <div class="subtitle">DESIGN TO DISCOVER</div>
+        </header>
+        
+        <div class="shelf-container">
+            <!-- Content Layers -->
+            <div class="layer" data-index="1">
+                <div class="layer-title">CREATIVE CONCEPT</div>
+                <div class="divider"></div>
+                <div class="content">
+                    We believe in design that transcends boundaries, creating experiences that resonate on a deeper level and inspire meaningful connections.
+                </div>
+            </div>
+            
+            <div class="layer" data-index="2">
+                <div class="layer-title">DESIGN PHILOSOPHY</div>
+                <div class="divider"></div>
+                <div class="content">
+                    Our approach combines minimalism with functionality, creating spaces and products that stand the test of time while serving real human needs.
+                </div>
+            </div>
+            
+            <div class="layer" data-index="3">
+                <div class="layer-title">PROJECT STATS</div>
+                <div class="divider"></div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">300+</div>
+                        <div class="stat-label">Projects</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Awards</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">98%</div>
+                        <div class="stat-label">Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layer" data-index="4">
+                <div class="layer-title">OUR PROCESS</div>
+                <div class="divider"></div>
+                <div class="content">
+                    From initial concept to final execution, our iterative design process ensures every detail is perfected, resulting in exceptional outcomes that exceed expectations.
+                </div>
+            </div>
+            
+            <div class="layer" data-index="5">
+                <div class="layer-title">VISION & MISSION</div>
+                <div class="divider"></div>
+                <div class="content">
+                    To reshape the design landscape through innovative solutions that balance aesthetics, functionality, and sustainability for a better tomorrow.
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="prevBtn">Previous Layer</button>
+            <button class="btn" id="nextBtn">Next Layer</button>
+        </div>
+    </div>
+    
+    <div class="instructions">Scroll to navigate through the layers | Click to focus | Arrow buttons for precise control</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const layers = document.querySelectorAll('.layer');
+            const shelf = document.querySelector('.shelf-container');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            let currentIndex = 2; // Start with the center layer
+            const maxIndex = layers.length - 1;
+            
+            // Initial positioning of layers
+            function positionLayers() {
+                layers.forEach((layer, index) => {
+                    const dataIndex = parseInt(layer.getAttribute('data-index'));
+                    const zDistance = Math.abs(dataIndex - currentIndex) * 150;
+                    const rotation = (dataIndex - currentIndex) * 30;
+                    const opacity = 1 - (Math.abs(dataIndex - currentIndex) * 0.3);
+                    const scale = 1 - Math.abs(dataIndex - currentIndex) * 0.1;
+                    
+                    layer.style.transform = `
+                        rotateY(${rotation}deg)
+                        translateZ(${-zDistance}px)
+                        scale(${scale})
+                    `;
+                    layer.style.opacity = opacity;
+                    layer.style.zIndex = 5 - Math.abs(dataIndex - currentIndex);
+                });
+            }
+            
+            // Update layers based on current index
+            function updateLayers() {
+                positionLayers();
+                
+                // Update active layer style
+                layers.forEach(layer => {
+                    layer.classList.remove('active');
+                    const dataIndex = parseInt(layer.getAttribute('data-index'));
+                    if (dataIndex === currentIndex) {
+                        layer.classList.add('active');
+                    }
+                });
+            }
+            
+            // Move to next layer
+            nextBtn.addEventListener('click', () => {
+                if (currentIndex < maxIndex) {
+                    currentIndex++;
+                    updateLayers();
+                }
+            });
+            
+            // Move to previous layer
+            prevBtn.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateLayers();
+                }
+            });
+            
+            // Click to focus on layer
+            layers.forEach(layer => {
+                layer.addEventListener('click', function() {
+                    const dataIndex = parseInt(this.getAttribute('data-index'));
+                    currentIndex = dataIndex;
+                    updateLayers();
+                    
+                    // Add a temporary animation effect
+                    this.style.transform += ' scale(0.95)';
+                    setTimeout(() => {
+                        updateLayers();
+                    }, 300);
+                });
+            });
+            
+            // Mouse wheel scrolling
+            window.addEventListener('wheel', function(e) {
+                // Throttle the scroll events
+                if (this.throttleScroll) return;
+                this.throttleScroll = true;
+                
+                setTimeout(() => {
+                    this.throttleScroll = false;
+                }, 150);
+                
+                if (e.deltaY > 0) {
+                    // Scroll down - move to next layer
+                    if (currentIndex < maxIndex) {
+                        currentIndex++;
+                        updateLayers();
+                    }
+                } else {
+                    // Scroll up - move to previous layer
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        updateLayers();
+                    }
+                }
+            });
+            
+            // Initialize
+            updateLayers();
+            
+            // Auto-rotate for demonstration
+            let autoRotate = true;
+            setInterval(() => {
+                if (autoRotate) {
+                    if (currentIndex < maxIndex) {
+                        currentIndex++;
+                    } else {
+                        currentIndex = 0;
+                    }
+                    updateLayers();
+                }
+            }, 4000);
+            
+            // Stop auto-rotate on interaction
+            shelf.addEventListener('mouseenter', () => {
+                autoRotate = false;
+            });
+            
+            shelf.addEventListener('mouseleave', () => {
+                autoRotate = true;
+            });
+        });
+    </script>
+</body>
+</html>
