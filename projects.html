@@ -711,7 +711,7 @@
                     <div class="layer-title">HearthVoice</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A compassionate AI companion for the elderly, using voice cloning and animated avatars to combat isolation. 
+                        A compassionate AI companion for the elderly, using voice cloning and animated avatars to combat isolation. 💬
                         <a href="https://github.com/Book15011/HearthVoice" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -731,7 +731,7 @@
                     <div class="layer-title">Minigame_ML</div>
                     <div class="divider"></div>
                     <div class="content">
-                        An AI bot trained with reinforcement learning for a simplified Chinese Checkers game, mastering moves with Q-learning. 
+                        An AI bot trained with reinforcement learning for a simplified Chinese Checkers game, mastering moves with Q-learning. 🧠🎯
                         <a href="https://github.com/Book15011/Minigame_ML" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -741,7 +741,7 @@
                     <div class="layer-title">HandTremors Project</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A robotic arm with an active ball joint to assist patients with hand tremors by filtering out unwanted movements. 
+                        A robotic arm with an active ball joint to assist patients with hand tremors by filtering out unwanted movements. 🤖💡
                         <a href="https://github.com/Book15011/HandTremors_Project" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -772,7 +772,7 @@
     <div class="modal-content" id="modalContent">
         <!-- Modal content will be injected here -->
     </div>
-    <div class="instructions">← Scroll or use buttons to explore projects | Hover for details | Click to expand</div>
+    <div class="instructions">Scroll or use buttons to explore | Hover for details | Click to expand</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -787,15 +787,14 @@
             const modalContent = document.getElementById('modalContent');
             const depthCursor = document.getElementById('depthCursor');
             const depthShadow = document.getElementById('depthShadow');
+            const instructions = document.querySelector('.instructions');
+            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || /Mobi/i.test(navigator.userAgent);
             
             let hoveredLayer = null;
             let currentDepth = Math.floor(layers.length / 2); // Start at the middle layer
             const maxDepth = layers.length - 1;
             const zStep = 200; // Depth step between layers
             const scaleStep = 0.1; // Scale reduction per layer
-            
-            // Initial positioning of layers
-            positionLayers();
             
             // Update layers based on current depth
             function positionLayers() {
@@ -832,65 +831,83 @@
                 depthValue.textContent = `${currentDepth + 1}/${layers.length}`;
                 depthProgress.style.width = `${(currentDepth / maxDepth) * 100}%`;
                 
-                // Rotate entire stack for perspective
-                layersStack.style.transform = `rotateY(-27deg) rotateX(-15deg) rotateZ(10deg) scale(0.8)`;
+                // Rotate entire stack for perspective, with a simpler version for mobile
+                if (isMobile) {
+                    layersStack.style.transform = `rotateX(-15deg) scale(0.8)`;
+                } else {
+                    layersStack.style.transform = `rotateY(-27deg) rotateX(-15deg) rotateZ(10deg) scale(0.8)`;
+                }
             }
             
             // Enhanced hover effect with depth
-            layers.forEach(layer => {
-                layer.addEventListener('mouseenter', function() {
-                    if (document.body.classList.contains('modal-active')) return;
-                    hoveredLayer = this;
-                    
-                    // Calculate hover effect - bring forward, scale up, and peek to the right
-                    const hoverTranslateZ = 80; // Bring all cards to a consistent Z depth on hover
-                    const hoverScale = 1.2; // Scale up consistently
-                    const peekTranslateX = 400; // Move it significantly to the right
-                    const peekRotateY = 2; // Rotate it slightly to face the user
-                    
-                    
-                    this.style.transform = `
-                        translate(-50%, -50%)
-                        translateX(${peekTranslateX}px)
-                        translateY(0px)
-                        translateZ(${hoverTranslateZ}px)
-                        scale(${hoverScale})
-                        rotateY(${peekRotateY}deg)
-                    `;
-                    this.style.zIndex = layers.length + 10;
-                    
-                    // Show depth cursor effect
-                    depthCursor.style.opacity = 1;
-                    depthShadow.style.opacity = 0.8;
-                });
+            if (!isMobile) {
+                layers.forEach(layer => {
+                    layer.addEventListener('mouseenter', function(e) {
+                        if (document.body.classList.contains('modal-active')) return;
 
-                layer.addEventListener('mouseleave', function() {
-                    if (document.body.classList.contains('modal-active')) return;
-                    hoveredLayer = null;
-                    
-                    const depthDiff = parseInt(this.dataset.depthDiff);
-                    const absDepth = Math.abs(depthDiff);
-                    
-                    // Return to original position
-                    const translateZ = depthDiff * -zStep;
-                    const scale = 1 - absDepth * scaleStep;
-                    const translateX = depthDiff * 40;
-                    const translateY = -absDepth * 20;
-                    
-                    this.style.transform = `
-                        translate(-50%, -50%)
-                        translateX(${translateX}px)
-                        translateY(${translateY}px)
-                        translateZ(${translateZ}px)
-                        scale(${scale})
-                    `;
-                    this.style.zIndex = layers.length - absDepth;
-                    
-                    // Hide depth cursor effect
-                    depthCursor.style.opacity = 0;
-                    depthShadow.style.opacity = 0;
+                        // Find the topmost layer at the cursor's position to prevent
+                        // hover effects from firing on multiple overlapping layers.
+                        const elements = document.elementsFromPoint(e.clientX, e.clientY);
+                        const topLayer = elements.find(el => el.classList.contains('layer'));
+
+                        // If this layer is not the topmost one, do nothing.
+                        if (topLayer !== this) return;
+
+                        hoveredLayer = this;
+
+                        const depthDiff = parseInt(this.dataset.depthDiff);
+                        const absDepth = Math.abs(depthDiff);
+                        const originalTranslateY = -absDepth * 20;
+
+                        // A more direct "peek" that comes forward and turns to the user.
+                        const hoverTranslateZ = 400; // Bring forward
+                        const hoverScale = 1.15;     // Scale up
+                        const peekTranslateX = 350;  // Move right
+                        const peekRotateY = 1;      // Turn significantly to face the user, counteracting the stack's rotation.
+                        
+                        this.style.transform = `
+                            translate(-50%, -50%)
+                            translateY(${originalTranslateY}px)
+                            translateZ(${hoverTranslateZ}px)
+                            scale(${hoverScale})
+                            rotateY(${peekRotateY}deg) /* Turn the card first... */
+                            translateX(${peekTranslateX}px) /* ...then move it right */
+                        `;
+                        this.style.zIndex = layers.length + 10;
+                        
+                        // Show depth cursor effect
+                        depthCursor.style.opacity = 1;
+                        depthShadow.style.opacity = 0.8;
+                    });
+
+                    layer.addEventListener('mouseleave', function() {
+                        if (document.body.classList.contains('modal-active')) return;
+                        hoveredLayer = null;
+                        
+                        const depthDiff = parseInt(this.dataset.depthDiff);
+                        const absDepth = Math.abs(depthDiff);
+                        
+                        // Return to original position
+                        const translateZ = depthDiff * -zStep;
+                        const scale = 1 - absDepth * scaleStep;
+                        const translateX = depthDiff * 50; // Corrected to match positionLayers()
+                        const translateY = -absDepth * 20;
+                        
+                        this.style.transform = `
+                            translate(-50%, -50%)
+                            translateX(${translateX}px)
+                            translateY(${translateY}px)
+                            translateZ(${translateZ}px)
+                            scale(${scale})
+                        `;
+                        this.style.zIndex = layers.length - absDepth;
+                        
+                        // Hide depth cursor effect
+                        depthCursor.style.opacity = 0;
+                        depthShadow.style.opacity = 0;
+                    });
                 });
-            });
+            }
             
             // Move to next layer
             nextBtn.addEventListener('click', () => {
@@ -911,38 +928,42 @@
             });
             
             // Mouse wheel scrolling
-            window.addEventListener('wheel', function(e) {
-                // Throttle the scroll events
-                if (this.throttleScroll) return;
-                this.throttleScroll = true;
-                
-                setTimeout(() => {
-                    this.throttleScroll = false;
-                }, 1000); // Increased timeout to make scrolling less sensitive.
-                         // This prevents a single scroll action from triggering
-                         // multiple project changes in quick succession.
-                
-                const changeAndPositionLayers = () => {
-                    if (e.deltaY > 0) {
-                        // Scroll down - move to next layer
-                        currentDepth = (currentDepth + 1) % layers.length;
-                    } else {
-                        // Scroll up - move to previous layer
-                        currentDepth = (currentDepth - 1 + layers.length) % layers.length;
-                    }
-                    positionLayers();
-                };
+            if (!isMobile) {
+                window.addEventListener('wheel', function(e) {
+                    if (this.throttleScroll) return;
+                    this.throttleScroll = true;
+                    setTimeout(() => { this.throttleScroll = false; }, 700);
+                    
+                    const changeAndPositionLayers = () => {
+                        if (e.deltaY > 0) {
+                            currentDepth = (currentDepth + 1) % layers.length;
+                        } else {
+                            currentDepth = (currentDepth - 1 + layers.length) % layers.length;
+                        }
+                        positionLayers();
+                    };
 
-                if (hoveredLayer) {
-                    // If a layer is peeking, trigger its mouseleave to close it first
-                    hoveredLayer.dispatchEvent(new Event('mouseleave'));
-                    // Wait for the close animation to start before changing depth
-                    setTimeout(changeAndPositionLayers, 150);
-                } else {
-                    // If no layer is peeking, change depth immediately
-                    changeAndPositionLayers();
-                }
-            });
+                    if (hoveredLayer) {
+                        hoveredLayer.dispatchEvent(new Event('mouseleave'));
+                        setTimeout(changeAndPositionLayers, 150);
+                    } else {
+                        changeAndPositionLayers();
+                    }
+                });
+            } else {
+                // Add swipe gestures for mobile
+                let touchStartX = 0;
+                layersStack.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+                layersStack.addEventListener('touchend', e => {
+                    const touchEndX = e.changedTouches[0].screenX;
+                    if (Math.abs(touchEndX - touchStartX) < 50) return; // Swipe threshold
+                    if (touchEndX < touchStartX) {
+                        nextBtn.click(); // Swipe left
+                    } else {
+                        prevBtn.click(); // Swipe right
+                    }
+                }, { passive: true });
+            }
             
             // NEW MODAL LOGIC
             function openModal(layer) {
@@ -992,31 +1013,33 @@
 
             // Auto-explore for demonstration
             let autoExplore = true;
-            setInterval(() => {
-                if (autoExplore) {
+            const autoExploreInterval = setInterval(() => {
+                if (autoExplore && !document.body.classList.contains('modal-active')) {
                     currentDepth = (currentDepth + 1) % layers.length;
                     positionLayers();
                 }
             }, 5000);
             
-            // Stop auto-explore on interaction
-            layersStack.addEventListener('mouseenter', () => {
-                autoExplore = false;
-            });
-            
-            layersStack.addEventListener('mouseleave', () => {
-                autoExplore = true;
+            // Stop auto-explore on any user interaction
+            const stopAutoExplore = () => { autoExplore = false; };
+            ['click', 'wheel', 'touchstart', 'mouseenter'].forEach(evt => {
+                document.body.addEventListener(evt, stopAutoExplore, { once: true });
             });
             
             // Depth cursor effect on mouse move
-            document.addEventListener('mousemove', (e) => {
-                const x = e.clientX;
-                const y = e.clientY;
-                depthCursor.style.left = `${x}px`;
-                depthCursor.style.top = `${y}px`;
-                depthShadow.style.left = `${x}px`;
-                depthShadow.style.top = `${y}px`;
-            });
+            if (!isMobile) {
+                document.addEventListener('mousemove', (e) => {
+                    depthCursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+                    depthShadow.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+                });
+            } else {
+                depthCursor.style.display = 'none';
+                depthShadow.style.display = 'none';
+            }
+
+            // Set initial state
+            instructions.textContent = isMobile ? 'Swipe or use buttons to explore | Tap to expand' : 'Scroll or use buttons to explore | Hover for details | Click to expand';
+            positionLayers();
         });
     </script>
 </body>
