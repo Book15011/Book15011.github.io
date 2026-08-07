@@ -1,1003 +1,608 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Thanisorn's Web</title>
-    <link rel="icon" href="favicon.png" type="image/png">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-            color: white;
-            transition: background 1s ease;
-        }
-        
-        #container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-        }
-        
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        /* Navigation / Header */
-        /* Updated Header Styles for index.html */
-        header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 3;
-            background: rgba(10, 10, 20, 0.7); /* Darker background */
-            backdrop-filter: blur(10px); /* Glass effect */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle divider */
-            pointer-events: all;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Thanisorn J. — Quant Developer &amp; Robotics Engineer</title>
+<meta name="description" content="Portfolio of Thanisorn J., a Mechanical &amp; Automation Engineering student bridging algorithmic trading with robotics. Choose a track: Quantitative Developer or Robotics Engineer.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Inter:wght@300;400;500;600;700;800&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --q-bg:#05070c;
+    --q-bg2:#0b1220;
+    --q-text:#eef1f6;
+    --q-muted:#9aa3b5;
+    --q-accent:#3ecf8e;
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 300; /* Thinner font weight */
-            letter-spacing: 3px;
-            text-decoration: none;
-            color: white;
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif; /* More refined font */
-            position: relative;
-            pointer-events: all;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    --r-bg:#0f0c29;
+    --r-bg2:#302b63;
+    --r-bg3:#24243e;
+    --r-accent:#00eeff;
 
-        .logo::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: #00eeff;
-            transition: width 0.4s ease;
-        }
+    --ink:#04050a;
+  }
 
-        .logo:hover::after {
-            width: 100%;
-        }
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-        nav {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: 12px;
-        }
+  html,body{ min-height:100%; }
 
-        nav a {
-            margin-left: 40px;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 400;
-            font-size: 1.1rem;
-            letter-spacing: 1.5px;
-            position: relative;
-            padding-bottom: 5px;
-            transition: color 0.3s ease;
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-        }
-        nav a::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #00eeff;
-            transition: width 0.4s ease;
-        }
+  body{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Inter', 'Segoe UI', sans-serif;
+    overflow-x:hidden;
+  }
 
-        nav a:hover {
-            color: white;
-        }
+  .skip-link{
+    position:absolute;
+    left:-999px; top:0;
+    background:#000; color:#fff;
+    padding:10px 16px;
+    z-index:100;
+    font-size:0.85rem;
+  }
+  .skip-link:focus{ left:12px; top:12px; }
 
-        nav a:hover::before {
-            width: 100%;
-        }
+  .gateway{
+    display:flex;
+    min-height:100vh;
+    width:100%;
+  }
 
-        nav a.active {
-            color: white;
-            font-weight: 500;
-            background: rgba(0, 238, 255, 0.15);
-            border-color: rgba(0, 238, 255, 0.3);
-        }
+  /* ---------------- Panels ---------------- */
+  .panel{
+    position:relative;
+    flex:1 1 0;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    text-decoration:none;
+    color:inherit;
+    isolation:isolate;
+  }
 
-        nav a.active::before {
-            width: 100%;
-            background: #00eeff;
-        }
+  .panel-canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    z-index:0;
+  }
 
-        /* Main Content Area */
-        .overlay-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 10px;
-        }
+  .panel-content{
+    position:relative;
+    z-index:2;
+    padding:0 clamp(28px, 6vw, 90px);
+    max-width:560px;
+  }
 
-        .overlay-content > div {
-            pointer-events: all;
-            width: 100%;
-            max-width: 800px;
-            padding: 0 15px;
-        }
+  .panel-eyebrow{
+    font-family:'Roboto Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    margin-bottom:16px;
+    opacity:0.85;
+  }
 
+  .panel-title{
+    font-size:clamp(2.1rem, 4.4vw, 3.7rem);
+    line-height:1.08;
+    letter-spacing:0.4px;
+  }
 
+  .panel-subtitle{
+    font-size:clamp(0.95rem, 1.4vw, 1.1rem);
+    margin-top:16px;
+    max-width:320px;
+    line-height:1.55;
+  }
 
-        .overlay-content p {
-            font-size: clamp(1rem, 4vw, 1.5rem);
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 30px;
-            max-width: 80%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .glowing-text {
-            font-size: clamp(2rem, 8vw, 4rem);
-            text-shadow: 
-                0 0 10px #00eeff,
-                0 0 20px #1159f5,
-                0 0 40px #00eeff;
-            margin-top: 50px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px 25px;
-            border-radius: 15px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(0, 238, 255, 0.3);
-            animation: pulse 3s infinite ease-in-out;
-            width: 90%;
-            margin: 20px auto 0;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
-        
-        .controls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 3;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 12px 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 238, 255, 0.3);
-            backdrop-filter: blur(5px);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* --- Model Selector Styles --- */
-        .model-selector-container {
-            position: relative;
-            display: flex;
-            flex: 1;
-            min-width: 120px;
-        }
+  .panel-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:30px;
+    font-family:'Roboto Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    font-weight:500;
+  }
+  .panel-cta svg{ width:16px; height:16px; transition:transform 0.3s ease; }
+  .panel:hover .panel-cta svg{ transform:translateX(5px); }
 
-        #modelSelectorBtn {
-            width: 100%;
-            position: relative;
-            padding-right: 30px;
-        }
+  .panel-subtitle, .panel-cta{ opacity:1; transform:none; }
 
-        #modelSelectorBtn::after {
-            content: "▼";
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.8rem;
-        }
+  .panel:focus-visible{ outline:none; }
 
-        .model-options {
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid rgba(0, 238, 255, 0.3);
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 8px;
-            opacity: 0;
-            transform: translateY(10px);
-            pointer-events: none;
-            transition: all 0.3s ease;
-            z-index: 4;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
+  /* Quant panel identity */
+  .panel--quant{
+    background:
+      radial-gradient(60% 60% at 12% 50%, rgba(4,6,10,0.8), transparent 70%),
+      radial-gradient(130% 150% at 10% 15%, var(--q-bg2) 0%, var(--q-bg) 62%, var(--q-bg) 100%);
+  }
+  .panel--quant .panel-eyebrow{ color:var(--q-accent); }
+  .panel--quant .panel-title{ font-family:'Playfair Display', serif; font-weight:700; color:var(--q-text); }
+  .panel--quant .panel-subtitle{ font-family:'Inter', sans-serif; color:var(--q-muted); }
+  .panel--quant .panel-cta{ color:var(--q-accent); }
+  .panel--quant:focus-visible{ box-shadow: inset 0 0 0 2px rgba(62,207,142,0.75); }
 
-        .model-options.show {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: all;
-        }
+  /* Robotics panel identity */
+  .panel--robotics{
+    background:
+      radial-gradient(60% 60% at 88% 50%, rgba(4,6,10,0.75), transparent 70%),
+      radial-gradient(130% 150% at 90% 15%, var(--r-bg2) 0%, var(--r-bg3) 55%, var(--r-bg) 100%);
+  }
+  .panel--robotics .panel-eyebrow{ color:var(--r-accent); }
+  .panel--robotics .panel-title{
+    font-family:'Inter', sans-serif;
+    font-weight:800;
+    text-transform:uppercase;
+    color:#fff;
+    text-shadow:0 0 26px rgba(0,238,255,0.35);
+  }
+  .panel--robotics .panel-subtitle{ font-family:'Inter', sans-serif; color:rgba(255,255,255,0.68); }
+  .panel--robotics .panel-cta{ color:var(--r-accent); }
+  .panel--robotics:focus-visible{ box-shadow: inset 0 0 0 2px rgba(0,238,255,0.75); }
 
-        .model-option-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 238, 255, 0.3);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+  /* cyberpunk scanline, robotics only */
+  .panel--robotics::before{
+    content:'';
+    position:absolute;
+    left:0; right:0;
+    height:160px;
+    background:linear-gradient(180deg, transparent, rgba(0,238,255,0.09), transparent);
+    animation:scan 7s linear infinite;
+    pointer-events:none;
+    z-index:1;
+  }
+  @keyframes scan{
+    0%{ transform:translateY(-180px); }
+    100%{ transform:translateY(110vh); }
+  }
 
-        .model-option-btn:hover, .model-option-btn:focus {
-            background: #00eeff;
-            color: #0f0c29;
-            transform: translateY(-2px);
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #00eeff, #00aaff);
-            border: none;
-            color: #000;
-            padding: 10px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            pointer-events: all;
-            box-shadow: 0 0 15px rgba(0, 238, 255, 0.5);
-            font-size: clamp(0.85rem, 3vw, 1rem);
-            flex: 1;
-            min-width: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn:hover, .btn:focus {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 25px rgba(0, 238, 255, 0.8);
-        }
-        
-        .btn i {
-            font-size: 1.2em;
-        }
-        
-        .loading-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0f0c29;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            transition: opacity 0.8s ease-out;
-        }
-        
-        .loading-text {
-            font-size: clamp(1.2rem, 5vw, 2rem);
-            margin-bottom: 25px;
-            color: #00eeff;
-            text-align: center;
-            padding: 0 20px;
-            text-shadow: 0 0 10px rgba(0, 238, 255, 0.7);
-        }
-        
-        .progress-bar {
-            width: 80%;
-            max-width: 350px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .progress {
-            height: 100%;
-            background: linear-gradient(90deg, #00eeff, #00aaff);
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 5px;
-        }
+  /* Hover / focus reveal — desktop pointer devices only */
+  @media (hover:hover) and (pointer:fine){
+    .panel-subtitle, .panel-cta{
+      opacity:0;
+      transform:translateY(10px);
+      transition:opacity 0.5s ease, transform 0.5s ease;
+    }
+    .panel-title{ transition:transform 0.6s ease; display:inline-block; }
+    .panel:hover .panel-title, .panel:focus-visible .panel-title{ transform:scale(1.03); }
+    .panel:hover .panel-subtitle, .panel:focus-visible .panel-subtitle,
+    .panel:hover .panel-cta, .panel:focus-visible .panel-cta{
+      opacity:1;
+      transform:translateY(0);
+    }
+  }
 
-        .mobile-warning {
-            display: none;
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 4;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 100, 100, 0.5);
-            backdrop-filter: blur(5px);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            animation: float 3s ease-in-out infinite;
-        }
+  /* ---------------- Divider ---------------- */
+  .divider{
+    flex:0 0 auto;
+    width:clamp(56px, 8vw, 110px);
+    background:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    position:relative;
+    z-index:3;
+    padding:24px 0;
+    border-left:1px solid rgba(255,255,255,0.07);
+    border-right:1px solid rgba(255,255,255,0.07);
+  }
+  .divider-line{
+    width:1px;
+    flex:1;
+    background:linear-gradient(180deg, transparent, rgba(255,255,255,0.18), transparent);
+  }
+  .divider-badge{
+    flex-shrink:0;
+    width:46px; height:46px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Playfair Display', serif;
+    font-size:1rem;
+    letter-spacing:1px;
+    color:#fff;
+  }
 
-        @keyframes float {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-8px); }
-        }
+  /* ---------------- Masthead ---------------- */
+  .masthead{
+    position:absolute;
+    top:28px; left:50%;
+    transform:translateX(-50%);
+    z-index:6;
+    text-align:center;
+    pointer-events:none;
+    background:rgba(4,5,10,0.45);
+    backdrop-filter:blur(6px);
+    padding:10px 26px;
+    border-radius:24px;
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .masthead-name{
+    font-family:'Inter', sans-serif;
+    font-size:0.85rem;
+    font-weight:500;
+    letter-spacing:3px;
+    color:rgba(255,255,255,0.9);
+  }
+  .masthead-tagline{
+    font-family:'Roboto Mono', monospace;
+    font-size:0.66rem;
+    letter-spacing:1.5px;
+    color:rgba(255,255,255,0.45);
+    margin-top:5px;
+  }
 
-        /* Status indicator for dance mode */
-        .status-indicator {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 3;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 238, 255, 0.3);
-            backdrop-filter: blur(5px);
-            font-size: 0.9rem;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #00eeff;
-            box-shadow: 0 0 8px #00eeff;
-        }
-        
-        /* Particles background effect */
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
+  /* ---------------- Mobile ---------------- */
+  @media (max-width:768px){
+    .gateway{ flex-direction:column; }
 
-        /* Mobile-specific adjustments */
-        @media (max-width: 768px) {
-            header {
-                padding: 15px 5%;
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .logo {
-                margin-bottom: 5px;
-            }
-            
-            nav {
-                justify-content: center;
-            }
-            
-            .glowing-text {
-                margin-top: 20px;
-                padding: 12px 20px;
-                font-size: clamp(1.6rem, 7vw, 2.5rem); /* Better mobile sizing */
-            }
-                
-            .controls {
-                bottom: 90px; /* Raised to be visible above mobile browser UI */
-                gap: 10px;
-                padding: 10px;
-            }
-            
-            .overlay-content p {
-                margin-bottom: 20px;
-                max-width: 90%;
-            }
-            
-            .mobile-warning {
-                display: block;
-                bottom: 170px; /* Raised to make space for the controls */
-            }
-            
-            .model-selector-container, .btn {
-                min-width: 100px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .btn {
-                min-width: 90px;
-                padding: 8px 12px;
-            }
-            
-            nav a {
-                padding: 6px 10px;
-                font-size: 0.85rem;
-            }
-            
-            .glowing-text {
-                padding: 10px 15px;
-                font-size: clamp(1.5rem, 7vw, 2rem); /* Even better for small screens */
-            }
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    .divider{
+      flex-direction:row;
+      width:100%;
+      height:56px;
+      padding:0 24px;
+      border-left:none; border-right:none;
+      border-top:1px solid rgba(255,255,255,0.07);
+      border-bottom:1px solid rgba(255,255,255,0.07);
+    }
+    .divider-line{ width:auto; height:1px; flex:1; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent); }
+    .divider-badge{ width:36px; height:36px; font-size:0.8rem; }
+
+    .panel{ min-height:0; }
+    .panel-content{ padding:0 28px; max-width:100%; }
+    .panel-title{ font-size:clamp(2rem, 8vw, 2.6rem); }
+
+    .masthead{ top:14px; padding:8px 18px; }
+    .masthead-name{ font-size:0.7rem; letter-spacing:2px; }
+    .masthead-tagline{ font-size:0.58rem; }
+  }
+
+  @media (max-width:400px){
+    .panel-content{ padding:0 22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .panel--robotics::before{ animation:none; opacity:0.5; }
+    *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  }
+</style>
 </head>
 <body>
-    <div id="container">
-        <div class="particles" id="particles"></div>
-        <div id="canvas-container"></div>
-        
-        <header>
-            <a href="index.html" class="logo">THANISORN J.</a>
-            <nav>
-                <a href="index.html" class="active"><i class="fas fa-home"></i> Home</a>
-                <a href="about.html"><i class="fas fa-user"></i> About</a>
-                <a href="projects.html"><i class="fas fa-code"></i> Projects</a>
-                <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
-            </nav>
-        </header>
-        
-        <div class="status-indicator" id="statusIndicator">
-            <div class="status-dot"></div>
-            <span>Dance Mode: On</span>
-        </div>
+<a class="skip-link" href="#gateway">Skip to content</a>
 
-        <div class="overlay-content">
-            <div>
-                <h1 class="glowing-text">HELLO, I'M BOOK</h1>
-                <p>Mechanical Engineering Student & Robotics Enthusiast</p>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <div class="model-selector-container">
-                <button class="btn" id="modelSelectorBtn"><i class="fas fa-robot"></i> Model</button>
-                <div class="model-options" id="modelOptions">
-                    <!-- Options will be generated by JS -->
-                </div>
-            </div>
-            <button class="btn" id="colorBtn"><i class="fas fa-palette"></i> Color</button>
-            <button class="btn" id="danceBtn"><i class="fas fa-music"></i> Dance</button>
-        </div>
-        
-        <div class="mobile-warning">
-            <i class="fas fa-hand-pointer"></i> Touch & drag to move the robot! Tap for special effect.
-        </div>
-        
-        <div class="loading-screen" id="loadingScreen">
-            <div class="loading-text">LOADING ROBOT MODEL</div>
-            <div class="progress-bar">
-                <div class="progress" id="progressBar"></div>
-            </div>
-        </div>
+<div class="masthead" aria-hidden="true">
+  <div class="masthead-name">THANISORN&nbsp;J.</div>
+  <div class="masthead-tagline">TWO DISCIPLINES · ONE BUILDER</div>
+</div>
+
+<main class="gateway" id="gateway">
+
+  <a href="quant.html" class="panel panel--quant" id="panel-quant" aria-label="Quantitative Developer track — Algorithmic Trading and Data Science">
+    <canvas class="panel-canvas" id="canvas-quant" aria-hidden="true"></canvas>
+    <div class="panel-content">
+      <p class="panel-eyebrow">Track&nbsp;01</p>
+      <h2 class="panel-title">Quantitative<br>Developer</h2>
+      <p class="panel-subtitle">Algorithmic Trading &amp; Data Science</p>
+      <span class="panel-cta">Enter
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </span>
     </div>
+  </a>
 
-    <!-- Include Three.js and GLTFLoader -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.8.0/gsap.min.js"></script>
-    
-    <script>
-        // Main variables
-        let scene, camera, renderer, robotModel;
-        let targetRotation = { x: 0, y: 0 };
-        let currentRotation = { x: 0, y: 0 };
-        const easeFactor = 0.05;
-        let isGlitching = false;
-        let glitchTimeout;
-        let currentHue = 180;
-        let danceState = 0; // 0: not dancing, 1: dance type 1, 2: dance type 2
-        let danceAnimation; // To hold the GSAP timeline
-        let isMobile = false;
-        let originalMaterials = new Map();
-        let colorChangeCount = 0;
-        
-        // Model Configuration
-        const models = [
-            { name: 'Standard Bot', path: 'robot_1.glb', scale: { desktop: 0.8, mobile: 0.6 }, positionY: { desktop: -1, mobile: -0.8 } },
-            { name: 'Gun Bot', path: 'robot_2.glb', scale: { desktop: 0.19, mobile: 0.1 }, positionY: { desktop: -1.2, mobile: -1.0 } },
-            { name: 'Small Bot', path: 'robot_3.glb', scale: { desktop: 2.5, mobile: 2 }, positionY: { desktop: -0.9, mobile: -0.7 } },
-            { name: 'Heavy Bot', path: 'robot_4.glb', scale: { desktop: 0.8, mobile: 0.6 }, positionY: { desktop: -1.5, mobile: -1.2 } },
-        ];
-        let currentModelIndex = 0;
-        
-        // Initialize the scene
-        function init() {
-            // Detect mobile devices
-            isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            
-            // Create scene
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0f0c29);
-            scene.fog = new THREE.Fog(0x0f0c29, 10, 30);
-            
-            // Create camera
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = isMobile ? 6 : 5;
-            camera.position.y = isMobile ? 1.5 : 1;
-            
-            // Create renderer
-            const canvasContainer = document.getElementById('canvas-container');
-            renderer = new THREE.WebGLRenderer({ 
-                antialias: true,
-                alpha: true,
-                powerPreference: isMobile ? "low-power" : "high-performance"
-            });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = !isMobile;
-            canvasContainer.appendChild(renderer.domElement);
-            
-            // Add lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0x00eeff, 1.2);
-            directionalLight.position.set(5, 3, 5);
-            directionalLight.castShadow = !isMobile;
-            scene.add(directionalLight);
-            
-            const pointLight = new THREE.PointLight(0xff6b6b, 1, 100);
-            pointLight.position.set(-5, -3, -5);
-            pointLight.castShadow = !isMobile;
-            scene.add(pointLight);
-            
-            // Create a grid for the floor
-            const gridHelper = new THREE.GridHelper(20, 20, 0x00eeff, 0x0088ff);
-            gridHelper.position.y = -2;
-            scene.add(gridHelper);
-            
-            // Add particles
-            createParticles();
-            
-            // Load initial robot model
-            loadRobotModel(models[currentModelIndex]);
-            
-            // Event listeners
-            window.addEventListener('resize', onWindowResize);
-            
-            // Mouse and touch events
-            if (isMobile) {
-                document.addEventListener('touchmove', onTouchMove, { passive: false });
-                document.getElementById('canvas-container').addEventListener('touchstart', onTouchStart);
-            } else {
-                document.addEventListener('mousemove', onMouseMove);
-                document.getElementById('canvas-container').addEventListener('click', onMouseClick);
-            }
-            
-            // Button listeners
-            setupModelSelector();
-            document.getElementById('colorBtn').addEventListener('click', changeRobotColor);
-            document.getElementById('danceBtn').addEventListener('click', toggleDance);
+  <div class="divider" aria-hidden="true">
+    <span class="divider-line"></span>
+    <span class="divider-badge">TJ</span>
+    <span class="divider-line"></span>
+  </div>
 
-            // Navigation links
-            document.querySelectorAll('header a').forEach(link => {
-                if (new URL(link.href).pathname === window.location.pathname) {
-                    return;
-                }
+  <a href="robotics.html" class="panel panel--robotics" id="panel-robotics" aria-label="Robotics Engineer track — Hardware Prototyping and System Integration">
+    <canvas class="panel-canvas" id="canvas-robotics" aria-hidden="true"></canvas>
+    <div class="panel-content">
+      <p class="panel-eyebrow">Track&nbsp;02</p>
+      <h2 class="panel-title">Robotics<br>Engineer</h2>
+      <p class="panel-subtitle">Hardware Prototyping &amp; System Integration</p>
+      <span class="panel-cta">Enter
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </span>
+    </div>
+  </a>
 
-                link.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    glitchAndNavigate(link.href);
-                });
-            });
-            
-            // Start animation loop
-            animate();
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Canvas field engine (shared by both panels) ---------- */
+  function createFieldCanvas(canvas, cfg) {
+    const ctx = canvas.getContext('2d');
+    let width = 0, height = 0, dpr = 1;
+    let nodes = [];
+    let ticks = [];
+    let intensity = 0;
+    let targetIntensity = 0;
+    let rafId = null;
+    let last = 0;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = Math.max(rect.width, 1);
+      height = Math.max(rect.height, 1);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      initNodes();
+      if (cfg.ticker) initTicker();
+    }
+
+    function initNodes() {
+      const count = cfg.nodeCount || Math.max(14, Math.round((width * height) / 26000));
+      nodes = Array.from({ length: count }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        r: Math.random() * 1.4 + 0.7
+      }));
+    }
+
+    function initTicker() {
+      const lineCount = cfg.tickerLines || 3;
+      const pointCount = 42;
+      ticks = Array.from({ length: lineCount }, (_, li) => {
+        const base = height * (0.22 + li * 0.24) + (Math.random() - 0.5) * 24;
+        const pts = [];
+        let val = base;
+        for (let i = 0; i < pointCount; i++) {
+          val += (Math.random() - 0.5) * 9;
+          val = base + (val - base) * 0.65;
+          pts.push(val);
         }
-        
-        // Create background particles
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = isMobile ? 30 : 50;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.cssText = `
-                    position: absolute;
-                    width: ${Math.random() * 4 + 2}px;
-                    height: ${Math.random() * 4 + 2}px;
-                    background: rgba(0, 238, 255, ${Math.random() * 0.4 + 0.1});
-                    border-radius: 50%;
-                    box-shadow: 0 0 10px rgba(0, 238, 255, 0.7);
-                    top: ${Math.random() * 100}%;
-                    left: ${Math.random() * 100}%;
-                    opacity: ${Math.random() * 0.5 + 0.3};
-                `;
-                
-                // Animate particles
-                gsap.to(particle, {
-                    x: Math.random() * 100 - 50,
-                    y: Math.random() * 100 - 50,
-                    duration: Math.random() * 10 + 10,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
-                });
-                
-                particlesContainer.appendChild(particle);
-            }
+        return { base, pts, acc: 0 };
+      });
+    }
+
+    function stepTicker(dt) {
+      const stepTime = 110;
+      ticks.forEach((line) => {
+        line.acc += dt;
+        while (line.acc > stepTime) {
+          line.acc -= stepTime;
+          line.pts.shift();
+          const lastVal = line.pts[line.pts.length - 1];
+          let next = lastVal + (Math.random() - 0.5) * 12;
+          next = line.base + (next - line.base) * 0.7;
+          line.pts.push(next);
         }
-        
-        // Handle touch movement
-        function onTouchMove(event) {
-            event.preventDefault();
-            if (event.touches.length > 0) {
-                const touch = event.touches[0];
-                updateRotationAndBackground(touch.clientX, touch.clientY);
-            }
+      });
+    }
+
+    function drawGrid() {
+      const gap = 46;
+      ctx.strokeStyle = cfg.gridColor;
+      ctx.lineWidth = 1;
+      for (let x = 0; x < width; x += gap) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gap) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawTicker() {
+      if (!ticks.length) return;
+      const segW = width / (ticks[0].pts.length - 1);
+      ticks.forEach((line, li) => {
+        ctx.beginPath();
+        line.pts.forEach((y, i) => {
+          const x = i * segW;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = cfg.tickerColor(li, intensity);
+        ctx.lineWidth = 1.3;
+        ctx.shadowColor = cfg.glow;
+        ctx.shadowBlur = 5 + intensity * 9;
+        ctx.stroke();
+      });
+      ctx.shadowBlur = 0;
+    }
+
+    function stepNodes(dt) {
+      const speed = 0.55 + intensity * 0.7;
+      nodes.forEach((n) => {
+        n.x += n.vx * dt * speed;
+        n.y += n.vy * dt * speed;
+        if (n.x < 0) n.x = width;
+        if (n.x > width) n.x = 0;
+        if (n.y < 0) n.y = height;
+        if (n.y > height) n.y = 0;
+      });
+    }
+
+    function drawNodes() {
+      const maxDist = cfg.linkDistance || 130;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i], b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const op = (1 - dist / maxDist) * (0.1 + intensity * 0.35);
+            ctx.strokeStyle = cfg.lineColor(op);
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
         }
-        
-        // Handle touch start
-        function onTouchStart(event) {
-            event.preventDefault();
-            if (event.touches.length > 0) {
-                const touch = event.touches[0];
-                updateRotationAndBackground(touch.clientX, touch.clientY);
-                onMouseClick();
-            }
-        }
-        
-        // Handle mouse movement
-        function onMouseMove(event) {
-            updateRotationAndBackground(event.clientX, event.clientY);
-        }
-        
-        // Update rotation and background based on pointer position
-        function updateRotationAndBackground(clientX, clientY) {
-            targetRotation.y = (clientX / window.innerWidth) * 2 - 1;
-            targetRotation.x = (clientY / window.innerHeight) * 2 - 1;
-            
-            const hue = (clientX / window.innerWidth) * 360;
-            currentHue = hue;
-            document.body.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 15%), hsl(${hue + 60}, 70%, 25%), hsl(${hue + 120}, 70%, 15%))`;
-        }
-        
-        // Load GLB robot model
-        function loadRobotModel(modelInfo) {
-            const loader = new THREE.GLTFLoader();
-            const loadingScreen = document.getElementById('loadingScreen');
-            const progressBar = document.getElementById('progressBar');
+      }
+      nodes.forEach((n) => {
+        ctx.beginPath();
+        ctx.fillStyle = cfg.nodeColor(0.35 + intensity * 0.55);
+        ctx.arc(n.x, n.y, n.r + intensity * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
 
-            loadingScreen.style.display = 'flex';
-            requestAnimationFrame(() => {
-                loadingScreen.style.opacity = '1';
-            });
-            progressBar.style.width = '0%';
-            
-            loader.load(
-                modelInfo.path,
-                (gltf) => {
-                    if (robotModel) {
-                        scene.remove(robotModel);
-                    }
+    function frame(now) {
+      const dt = Math.min(now - last, 48);
+      last = now;
+      intensity += (targetIntensity - intensity) * 0.06;
+      ctx.clearRect(0, 0, width, height);
+      if (cfg.grid) drawGrid();
+      if (cfg.ticker) {
+        stepTicker(dt);
+        drawTicker();
+      }
+      stepNodes(dt);
+      drawNodes();
+      rafId = requestAnimationFrame(frame);
+    }
 
-                    originalMaterials.clear();
-                    colorChangeCount = 0;
+    resize();
+    let resizeT;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(resize, 150);
+    });
 
-                    robotModel = gltf.scene;
-                    
-                    const scaleValue = isMobile ? modelInfo.scale.mobile : modelInfo.scale.desktop;
-                    const positionYValue = isMobile ? modelInfo.positionY.mobile : modelInfo.positionY.desktop;
-                    robotModel.scale.set(scaleValue, scaleValue, scaleValue);
-                    robotModel.position.y = positionYValue;
-                    
-                    robotModel.traverse((node) => {
-                        if (node.isMesh) {
-                            originalMaterials.set(node.uuid, {
-                                color: node.material.color.clone(),
-                                emissive: node.material.emissive.clone()
-                            });
-                            node.castShadow = !isMobile;
-                            node.receiveShadow = !isMobile;
-                        }
-                    });
+    if (!reduced) {
+      last = performance.now();
+      rafId = requestAnimationFrame(frame);
+    } else {
+      ctx.clearRect(0, 0, width, height);
+      if (cfg.grid) drawGrid();
+      drawNodes();
+    }
 
-                    scene.add(robotModel);
-                    
-                    loadingScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                    }, 1000);
-                },
-                (xhr) => {
-                    const percent = (xhr.loaded / xhr.total) * 100;
-                    progressBar.style.width = `${percent}%`;
-                },
-                (error) => {
-                    console.error(`Error loading GLB model: ${modelInfo.path}`, error);
-                    document.querySelector('.loading-text').textContent = 'MODEL LOAD FAILED - TRY ANOTHER';
-                }
-            );
-        }
-        
-        // Handle mouse click or touch
-        function onMouseClick() {
-            if (isGlitching || danceState !== 0) return;
-            
-            isGlitching = true;
-            
-            gsap.to(robotModel.rotation, {
-                z: Math.PI / 8 * (Math.random() > 0.5 ? 1 : -1),
-                duration: 0.1,
-                repeat: 3,
-                yoyo: true,
-                onComplete: () => {
-                    robotModel.rotation.z = 0;
-                    isGlitching = false;
-                }
-            });
-            
-            // Flash eyes red
-            if (robotModel) {
-                robotModel.traverse((node) => {
-                    if (node.isMesh && node.name.toLowerCase().includes('eye')) {
-                        const originalColor = node.material.emissive.getHex();
-                        node.material.emissive.set(0xff0000);
-                        setTimeout(() => {
-                            node.material.emissive.set(originalColor);
-                        }, 300);
-                    }
-                });
-            }
-        }
-        
-        // Select model by index
-        function selectModel(index) {
-            if (danceState !== 0) {
-                if (danceAnimation) {
-                    danceAnimation.kill();
-                    danceAnimation = null;
-                }
-                danceState = 0;
-                document.getElementById('statusIndicator').style.display = 'none';
-            }
-            currentModelIndex = index;
-            loadRobotModel(models[currentModelIndex]);
-        }
+    return {
+      setIntensity(v) { targetIntensity = v; },
+      stop() { if (rafId) cancelAnimationFrame(rafId); }
+    };
+  }
 
-        // Set up model selector UI
-        function setupModelSelector() {
-            const selectorBtn = document.getElementById('modelSelectorBtn');
-            const optionsContainer = document.getElementById('modelOptions');
+  const quantCanvas = document.getElementById('canvas-quant');
+  const roboticsCanvas = document.getElementById('canvas-robotics');
 
-            models.forEach((model, index) => {
-                const optionBtn = document.createElement('button');
-                optionBtn.className = 'model-option-btn';
-                optionBtn.textContent = model.name;
-                optionBtn.dataset.index = index;
-                optionsContainer.appendChild(optionBtn);
-            });
+  const quantField = quantCanvas ? createFieldCanvas(quantCanvas, {
+    grid: true,
+    ticker: true,
+    tickerLines: 3,
+    linkDistance: 125,
+    gridColor: 'rgba(62, 207, 142, 0.05)',
+    glow: 'rgba(62, 207, 142, 0.55)',
+    tickerColor: (li, i) => `rgba(62, 207, 142, ${0.32 + li * 0.07 + i * 0.25})`,
+    lineColor: (op) => `rgba(62, 207, 142, ${op})`,
+    nodeColor: (op) => `rgba(185, 245, 220, ${op})`
+  }) : null;
 
-            selectorBtn.addEventListener('click', (event) => {
-                event.stopPropagation();
-                optionsContainer.classList.toggle('show');
-            });
+  const roboticsField = roboticsCanvas ? createFieldCanvas(roboticsCanvas, {
+    grid: false,
+    ticker: false,
+    linkDistance: 150,
+    gridColor: 'rgba(0, 238, 255, 0.05)',
+    glow: 'rgba(0, 238, 255, 0.55)',
+    tickerColor: () => 'rgba(0, 238, 255, 0.4)',
+    lineColor: (op) => `rgba(0, 238, 255, ${op})`,
+    nodeColor: (op) => `rgba(170, 240, 255, ${op})`
+  }) : null;
 
-            optionsContainer.addEventListener('click', (event) => {
-                if (event.target.classList.contains('model-option-btn')) {
-                    const modelIndex = parseInt(event.target.dataset.index, 10);
-                    if (modelIndex !== currentModelIndex) {
-                        selectModel(modelIndex);
-                    }
-                    optionsContainer.classList.remove('show');
-                }
-            });
+  /* ---------- Panel hover / focus / click choreography ---------- */
+  const panelEls = {
+    quant: document.getElementById('panel-quant'),
+    robotics: document.getElementById('panel-robotics')
+  };
+  const fields = { quant: quantField, robotics: roboticsField };
+  let navigating = false;
 
-            window.addEventListener('click', () => {
-                if (optionsContainer.classList.contains('show')) {
-                    optionsContainer.classList.remove('show');
-                }
-            });
-        }
+  function setHover(activeKey, isHover) {
+    if (!canHover || reduced || navigating) return;
+    Object.keys(panelEls).forEach((key) => {
+      const isActive = key === activeKey;
+      gsap.to(panelEls[key], {
+        flexGrow: isHover ? (isActive ? 1.32 : 0.68) : 1,
+        duration: 0.7,
+        ease: 'power3.out'
+      });
+      if (fields[key]) fields[key].setIntensity(isHover && isActive ? 1 : 0);
+    });
+  }
 
-        // Glitch effect before navigation
-        function glitchAndNavigate(url) {
-            if (isGlitching || danceState !== 0) return;
-            isGlitching = true;
+  Object.keys(panelEls).forEach((key) => {
+    const el = panelEls[key];
+    if (!el) return;
 
-            gsap.to(robotModel.rotation, {
-                z: Math.PI / 6 * (Math.random() > 0.5 ? 1 : -1),
-                duration: 0.08,
-                repeat: 5,
-                yoyo: true,
-                onComplete: () => {
-                    window.location.href = url;
-                }
-            });
+    el.addEventListener('mouseenter', () => setHover(key, true));
+    el.addEventListener('mouseleave', () => setHover(key, false));
+    el.addEventListener('focus', () => setHover(key, true));
+    el.addEventListener('blur', () => setHover(key, false));
 
-            if (robotModel) {
-                robotModel.traverse((node) => {
-                    if (node.isMesh && node.name.toLowerCase().includes('eye')) {
-                        node.material.emissive.set(0xff0000);
-                    }
-                });
-            }
-        }
+    el.addEventListener('click', (e) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (navigating) {
+        e.preventDefault();
+        return;
+      }
+      const href = el.getAttribute('href');
+      if (!href) return;
+      e.preventDefault();
+      navigating = true;
 
-        // Change robot color
-        function changeRobotColor() {
-            if (!robotModel || danceState !== 0) return;
+      if (reduced) {
+        window.location.href = href;
+        return;
+      }
 
-            colorChangeCount++;
+      const otherKey = key === 'quant' ? 'robotics' : 'quant';
+      const otherEl = panelEls[otherKey];
 
-            if (colorChangeCount > 3) {
-                // Reset to original colors
-                robotModel.traverse((node) => {
-                    if (node.isMesh && originalMaterials.has(node.uuid)) {
-                        const originalMat = originalMaterials.get(node.uuid);
-                        node.material.color.copy(originalMat.color);
-                        node.material.emissive.copy(originalMat.emissive);
-                        node.material.needsUpdate = true;
-                    }
-                });
-                colorChangeCount = 0;
-            } else {
-                // Apply new color
-                const hue = Math.random() * 360;
-                const newColor = new THREE.Color(`hsl(${hue}, 70%, 50%)`);
-                const newEmissive = new THREE.Color(`hsl(${hue}, 70%, 30%)`);
-                
-                robotModel.traverse((node) => {
-                    if (node.isMesh && node.material) {
-                        if (node.material.emissive) {
-                            node.material.emissive.copy(newEmissive);
-                        }
-                        node.material.color.copy(newColor);
-                        node.material.needsUpdate = true;
-                    }
-                });
-            }
-        }
-        
-        // Toggle dance animation
-        function toggleDance() {
-            danceState = (danceState + 1) % 3;
+      if (fields[key]) fields[key].setIntensity(1);
+      gsap.to('.divider', { opacity: 0, duration: 0.3, ease: 'power1.in' });
+      if (otherEl) {
+        gsap.to(otherEl, { flexGrow: 0.001, opacity: 0, duration: 0.45, ease: 'power2.in' });
+      }
+      gsap.to(el, {
+        flexGrow: 6,
+        duration: 0.55,
+        ease: 'power3.inOut',
+        onComplete: () => { window.location.href = href; }
+      });
+    });
+  });
 
-            if (danceAnimation) {
-                danceAnimation.kill();
-                danceAnimation = null;
-            }
-
-            const statusIndicator = document.getElementById('statusIndicator');
-            
-            if (danceState === 0) {
-                statusIndicator.style.display = 'none';
-                resetToIdle();
-            } else {
-                statusIndicator.style.display = 'flex';
-                startDance(danceState);
-            }
-        }
-        
-        // Start dance animation
-        function startDance(type) {
-            if (!robotModel) return;
-
-            const modelInfo = models[currentModelIndex];
-            const originalY = isMobile ? modelInfo.positionY.mobile : modelInfo.positionY.desktop;
-
-            if (type === 1) {
-                // Dance 1: Gentle wobble
-                danceAnimation = gsap.timeline({ repeat: -1, yoyo: true })
-                    .to(robotModel.rotation, { z: 0.52, duration: 0.5, ease: "sine.inOut" }, 0)
-                    .to(robotModel.position, { y: originalY + 0.5, duration: 0.5, ease: "sine.inOut" }, 0);
-            } else if (type === 2) {
-                // Dance 2: Jump and spin
-                danceAnimation = gsap.timeline({ repeat: -1 })
-                    .to(robotModel.rotation, { y: Math.PI * 2, duration: 2, ease: "none" })
-                    .to(robotModel.position, { 
-                        y: originalY + 1.5, 
-                        duration: 0.5, 
-                        ease: "power1.out", 
-                        yoyo: true, 
-                        repeat: 1, 
-                        repeatDelay: 0.5 
-                    }, 0);
-            }
-        }
-        
-        // Reset to idle position
-        function resetToIdle() {
-            if (!robotModel) return;
-            
-            const modelInfo = models[currentModelIndex];
-            const originalY = isMobile ? modelInfo.positionY.mobile : modelInfo.positionY.desktop;
-            
-            gsap.to(robotModel.rotation, { 
-                x: 0, y: 0, z: 0, 
-                duration: 0.8, 
-                ease: "elastic.out(1, 0.3)" 
-            });
-            
-            gsap.to(robotModel.position, { 
-                y: originalY, 
-                duration: 0.8, 
-                ease: "bounce.out" 
-            });
-        }
-        
-        // Handle window resize
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            currentRotation.x += (targetRotation.x - currentRotation.x) * easeFactor;
-            currentRotation.y += (targetRotation.y - currentRotation.y) * easeFactor;
-            
-            if (robotModel && danceState === 0) {
-                robotModel.rotation.y = currentRotation.y * 0.5;
-                robotModel.rotation.x = currentRotation.x * 0.3;
-            }
-            
-            renderer.render(scene, camera);
-        }
-        
-        // Initialize on load
-        window.addEventListener('load', init);
-    </script>
+  /* ---------- Page-load entrance ---------- */
+  if (!reduced && window.gsap) {
+    gsap.timeline({ defaults: { ease: 'power3.out' } })
+      .from('.panel-content', { opacity: 0, y: 22, duration: 0.9, stagger: 0.15 })
+      .from('.divider-badge', { opacity: 0, scale: 0.6, duration: 0.6, ease: 'back.out(2)' }, 0.15)
+      .from('.masthead', { opacity: 0, y: -10, duration: 0.6 }, 0.1);
+  }
+});
+</script>
 </body>
 </html>

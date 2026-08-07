@@ -104,6 +104,21 @@
             width: 100%;
         }
 
+        /* Cross-track link to the Quant Developer side — colored with that
+           track's own accent so the color itself signals the destination. */
+        nav a.nav-cross {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(62, 207, 142, 0.4);
+            color: #3ecf8e;
+        }
+        nav a.nav-cross::after { display: none; }
+        nav a.nav-cross:hover, nav a.nav-cross:focus {
+            color: #3ecf8e;
+            background: rgba(62, 207, 142, 0.12);
+            border-color: #3ecf8e;
+        }
+
         .container {
             position: relative;
             width: 100%;
@@ -675,10 +690,11 @@
     <header>
         <a href="index.html" class="logo">THANISORN J.</a>
         <nav>
-            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="robotics.html"><i class="fas fa-home"></i> Home</a>
             <a href="about.html"><i class="fas fa-user"></i> About</a>
             <a href="projects.html" class="active"><i class="fas fa-code"></i> Projects</a>
             <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+            <a href="quant.html" class="nav-cross"><i class="fas fa-chart-line"></i> Quant</a>
         </nav>
     </header>
     <div class="container">
@@ -702,7 +718,7 @@
                     <div class="divider"></div>
                     <div class="content">
                         The very website you are on! A portfolio with a 3D robot that tracks cursor movements, built with Three.js and GSAP.
-                        <a href="index.html" target="_blank" class="project-link">View Live</a>
+                        <a href="robotics.html" target="_blank" class="project-link">View Live</a>
                     </div>
                     <div class="hover-indicator"></div>
                 </div>

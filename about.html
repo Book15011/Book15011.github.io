@@ -90,6 +90,21 @@
             width: 100%;
             background: #00eeff;
         }
+
+        /* Cross-track link to the Quant Developer side — colored with that
+           track's own accent so the color itself signals the destination. */
+        nav a.nav-cross {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(62, 207, 142, 0.4);
+            color: #3ecf8e;
+        }
+        nav a.nav-cross::after { display: none; }
+        nav a.nav-cross:hover {
+            color: #3ecf8e;
+            background: rgba(62, 207, 142, 0.12);
+            border-color: #3ecf8e;
+        }
         
         /* Page-specific styles */
         .page-container {
@@ -199,10 +214,11 @@
     <header>
         <a href="index.html" class="logo">THANISORN J.</a>
         <nav>
-            <a href="index.html">Home</a>
+            <a href="robotics.html">Home</a>
             <a href="about.html" class="active">About</a>
             <a href="projects.html">Projects</a>
             <a href="contact.html">Contact</a>
+            <a href="quant.html" class="nav-cross">Quant</a>
         </nav>
     </header>
 
