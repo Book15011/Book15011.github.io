@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robotics Engineering — Thanisorn J.</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root{ --ink:#090d1b; --panel:#11182d; --panel-soft:#151e37; --cyan:#00eeff; --violet:#8a72ff; --text:#f4f7ff; --muted:#a8b4d1; --line:rgba(180,205,255,.15); }
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{ margin:0; min-height:100vh; overflow-x:hidden; color:var(--text); background:var(--ink); font-family:Inter,system-ui,sans-serif; }
+    body::before,body::after{ content:""; position:fixed; border-radius:50%; filter:blur(20px); pointer-events:none; z-index:-1; }
+    body::before{ width:42vw; height:42vw; top:-18vw; right:-10vw; background:rgba(0,238,255,.12); }
+    body::after{ width:42vw; height:42vw; bottom:-24vw; left:-14vw; background:rgba(138,114,255,.14); }
+    a:focus-visible{ outline:2px solid var(--cyan); outline-offset:4px; }
+    .shell{ width:min(1180px,calc(100% - 48px)); margin:0 auto; }
+    header{ display:flex; align-items:center; justify-content:space-between; gap:28px; min-height:88px; border-bottom:1px solid var(--line); }
+    .logo{ color:var(--text); font-size:1.15rem; font-weight:600; letter-spacing:3px; text-decoration:none; white-space:nowrap; }
+    nav{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:22px; }
+    nav a{ color:var(--muted); font-size:.84rem; letter-spacing:.6px; text-decoration:none; transition:color .2s ease; }
+    nav a:hover,nav a.active{ color:var(--cyan); }
+    .hero{ display:grid; grid-template-columns:1.18fr .82fr; gap:64px; align-items:center; min-height:calc(100vh - 88px); padding:80px 0 100px; }
+    .eyebrow{ margin:0 0 20px; color:var(--cyan); font:500 .72rem 'Roboto Mono',monospace; letter-spacing:2.1px; text-transform:uppercase; }
+    h1{ max-width:760px; margin:0; font-size:clamp(3.3rem,7vw,6.8rem); line-height:.94; letter-spacing:-.075em; }
+    h1 span{ color:var(--cyan); }
+    .intro{ max-width:650px; margin:28px 0 0; color:var(--muted); font-size:1.08rem; line-height:1.75; }
+    .actions{ display:flex; flex-wrap:wrap; gap:14px; margin-top:36px; }
+    .button{ display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:48px; padding:0 20px; border:1px solid var(--line); border-radius:6px; color:var(--text); font-size:.85rem; font-weight:600; letter-spacing:.3px; text-decoration:none; transition:transform .2s ease,background .2s ease,border-color .2s ease; }
+    .button:hover{ transform:translateY(-2px); border-color:var(--cyan); }
+    .button--primary{ color:#031116; background:var(--cyan); border-color:var(--cyan); }
+    .button--primary:hover{ background:#77f6ff; }
+    .hero-note{ display:flex; gap:9px; align-items:center; margin-top:20px; color:#7685a9; font:400 .72rem 'Roboto Mono',monospace; }
+    .hero-note i{ color:var(--cyan); }
+    .garage-card{ position:relative; overflow:hidden; min-height:400px; padding:30px; border:1px solid rgba(0,238,255,.35); border-radius:16px; background:linear-gradient(145deg,rgba(20,32,61,.96),rgba(10,14,29,.9)); box-shadow:0 24px 80px rgba(0,0,0,.3); }
+    .garage-card::before{ content:""; position:absolute; inset:0; background:linear-gradient(120deg,transparent 20%,rgba(0,238,255,.12),transparent 75%); transform:translateX(-100%); animation:sweep 6s ease-in-out infinite; }
+    .garage-card > *{ position:relative; }
+    .garage-number{ color:var(--cyan); font:500 .72rem 'Roboto Mono',monospace; letter-spacing:2px; }
+    .garage-visual{ display:grid; place-items:center; min-height:210px; }
+    .bot-mark{ position:relative; display:grid; place-items:center; width:150px; height:150px; border:1px solid rgba(0,238,255,.6); border-radius:48px 48px 34px 34px; color:var(--cyan); font-size:4rem; box-shadow:0 0 0 15px rgba(0,238,255,.035),0 0 42px rgba(0,238,255,.18); }
+    .bot-mark::before,.bot-mark::after{ content:""; position:absolute; top:58px; width:10px; height:10px; border-radius:50%; background:var(--cyan); box-shadow:0 0 12px var(--cyan); }
+    .bot-mark::before{ left:43px; }.bot-mark::after{ right:43px; }
+    .garage-card h2{ margin:0; font-size:1.5rem; }
+    .garage-card p{ margin:10px 0 0; color:var(--muted); font-size:.9rem; line-height:1.6; }
+    .garage-link{ display:inline-flex; align-items:center; gap:8px; margin-top:22px; color:var(--cyan); font:500 .77rem 'Roboto Mono',monospace; letter-spacing:.9px; text-decoration:none; }
+    .garage-link:hover{ color:#fff; }
+    .section{ padding:22px 0 110px; }
+    .section-heading{ display:flex; justify-content:space-between; gap:32px; align-items:end; margin-bottom:28px; }
+    .section-heading h2{ margin:0; font-size:1.65rem; letter-spacing:-.04em; }
+    .section-heading p{ max-width:440px; margin:0; color:var(--muted); font-size:.9rem; line-height:1.6; }
+    .capabilities{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .capability{ min-height:190px; padding:25px; border:1px solid var(--line); border-radius:12px; background:rgba(17,24,45,.72); }
+    .capability i{ color:var(--cyan); font-size:1.2rem; }
+    .capability h3{ margin:22px 0 8px; font-size:1rem; }
+    .capability p{ margin:0; color:var(--muted); font-size:.86rem; line-height:1.6; }
+    .route-bar{ display:flex; align-items:center; justify-content:space-between; gap:24px; margin-top:50px; padding:25px 28px; border:1px solid var(--line); border-radius:12px; background:rgba(17,24,45,.52); }
+    .route-bar p{ margin:0; color:var(--muted); line-height:1.55; }
+    footer{ padding:24px 0 34px; border-top:1px solid var(--line); color:#7380a0; font:400 .72rem 'Roboto Mono',monospace; letter-spacing:.5px; }
+    @keyframes sweep{ 0%,40%{transform:translateX(-100%)} 58%,100%{transform:translateX(100%)} }
+    @media(max-width:850px){ .hero{ grid-template-columns:1fr; gap:40px; padding-top:62px; } .garage-card{ min-height:0; } .garage-visual{ min-height:160px; } .capabilities{ grid-template-columns:1fr; } }
+    @media(max-width:620px){ .shell{ width:min(100% - 36px,1180px); } header{ min-height:unset; padding:22px 0; align-items:flex-start; } nav{ gap:10px 16px; justify-content:flex-start; } nav a{ font-size:.76rem; } .hero{ min-height:auto; padding:58px 0 82px; } h1{ font-size:clamp(3rem,16vw,5rem); } .section-heading,.route-bar{ align-items:flex-start; flex-direction:column; gap:14px; } .route-bar{ padding:22px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a href="index.html" class="logo">THANISORN J.</a>
+      <nav aria-label="Primary navigation">
+        <a href="robotics-home.html" class="active">Robotics</a>
+        <a href="about.html">About</a>
+        <a href="projects.html">Projects</a>
+        <a href="contact.html">Contact</a>
+        <a href="quant.html">Quant</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Robotics Portfolio · Engineering Track</p>
+          <h1 id="page-title">Build systems<br>that <span>move.</span></h1>
+          <p class="intro">A portfolio of robotics, AI, and interactive engineering work—spanning embodied intelligence, real-time systems, and the practical work of turning ideas into working machines.</p>
+          <div class="actions">
+            <a class="button button--primary" href="projects.html"><i class="fas fa-layer-group" aria-hidden="true"></i> Explore projects</a>
+            <a class="button" href="robotics.html"><i class="fas fa-robot" aria-hidden="true"></i> Enter Robot Garage</a>
+          </div>
+          <p class="hero-note"><i class="fas fa-bolt" aria-hidden="true"></i> Fast landing page — 3D models only load inside the Garage.</p>
+        </div>
+
+        <aside class="garage-card" aria-label="Robot Garage preview">
+          <span class="garage-number">01 / INTERACTIVE SPACE</span>
+          <div class="garage-visual" aria-hidden="true"><div class="bot-mark"><i class="fas fa-robot"></i></div></div>
+          <h2>Robot Garage</h2>
+          <p>Explore the interactive 3D robot models when you choose to launch them. A clear entry point means the loading state is expected, not mistaken for a broken page.</p>
+          <a href="robotics.html" class="garage-link">OPEN THE GARAGE <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </aside>
+      </section>
+
+      <section class="section" aria-labelledby="focus-title">
+        <div class="section-heading">
+          <h2 id="focus-title">What I build</h2>
+          <p>Technical work at the intersection of mechanical systems, software, and learning-based control.</p>
+        </div>
+        <div class="capabilities">
+          <article class="capability"><i class="fas fa-robot" aria-hidden="true"></i><h3>Robotics systems</h3><p>Mechanical and software systems designed for physical interaction, sensing, and control.</p></article>
+          <article class="capability"><i class="fas fa-brain" aria-hidden="true"></i><h3>Learning &amp; simulation</h3><p>Reinforcement-learning and simulation work that connects decision-making with real-time behaviour.</p></article>
+          <article class="capability"><i class="fas fa-code" aria-hidden="true"></i><h3>Engineering software</h3><p>Practical, interactive tools and pipelines that make technical ideas visible and usable.</p></article>
+        </div>
+        <div class="route-bar">
+          <p>Want the interactive showcase? The Garage keeps the high-resolution model experience separate from the portfolio overview.</p>
+          <a class="button" href="robotics.html">Launch Robot Garage <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        </div>
+      </section>
+    </main>
+
+    <footer>THANISORN J. · ROBOTICS ENGINEERING</footer>
+  </div>
+</body>
+</html>
