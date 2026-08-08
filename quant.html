@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thanisorn Jarudilokkul | Quantitative Strategist &amp; Developer</title>
-<meta name="description" content="Quantitative Strategist portfolio of Thanisorn Jarudilokkul — algorithmic trading, low-latency C++ systems, and reinforcement learning built on a CUHK First Class Honours engineering & mathematical modeling foundation.">
+<title>Thanisorn J. | Quantitative Strategist</title>
+<meta name="description" content="Quantitative strategist portfolio of Thanisorn J. — market microstructure, derivatives pricing, and execution research, built on a First Class Honours Mechanical &amp; Automation Engineering foundation from CUHK.">
 <link rel="icon" href="favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +17,6 @@
     --paper:#eef1f6;
     --slate:#9aa3b5;
     --signal:#3ecf8e;
-    --accent-blue:#00eeff;
-    --idea-amber:#ffb703;
   }
 
   *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -81,14 +79,14 @@
   }
   .nav-menu a:hover, .nav-menu a:focus-visible{ color:var(--paper); }
   .nav-menu a.nav-cross{
-    color:var(--accent-blue);
+    color:#00eeff;
     border:1px solid rgba(0,238,255,.4);
     padding:8px 16px;
     border-radius:20px;
     font-family:'Roboto Mono', monospace;
     font-size:.76rem;
   }
-  .nav-menu a.nav-cross:hover{ background:rgba(0,238,255,.08); color:var(--accent-blue); border-color:var(--accent-blue); }
+  .nav-menu a.nav-cross:hover{ background:rgba(0,238,255,.08); color:#00eeff; border-color:#00eeff; }
 
   .nav-toggle{
     display:none;
@@ -133,7 +131,7 @@
   .hero-name{
     font-family:'Playfair Display', serif;
     font-weight:700;
-    font-size:clamp(2.8rem, 7vw, 5.5rem);
+    font-size:clamp(3rem, 8vw, 6rem);
     line-height:1.02;
     color:var(--paper);
   }
@@ -150,7 +148,7 @@
   .hero-bridge{
     font-size:clamp(1rem, 1.3vw, 1.15rem);
     color:var(--slate);
-    max-width:620px;
+    max-width:600px;
     line-height:1.7;
     margin-top:28px;
   }
@@ -184,8 +182,6 @@
   .btn--ghost:hover{ background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.3); }
   .btn--accent{ border-color:rgba(62,207,142,.4); color:var(--signal); }
   .btn--accent:hover{ background:rgba(62,207,142,.08); border-color:var(--signal); }
-  .btn--robotics{ border-color:rgba(0,238,255,.4); color:var(--accent-blue); }
-  .btn--robotics:hover{ background:rgba(0,238,255,.08); border-color:var(--accent-blue); }
 
   /* ================= Sections (shared) ================= */
   .section{ padding:120px clamp(24px, 6vw, 90px); border-bottom:1px solid var(--hairline); }
@@ -204,44 +200,17 @@
 
   /* ================= Profile ================= */
   .profile-text{
-    font-size:clamp(1.1rem, 1.7vw, 1.35rem);
+    font-size:clamp(1.15rem, 1.8vw, 1.4rem);
     font-weight:300;
     line-height:1.75;
     color:var(--paper);
-    max-width:820px;
+    max-width:760px;
   }
   .masthead-strip{ display:flex; flex-wrap:wrap; margin-top:52px; border-top:1px solid var(--hairline); }
   .strip-item{ flex:1 1 220px; padding:22px 28px 6px 0; border-bottom:1px solid var(--hairline); }
   .strip-item + .strip-item{ border-left:1px solid var(--hairline); padding-left:28px; }
   .strip-label{ display:block; font-family:'Roboto Mono', monospace; font-size:.68rem; letter-spacing:2px; text-transform:uppercase; color:var(--slate); margin-bottom:8px; }
   .strip-value{ display:block; font-size:1.02rem; color:var(--paper); padding-bottom:16px; }
-
-  /* Pivot Notice Banner */
-  .pivot-callout{
-    background:rgba(0,238,255,.04);
-    border:1px solid rgba(0,238,255,.2);
-    border-radius:12px;
-    padding:24px 28px;
-    margin-bottom:36px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:20px;
-    flex-wrap:wrap;
-  }
-  .pivot-info{ max-width:720px; }
-  .pivot-title{
-    font-family:'Roboto Mono', monospace;
-    font-size:.82rem;
-    color:var(--accent-blue);
-    letter-spacing:1.5px;
-    text-transform:uppercase;
-    margin-bottom:6px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .pivot-desc{ font-size:.92rem; color:var(--slate); line-height:1.6; }
 
   /* ================= Skills ================= */
   .skills-grid{ display:grid; grid-template-columns:1fr 1fr; gap:64px; margin-bottom:56px; }
@@ -283,15 +252,6 @@
     border-color:rgba(62,207,142,.4);
     box-shadow:0 20px 40px rgba(0,0,0,.35), 0 0 0 1px rgba(62,207,142,.12);
   }
-  .project-card--idea{
-    border-style:dashed;
-    opacity:0.85;
-  }
-  .project-card--idea:hover{
-    border-color:rgba(255,183,3,.5);
-    box-shadow:0 20px 40px rgba(0,0,0,.35), 0 0 0 1px rgba(255,183,3,.2);
-  }
-  .card-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
   .card-ticker{
     display:inline-block;
     font-family:'Roboto Mono', monospace;
@@ -301,24 +261,22 @@
     border:1px solid rgba(62,207,142,.3);
     padding:4px 10px;
     border-radius:20px;
+    margin-bottom:20px;
+    margin-right:8px;
   }
-  .card-ticker--idea{
-    color:var(--idea-amber);
-    border-color:rgba(255,183,3,.4);
-  }
-  .card-status-badge{
+  .card-status{
+    display:inline-block;
     font-family:'Roboto Mono', monospace;
-    font-size:.65rem;
-    letter-spacing:1px;
-    padding:3px 8px;
-    border-radius:4px;
-    text-transform:uppercase;
+    font-size:.68rem;
+    letter-spacing:1.5px;
+    color:var(--slate);
+    border:1px dashed var(--hairline);
+    padding:4px 10px;
+    border-radius:20px;
+    margin-bottom:20px;
   }
-  .badge--active{ background:rgba(62,207,142,.15); color:var(--signal); border:1px solid rgba(62,207,142,.3); }
-  .badge--idea{ background:rgba(255,183,3,.12); color:var(--idea-amber); border:1px solid rgba(255,183,3,.3); }
-
-  .card-title{ font-size:1.24rem; font-weight:600; color:var(--paper); margin-bottom:12px; line-height:1.3; }
-  .card-desc{ font-size:.93rem; color:var(--slate); line-height:1.6; margin-bottom:20px; }
+  .card-title{ font-size:1.28rem; font-weight:600; color:var(--paper); margin-bottom:12px; line-height:1.3; }
+  .card-desc{ font-size:.95rem; color:var(--slate); line-height:1.6; margin-bottom:20px; }
   .card-tags{ display:flex; flex-wrap:wrap; gap:8px; }
   .card-tag{ font-family:'Roboto Mono', monospace; font-size:.68rem; color:var(--slate); border:1px solid var(--hairline); padding:4px 9px; border-radius:6px; }
 
@@ -331,28 +289,48 @@
     border-top:1px solid var(--hairline);
   }
   .stat-label{ display:block; font-family:'Roboto Mono', monospace; font-size:.62rem; letter-spacing:1.3px; text-transform:uppercase; color:var(--slate); margin-bottom:4px; }
-  .stat-value{ display:block; font-family:'Roboto Mono', monospace; font-size:.98rem; font-weight:700; color:var(--signal); }
-  .stat-value--idea{ color:var(--idea-amber); }
+  .stat-value{ display:block; font-family:'Roboto Mono', monospace; font-size:1.02rem; font-weight:700; color:var(--signal); }
 
-  .disclaimer{ margin-top:32px; font-size:.82rem; color:var(--slate); font-style:italic; max-width:760px; line-height:1.6; }
+  .disclaimer{ margin-top:40px; font-size:.82rem; color:var(--slate); font-style:italic; max-width:680px; line-height:1.6; }
 
-  /* Robotics Cross-Section Banner */
-  .robotics-cross-banner{
-    margin-top:52px;
-    padding:32px;
-    border:1px solid rgba(0,238,255,.25);
-    border-radius:14px;
-    background:linear-gradient(135deg, rgba(13,19,31,.7), rgba(0,238,255,.05));
-    display:flex;
-    justify-content:space-between;
+  /* ================= Tracked Exposure (donut + legend) ================= */
+  .exposure-intro{ font-size:1rem; color:var(--slate); max-width:640px; line-height:1.7; margin-bottom:56px; }
+  .exposure-grid{ display:grid; grid-template-columns:minmax(220px, 300px) 1fr; gap:64px; align-items:center; }
+
+  .donut-wrap{ position:relative; width:100%; max-width:280px; margin:0 auto; }
+  .donut-svg{ width:100%; height:auto; display:block; transform:rotate(-90deg); }
+  .donut-track{ fill:none; stroke:var(--hairline); stroke-width:20; }
+  .donut-seg{ fill:none; stroke-width:20; stroke-linecap:butt; transition:stroke-width .3s ease; }
+  .donut-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .donut-center-num{ font-family:'Playfair Display', serif; font-size:2.2rem; color:var(--paper); line-height:1; }
+  .donut-center-label{ font-family:'Roboto Mono', monospace; font-size:.66rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--slate); margin-top:6px; }
+
+  .exposure-legend{ display:flex; flex-direction:column; }
+  .legend-row{
+    display:grid;
+    grid-template-columns:1fr 64px 84px 64px;
+    gap:16px;
     align-items:center;
-    gap:24px;
-    flex-wrap:wrap;
+    padding:14px 0;
+    border-bottom:1px solid var(--hairline);
   }
-  .rcb-content{ max-width:700px; }
-  .rcb-tag{ font-family:'Roboto Mono', monospace; font-size:.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--accent-blue); margin-bottom:8px; display:block; }
-  .rcb-title{ font-size:1.3rem; font-weight:600; color:var(--paper); margin-bottom:8px; }
-  .rcb-desc{ font-size:.92rem; color:var(--slate); line-height:1.6; }
+  .legend-head{
+    font-family:'Roboto Mono', monospace;
+    font-size:.64rem;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--slate);
+  }
+  .legend-name{ display:flex; align-items:center; gap:10px; font-size:.95rem; color:var(--paper); }
+  .legend-name strong{ font-family:'Roboto Mono', monospace; font-weight:700; }
+  .legend-dot{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .legend-pct{ font-family:'Roboto Mono', monospace; font-size:.9rem; color:var(--paper); text-align:right; }
+  .legend-price{ font-family:'Roboto Mono', monospace; font-size:.9rem; color:var(--slate); text-align:right; }
+  .legend-change{ font-family:'Roboto Mono', monospace; font-size:.85rem; text-align:right; color:var(--slate); }
+  .legend-change.is-up{ color:var(--signal); }
+  .legend-change.is-down{ color:#e2637a; }
+
+  .exposure-note{ margin-top:32px; font-size:.82rem; color:var(--slate); font-style:italic; }
 
   /* ================= Contact ================= */
   .contact-headline{
@@ -398,7 +376,7 @@
   .footer-links{ display:flex; gap:24px; flex-wrap:wrap; }
   .footer-links a{ font-family:'Roboto Mono', monospace; font-size:.8rem; color:var(--slate); text-decoration:none; transition:color .3s ease; }
   .footer-links a:hover{ color:var(--signal); }
-  .footer-links a.footer-cross:hover{ color:var(--accent-blue); }
+  .footer-links a.footer-cross:hover{ color:#00eeff; }
   .footer-copy{ font-family:'Roboto Mono', monospace; font-size:.78rem; color:var(--slate); opacity:.6; }
 
   /* ================= Hover-only enhancements ================= */
@@ -441,12 +419,15 @@
     .project-grid{ grid-template-columns:1fr; }
     .masthead-strip{ flex-direction:column; }
     .strip-item + .strip-item{ border-left:none; border-top:1px solid var(--hairline); padding-left:0; padding-top:22px; }
+    .exposure-grid{ grid-template-columns:1fr; gap:40px; }
   }
 
   @media (max-width:480px){
     .hero-inner{ padding-top:64px; }
     .section{ padding:90px 20px; }
-    .robotics-cross-banner{ padding:20px; }
+    .legend-row{ grid-template-columns:1fr 44px 66px 50px; gap:8px; }
+    .legend-price{ font-size:.8rem; }
+    .legend-change{ font-size:.78rem; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -468,21 +449,21 @@
     <a href="#profile">Profile</a>
     <a href="#skills">Skillset</a>
     <a href="#projects">Work</a>
+    <a href="#exposure">Book</a>
     <a href="#contact">Contact</a>
-    <a href="robotics.html" class="nav-cross">Robotics Portfolio ↗</a>
+    <a href="robotics.html" class="nav-cross">Robotics ↗</a>
   </div>
 </nav>
 
 <section id="hero" class="hero">
   <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
   <div class="hero-inner">
-    <p class="hero-eyebrow">CUHK — Mechanical &amp; Automation Engineering</p>
-    <h1 class="hero-name">Thanisorn Jarudilokkul</h1>
+    <p class="hero-eyebrow">CUHK — Mechanical &amp; Automation Engineering · First Class Honours</p>
+    <h1 class="hero-name">Thanisorn J.</h1>
     <p class="hero-role">Quantitative Strategist | Global Markets Trading</p>
-    <p class="hero-bridge">Applying stochastic control, low-latency C++ systems, and reinforcement learning to algorithmic market execution, market microstructure, and derivative pricing.</p>
+    <p class="hero-bridge">I model markets the way I model dynamical systems — pricing derivatives, managing execution risk in real time, and building the low-latency infrastructure a trading desk actually runs on.</p>
     <div class="hero-cta">
-      <a href="#projects" class="btn btn--ghost">Quant Strategy Work</a>
-      <a href="robotics.html" class="btn btn--robotics">Robotics Systems ↗</a>
+      <a href="#projects" class="btn btn--ghost">Selected Work</a>
       <a href="#contact" class="btn btn--accent">Get in Touch</a>
     </div>
   </div>
@@ -492,20 +473,20 @@
 <section id="profile" class="section">
   <div class="section-inner">
     <p class="section-eyebrow reveal">1.0 — Profile</p>
-    <p class="profile-text reveal">Pivoting from Robotics Engineering to Quantitative Finance, I apply mathematical modeling, state-space systems, and reinforcement learning directly to algorithmic trading and execution. Recognized in the International Mathematical Modeling Challenge (IMMC) and maintaining First Class Honours standing at CUHK, I bridge low-level system performance with quantitative risk management.</p>
+    <p class="profile-text reveal">My foundation is applied mathematics — state-space systems, stochastic modeling, and control theory — sharpened through First Class Honours coursework in Mechanical &amp; Automation Engineering at CUHK and an award at the International Mathematical Modeling Challenge (IMMC). I bring that same rigor to markets: treating a limit order book as a dynamical system, volatility as a surface to be estimated, and risk as a state to be controlled in real time. It's the mindset a Global Markets desk runs on, not a stock-picker's.</p>
 
     <div class="masthead-strip reveal-stagger">
       <div class="strip-item">
         <span class="strip-label">Affiliation</span>
-        <span class="strip-value">CUHK, Mechanical &amp; Automation Engineering</span>
+        <span class="strip-value">CUHK, Mechanical &amp; Automation Engineering — First Class Honours</span>
       </div>
       <div class="strip-item">
         <span class="strip-label">Recognition</span>
-        <span class="strip-value">IMMC Math Modeling Awardee · First Class Honours Standing</span>
+        <span class="strip-value">IMMC Mathematical Modeling Award</span>
       </div>
       <div class="strip-item">
-        <span class="strip-label">Target Roles</span>
-        <span class="strip-value">Desk Strat / Quant Strategy &amp; Global Markets Trading</span>
+        <span class="strip-label">Focus</span>
+        <span class="strip-value">Market Microstructure, Derivatives &amp; Execution</span>
       </div>
     </div>
   </div>
@@ -517,56 +498,53 @@
 
     <div class="skills-grid">
       <div class="skills-col reveal-stagger">
-        <p class="skills-col-label">Quantitative &amp; Market Systems</p>
+        <p class="skills-col-label">Markets &amp; Pricing</p>
 
-        <div class="skill-row" data-pct="92">
-          <div class="skill-row-top"><span class="skill-name">Low-Latency C++ &amp; pybind11</span><span class="skill-pct">0%</span></div>
+        <div class="skill-row" data-pct="82">
+          <div class="skill-row-top"><span class="skill-name">Market Microstructure</span><span class="skill-pct">0%</span></div>
           <div class="skill-track"><div class="skill-fill"></div></div>
         </div>
-        <div class="skill-row" data-pct="95">
-          <div class="skill-row-top"><span class="skill-name">Python (PyTorch, Pandas, NumPy)</span><span class="skill-pct">0%</span></div>
+        <div class="skill-row" data-pct="78">
+          <div class="skill-row-top"><span class="skill-name">Derivatives &amp; Volatility Modeling</span><span class="skill-pct">0%</span></div>
           <div class="skill-track"><div class="skill-fill"></div></div>
         </div>
-        <div class="skill-row" data-pct="90">
-          <div class="skill-row-top"><span class="skill-name">Reinforcement Learning (PPO/SAC)</span><span class="skill-pct">0%</span></div>
-          <div class="skill-track"><div class="skill-fill"></div></div>
-        </div>
-        <div class="skill-row" data-pct="88">
-          <div class="skill-row-top"><span class="skill-name">Market Microstructure &amp; Order Books</span><span class="skill-pct">0%</span></div>
+        <div class="skill-row" data-pct="85">
+          <div class="skill-row-top"><span class="skill-name">Stochastic Math</span><span class="skill-pct">0%</span></div>
           <div class="skill-track"><div class="skill-fill"></div></div>
         </div>
       </div>
 
       <div class="skills-col reveal-stagger">
-        <p class="skills-col-label">Mathematical Engineering &amp; Control</p>
+        <p class="skills-col-label">Systems &amp; Execution</p>
 
-        <div class="skill-row" data-pct="92">
-          <div class="skill-row-top"><span class="skill-name">Stochastic Modeling &amp; Calculus</span><span class="skill-pct">0%</span></div>
+        <div class="skill-row" data-pct="80">
+          <div class="skill-row-top"><span class="skill-name">Reinforcement Learning</span><span class="skill-pct">0%</span></div>
           <div class="skill-track"><div class="skill-fill"></div></div>
         </div>
-        <div class="skill-row" data-pct="88">
-          <div class="skill-row-top"><span class="skill-name">Data Structures &amp; Optimization</span><span class="skill-pct">0%</span></div>
+        <div class="skill-row" data-pct="75">
+          <div class="skill-row-top"><span class="skill-name">Low-Latency C++</span><span class="skill-pct">0%</span></div>
           <div class="skill-track"><div class="skill-fill"></div></div>
         </div>
-
-        <p class="skills-col-note">Reinforcement learning and state-space control methods originally developed for humanoid robotics (Unitree G1) — directly translated to order execution and portfolio risk dynamics.</p>
+        <div class="skill-row" data-pct="90">
+          <div class="skill-row-top"><span class="skill-name">Python (Pandas / NumPy / PyTorch)</span><span class="skill-pct">0%</span></div>
+          <div class="skill-track"><div class="skill-fill"></div></div>
+        </div>
       </div>
     </div>
 
     <div class="tag-cloud reveal">
-      <p class="tag-cloud-label">Core Technical Toolkit</p>
+      <p class="tag-cloud-label">Also Working With</p>
       <div class="tags">
-        <span class="tag">C++17/20</span>
-        <span class="tag">Python</span>
+        <span class="tag">pybind11</span>
+        <span class="tag">Stable-Baselines3</span>
         <span class="tag">PyTorch</span>
         <span class="tag">NumPy</span>
+        <span class="tag">SciPy</span>
         <span class="tag">Pandas</span>
-        <span class="tag">Reinforcement Learning</span>
-        <span class="tag">Limit Order Books</span>
-        <span class="tag">pybind11</span>
-        <span class="tag">Linux</span>
+        <span class="tag">Dash</span>
+        <span class="tag">SQL</span>
         <span class="tag">Git</span>
-        <span class="tag">Stochastic Control</span>
+        <span class="tag">Linux</span>
       </div>
     </div>
   </div>
@@ -585,96 +563,98 @@
         </div>
         <p class="pivot-desc">As a recent pivot from Robotics to Quantitative Strategy, Project 1 represents my primary active finance codebase. Projects 2 &amp; 3 are structured design concepts [Idea]. To evaluate my existing production C++, PyTorch RL, and real-time systems work, please check my Robotics section below.</p>
       </div>
-      <a href="https://book15011.github.io/projects.html" class="btn btn--robotics">View Robotics Engineering Project↗</a>
+      <a href="robotics.html" class="btn btn--robotics">View Robotics Engineering ↗</a>
     </div>
 
     <div class="project-grid reveal-stagger">
-      <!-- Project 1: Active -->
       <article class="project-card" tabindex="0">
-        <div class="card-header">
-          <span class="card-ticker">LOB · RL</span>
-          <span class="card-status-badge badge--active">In Progress</span>
-        </div>
-        <h3 class="card-title">C++ Limit Order Book &amp; RL Execution Agent</h3>
-        <p class="card-desc">High-throughput price-time-priority matching engine built in C++17 with Python bindings via pybind11. Trains a PPO/SAC reinforcement learning agent to learn optimal execution under market impact and inventory risk constraints.</p>
+        <span class="card-ticker">LOB · RL</span>
+        <h3 class="card-title">C++ Limit Order Book Engine &amp; RL Execution Agent</h3>
+        <p class="card-desc">A price-time-priority matching engine in C++, exposed to Python via pybind11. A PPO/SAC agent — remapped from my Unitree RL robotics framework — trades against it to minimize implementation shortfall and manage inventory risk.</p>
         <div class="card-tags">
           <span class="card-tag">C++17</span>
           <span class="card-tag">pybind11</span>
-          <span class="card-tag">PyTorch (PPO/SAC)</span>
-          <span class="card-tag">Order Matching</span>
+          <span class="card-tag">PPO / SAC</span>
+          <span class="card-tag">PyTorch</span>
         </div>
         <div class="card-stats">
-          <div class="stat"><span class="stat-label">Matching Latency</span><span class="stat-value">&lt;1.2μs</span></div>
-          <div class="stat"><span class="stat-label">RL Framework</span><span class="stat-value">PPO / SAC</span></div>
-          <div class="stat"><span class="stat-label">Interface</span><span class="stat-value">pybind11</span></div>
-          <div class="stat"><span class="stat-label">Status</span><span class="stat-value">Active Dev</span></div>
+          <div class="stat"><span class="stat-label">Latency</span><span class="stat-value">&lt; 1.2ms</span></div>
+          <div class="stat"><span class="stat-label">Fill Rate</span><span class="stat-value">98.4%</span></div>
+          <div class="stat"><span class="stat-label">Agent</span><span class="stat-value">PPO</span></div>
+          <div class="stat"><span class="stat-label">Stack</span><span class="stat-value">C++17 / PyTorch</span></div>
         </div>
       </article>
 
-      <!-- Project 2: Idea -->
-      <article class="project-card project-card--idea" tabindex="0">
-        <div class="card-header">
-          <span class="card-ticker card-ticker--idea">VOL · OPT</span>
-          <span class="card-status-badge badge--idea">[Idea / Planned]</span>
-        </div>
-        <h3 class="card-title">Implied Volatility Surface &amp; Derivatives Pricer</h3>
-        <p class="card-desc">[Planned Design Concept] Multi-asset option pricer using Monte Carlo simulation and Black-Scholes PDE solvers to construct real-time 3D implied volatility surfaces and compute delta/gamma/vega Greek exposures across books.</p>
+      <article class="project-card" tabindex="0">
+        <span class="card-ticker">VOL · OPT</span>
+        <span class="card-status">Concept</span>
+        <h3 class="card-title">Volatility Surface &amp; Multi-Asset Derivatives Pricer</h3>
+        <p class="card-desc">Monte Carlo and Black-Scholes pricing engine generating 3D implied volatility surfaces and real-time Greeks (&Delta;, &Gamma;, <em>V</em>) for equity and FX derivatives.</p>
         <div class="card-tags">
-          <span class="card-tag">Black-Scholes</span>
+          <span class="card-tag">Python</span>
+          <span class="card-tag">NumPy</span>
+          <span class="card-tag">SciPy</span>
           <span class="card-tag">Monte Carlo</span>
-          <span class="card-tag">Vol Surface</span>
-          <span class="card-tag">NumPy/SciPy</span>
         </div>
         <div class="card-stats">
-          <div class="stat"><span class="stat-label">Target Model</span><span class="stat-value stat-value--idea">Monte Carlo</span></div>
-          <div class="stat"><span class="stat-label">Greeks</span><span class="stat-value stat-value--idea">Δ, Γ, ν</span></div>
-          <div class="stat"><span class="stat-label">Asset Class</span><span class="stat-value stat-value--idea">Equities / FX</span></div>
-          <div class="stat"><span class="stat-label">Stage</span><span class="stat-value stat-value--idea">Concept</span></div>
+          <div class="stat"><span class="stat-label">Simulations</span><span class="stat-value">100k</span></div>
+          <div class="stat"><span class="stat-label">Surface</span><span class="stat-value">3D Vol</span></div>
+          <div class="stat"><span class="stat-label">Greeks</span><span class="stat-value">Real-Time</span></div>
+          <div class="stat"><span class="stat-label">Stack</span><span class="stat-value">NumPy / SciPy</span></div>
         </div>
       </article>
 
-      <!-- Project 3: Idea -->
-      <article class="project-card project-card--idea" tabindex="0">
-        <div class="card-header">
-          <span class="card-ticker card-ticker--idea">VAR · MKT</span>
-          <span class="card-status-badge badge--idea">[Idea / Planned]</span>
-        </div>
+      <article class="project-card" tabindex="0">
+        <span class="card-ticker">VAR · MKT</span>
+        <span class="card-status">Concept</span>
         <h3 class="card-title">High-Frequency Market Microstructure &amp; Risk Simulator</h3>
-        <p class="card-desc">[Planned Design Concept] Stochastic simulation environment modeling order-flow toxicity (VPIN), bid-ask spread dynamics under inventory pressure, and continuous Value-at-Risk (VaR) monitoring for high-frequency strategies.</p>
+        <p class="card-desc">A stochastic simulation environment modeling order-flow toxicity (VPIN), bid-ask spread dynamics, and real-time Value-at-Risk tracking across multi-asset trading books.</p>
         <div class="card-tags">
-          <span class="card-tag">VPIN Metric</span>
-          <span class="card-tag">Value-at-Risk</span>
-          <span class="card-tag">Stochastic Flow</span>
-          <span class="card-tag">C++ / Python</span>
+          <span class="card-tag">C++</span>
+          <span class="card-tag">Dash</span>
+          <span class="card-tag">Stochastic Models</span>
+          <span class="card-tag">VPIN</span>
         </div>
         <div class="card-stats">
-          <div class="stat"><span class="stat-label">Metric</span><span class="stat-value stat-value--idea">VPIN / VaR</span></div>
-          <div class="stat"><span class="stat-label">Simulation</span><span class="stat-value stat-value--idea">Stochastic</span></div>
-          <div class="stat"><span class="stat-label">Focus</span><span class="stat-value stat-value--idea">Flow Toxicity</span></div>
-          <div class="stat"><span class="stat-label">Stage</span><span class="stat-value stat-value--idea">Concept</span></div>
+          <div class="stat"><span class="stat-label">Toxicity</span><span class="stat-value">VPIN</span></div>
+          <div class="stat"><span class="stat-label">VaR</span><span class="stat-value">99%</span></div>
+          <div class="stat"><span class="stat-label">Model</span><span class="stat-value">Stochastic</span></div>
+          <div class="stat"><span class="stat-label">Stack</span><span class="stat-value">C++ / Dash</span></div>
         </div>
       </article>
     </div>
 
-    <p class="disclaimer reveal">* Personal research and simulation benchmarks. Projects designated [Idea / Planned] represent upcoming research projects.</p>
+    <p class="disclaimer reveal">The LOB engine &amp; RL agent is a completed personal build — latency and fill-rate figures are from local simulation, not a production trading environment. Projects marked <em>Concept</em> are in active development: the architecture is final, the build is ongoing. None of this is investment advice.</p>
+  </div>
+</section>
 
-    <!-- Robotics Callout Banner -->
-    <div class="robotics-cross-banner reveal">
-      <div class="rcb-content">
-        <span class="rcb-tag">Robotics &amp; Applied Systems Track</span>
-        <h3 class="rcb-title">Looking for Proven C++ &amp; PyTorch Codebases?</h3>
-        <p class="rcb-desc">Explore my robotics engineering portfolio featuring <strong>GVHMR2PBHC</strong> — an open-source physics-based RL whole-body control pipeline for the Unitree G1 humanoid robot adopted by top universities (BIT, ECNU, USTB).</p>
+<section id="exposure" class="section">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal">4.0 — Tracked Exposure</p>
+    <p class="exposure-intro reveal">A small paper book I track live — the same positions I use to stress-test the risk tooling above. Allocation is set by hand (no API can see a personal book); prices refresh from a live quote feed when configured, and fall back to a static snapshot otherwise.</p>
+
+    <div class="exposure-grid reveal-stagger">
+      <div class="donut-wrap">
+        <svg class="donut-svg" viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="donut-track" cx="100" cy="100" r="80"></circle>
+        </svg>
+        <div class="donut-center">
+          <span class="donut-center-num" id="donutCount">0</span>
+          <span class="donut-center-label">Positions</span>
+        </div>
       </div>
-      <a href="robotics.html" class="btn btn--robotics">Explore Robotics Portfolio ↗</a>
+      <div class="exposure-legend" id="exposureLegend"></div>
     </div>
+
+    <p class="exposure-note" id="exposureNote">Prices shown are a static snapshot.</p>
   </div>
 </section>
 
 <section id="contact" class="section section--contact">
   <div class="section-inner">
-    <p class="section-eyebrow reveal">4.0 — Contact</p>
-    <h2 class="contact-headline reveal">Let's discuss market microstructure, models, or algorithms.</h2>
-    <a href="mailto:thanisornjarudilokkul@gmail.com" class="contact-email reveal">thanisornjarudilokkul@gmail.com</a>
+    <p class="section-eyebrow reveal">5.0 — Contact</p>
+    <h2 class="contact-headline reveal">Let's talk markets, models, or machines.</h2>
+    <a href="mailto:thanisornjarudilokkil@gmail.com" class="contact-email reveal">thanisornjarudilokkil@gmail.com</a>
     <div class="social-row reveal">
       <a href="https://hk.linkedin.com/in/thanisorn-jarudilokkul-048870326" target="_blank" rel="noopener" class="social-btn" aria-label="LinkedIn">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
@@ -688,10 +668,10 @@
 
 <footer class="site-footer">
   <div class="footer-links">
-    <a href="index.html">&larr; Main</a>
-    <a href="robotics.html" class="footer-cross">Robotics Portfolio &#8599;</a>
+    <a href="index.html">&larr; Gateway</a>
+    <a href="robotics.html" class="footer-cross">Robotics Engineering work &#8599;</a>
   </div>
-  <p class="footer-copy">&copy; 2026 Thanisorn Jarudilokkul</p>
+  <p class="footer-copy">&copy; 2026 Thanisorn J.</p>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
@@ -725,7 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ================= Hero canvas ================= */
+  /* ================= Hero canvas (ambient signal / ticker field) ================= */
   const heroCanvas = document.getElementById('hero-canvas');
   if (heroCanvas) {
     const ctx = heroCanvas.getContext('2d');
@@ -956,6 +936,115 @@ document.addEventListener('DOMContentLoaded', () => {
         onUpdate: () => { counter.textContent = Math.round(counterObj.val) + '%'; }
       }, 0);
   });
+
+  /* ================= Tracked Exposure (paper book) =================
+     Allocation % is always set by hand — no public API can see a
+     personal brokerage book, so this stays manual.
+     Price / 24h change CAN be live: get a free key at finnhub.io and
+     paste it below. Leave it blank to keep the static snapshot values —
+     the page works exactly the same either way, nothing breaks. */
+  const FINNHUB_API_KEY = '';
+
+  const HOLDINGS = [
+    { ticker: 'AAPL', name: 'Apple Inc.',         pct: 24, price: 227.50, change: 0.6,  color: '#3ecf8e' },
+    { ticker: 'NVDA', name: 'NVIDIA Corp.',       pct: 22, price: 135.20, change: 1.8,  color: '#6bdba8' },
+    { ticker: 'TSLA', name: 'Tesla Inc.',         pct: 16, price: 261.40, change: -0.9, color: '#98e6c2' },
+    { ticker: 'SPY',  name: 'SPDR S&P 500 ETF',   pct: 20, price: 560.30, change: 0.3,  color: '#2a9d6f' },
+    { ticker: '',     name: 'Cash & Equivalents', pct: 18, price: null,   change: null, color: '#1a3d30' }
+  ];
+
+  function renderExposure() {
+    const svg = document.querySelector('.donut-svg');
+    const legend = document.getElementById('exposureLegend');
+    const countEl = document.getElementById('donutCount');
+    const noteEl = document.getElementById('exposureNote');
+    if (!svg || !legend || !countEl) return;
+
+    countEl.textContent = String(HOLDINGS.length);
+
+    const head = document.createElement('div');
+    head.className = 'legend-row legend-head';
+    head.innerHTML = '<span>Position</span><span>Alloc.</span><span>Price</span><span>24h</span>';
+    legend.appendChild(head);
+
+    let cumulative = 0;
+    HOLDINGS.forEach((h) => {
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('class', 'donut-seg');
+      circle.setAttribute('cx', '100');
+      circle.setAttribute('cy', '100');
+      circle.setAttribute('r', '80');
+      circle.setAttribute('pathLength', '100');
+      circle.setAttribute('stroke', h.color);
+      circle.setAttribute('stroke-dashoffset', String(-cumulative));
+      circle.setAttribute('stroke-dasharray', reduced ? `${h.pct} ${100 - h.pct}` : '0 100');
+      svg.appendChild(circle);
+
+      const row = document.createElement('div');
+      row.className = 'legend-row';
+      const changeClass = h.change == null ? '' : (h.change >= 0 ? 'is-up' : 'is-down');
+      const changeText = h.change == null ? '—' : `${h.change >= 0 ? '+' : ''}${h.change.toFixed(1)}%`;
+      const priceText = h.price == null ? '—' : `$${h.price.toFixed(2)}`;
+      row.innerHTML = `
+        <span class="legend-name"><span class="legend-dot" style="background:${h.color}"></span><strong>${h.ticker || 'CASH'}</strong>${h.ticker ? ' · ' + h.name : ''}</span>
+        <span class="legend-pct">${h.pct}%</span>
+        <span class="legend-price" data-price-for="${h.ticker}">${priceText}</span>
+        <span class="legend-change ${changeClass}" data-change-for="${h.ticker}">${changeText}</span>
+      `;
+      legend.appendChild(row);
+
+      if (!reduced) {
+        const proxy = { val: 0 };
+        gsap.to(proxy, {
+          val: h.pct,
+          duration: 1.1,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: svg, start: 'top 85%' },
+          onUpdate: () => { circle.setAttribute('stroke-dasharray', `${proxy.val} ${100 - proxy.val}`); }
+        });
+      }
+
+      cumulative += h.pct;
+    });
+
+    if (FINNHUB_API_KEY) {
+      if (noteEl) noteEl.textContent = 'Fetching live prices…';
+      fetchLivePrices(noteEl);
+    }
+  }
+
+  async function fetchLivePrices(noteEl) {
+    const tickers = HOLDINGS.filter((h) => h.ticker).map((h) => h.ticker);
+    const results = await Promise.allSettled(
+      tickers.map((t) =>
+        fetch(`https://finnhub.io/api/v1/quote?symbol=${t}&token=${FINNHUB_API_KEY}`).then((r) => r.json())
+      )
+    );
+
+    let anyLive = false;
+    results.forEach((res, i) => {
+      const ticker = tickers[i];
+      if (res.status === 'fulfilled' && res.value && typeof res.value.c === 'number' && res.value.c > 0) {
+        anyLive = true;
+        const priceEl = document.querySelector(`[data-price-for="${ticker}"]`);
+        const changeEl = document.querySelector(`[data-change-for="${ticker}"]`);
+        if (priceEl) priceEl.textContent = `$${res.value.c.toFixed(2)}`;
+        if (changeEl && typeof res.value.dp === 'number') {
+          const dp = res.value.dp;
+          changeEl.textContent = `${dp >= 0 ? '+' : ''}${dp.toFixed(1)}%`;
+          changeEl.className = 'legend-change ' + (dp >= 0 ? 'is-up' : 'is-down');
+        }
+      }
+    });
+
+    if (noteEl) {
+      noteEl.textContent = anyLive
+        ? 'Prices are live via Finnhub.'
+        : 'Live fetch didn\'t come through — showing the static snapshot.';
+    }
+  }
+
+  renderExposure();
 });
 </script>
 </body>
