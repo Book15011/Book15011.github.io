@@ -104,7 +104,7 @@
             width: 100%;
         }
 
-        /* Cross-track link to the Quant Developer side — colored with that
+        /* Cross-track link to the Quant Developer side, colored with that
            track's own accent so the color itself signals the destination. */
         nav a.nav-cross {
             padding: 6px 16px;
@@ -687,7 +687,7 @@
     </style>
     <link rel="stylesheet" href="robotics-theme.css">
 </head>
-<body>
+<body class="project-page">
     <header>
         <a href="index.html" class="logo">THANISORN J.</a>
         <nav>
@@ -719,7 +719,7 @@
                     <div class="layer-title">3D Robot Portfolio</div>
                     <div class="divider"></div>
                     <div class="content">
-                        The very website you are on! A portfolio with a 3D robot that tracks cursor movements, built with Three.js and GSAP.
+                        The interactive robot space you are exploring, built with Three.js and GSAP. Pick a model, change its colour, and see how it reacts.
                         <a href="robotics.html" target="_blank" class="project-link">Open Robot Garage</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -729,7 +729,7 @@
                     <div class="layer-title">HearthVoice</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A compassionate AI companion for the elderly, using voice cloning and animated avatars to combat isolation. 💬
+                        A voice-first AI companion concept for older adults, with personalised voices and animated avatars designed to make everyday conversations feel warmer. 💬
                         <a href="https://github.com/Book15011/HearthVoice" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -739,7 +739,7 @@
                     <div class="layer-title">GVHMR2PBHC</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A motion processing pipeline converting GVHMR outputs to PBHC format, with advanced motion stabilization for robotics.
+                        A motion-processing pipeline that converts GVHMR output to PBHC format and helps make the resulting movement more stable for robotics work.
                         <a href="https://github.com/Book15011/GVHMR2PBHC" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -749,7 +749,7 @@
                     <div class="layer-title">Minigame_ML</div>
                     <div class="divider"></div>
                     <div class="content">
-                        An AI bot trained with reinforcement learning for a simplified Chinese Checkers game, mastering moves with Q-learning. 🧠🎯
+                        A simplified Chinese Checkers bot trained with Q-learning. I made it to experiment with how an agent learns better moves through repeated play. 🧠🎯
                         <a href="https://github.com/Book15011/Minigame_ML" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -759,7 +759,7 @@
                     <div class="layer-title">HandTremors Project</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A robotic arm with an active ball joint to assist patients with hand tremors by filtering out unwanted movements. 🤖💡
+                        A robotic-arm concept with an active ball joint that aims to filter unwanted movement and support people living with hand tremors. 🤖💡
                         <a href="https://github.com/Book15011/HandTremors_Project" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -769,7 +769,7 @@
                     <div class="layer-title">VERITAS</div>
                     <div class="divider"></div>
                     <div class="content">
-                        An inclusive education app supporting SDG #4, offering Braille learning, multilingual tools, and more for marginalized learners.
+                        An inclusive learning app with Braille practice and multilingual tools, built around the goal of making education easier to access.
                         <a href="https://github.com/Book15011/VERITAS" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -803,16 +803,21 @@
             const depthProgress = document.getElementById('depthProgress');
             const modalOverlay = document.getElementById('modalOverlay');
             const modalContent = document.getElementById('modalContent');
-            const depthCursor = document.getElementById('depthCursor');
-            const depthShadow = document.getElementById('depthShadow');
             const instructions = document.querySelector('.instructions');
             const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || /Mobi/i.test(navigator.userAgent);
             
             let hoveredLayer = null;
-            let currentDepth = Math.floor(layers.length / 2); // Start at the middle layer
+            let currentDepth = 0;
             const maxDepth = layers.length - 1;
-            const zStep = 200; // Depth step between layers
-            const scaleStep = 0.1; // Scale reduction per layer
+            const scaleStep = isMobile ? 0.04 : 0.055;
+            const horizontalStep = isMobile ? 12 : 28;
+            const verticalStep = isMobile ? 10 : 16;
+
+            function layerTransform(depthDiff, isHovered = false) {
+                const distance = Math.abs(depthDiff);
+                const scale = Math.max(0.78, 1 - distance * scaleStep) + (isHovered ? 0.025 : 0);
+                return `translate(-50%, -50%) translateX(${depthDiff * horizontalStep}px) translateY(${-distance * verticalStep}px) scale(${scale})`;
+            }
             
             // Update layers based on current depth
             function positionLayers() {
@@ -823,38 +828,21 @@
                     // Calculate depth difference from current layer
                     const depthDiff = index - currentDepth;
                     
-                    // Calculate position and scale for depth effect
-                    const translateZ = depthDiff * -zStep;
-                    const scale = 1 - Math.abs(depthDiff) * scaleStep;
-                    const translateX = depthDiff * 50; // Slight horizontal offset
-                    const translateY = -Math.abs(depthDiff) * 20; // Vertical offset for depth effect
-                    
-                    // Apply transform with depth effect
-                    layer.style.transform = `
-                        translate(-50%, -50%)
-                        translateX(${translateX}px)
-                        translateY(${translateY}px)
-                        translateZ(${translateZ}px)
-                        scale(${scale})
-                    `;
+                    layer.style.transform = layerTransform(depthDiff);
                     
                     // Set z-index for proper stacking
                     layer.style.zIndex = layers.length - Math.abs(depthDiff);
                     
                     // Store depth difference for hover effect
                     layer.dataset.depthDiff = depthDiff;
+                    layer.style.opacity = Math.max(0.35, 1 - Math.abs(depthDiff) * 0.16);
                 });
                 
                 // Update depth indicator
                 depthValue.textContent = `${currentDepth + 1}/${layers.length}`;
                 depthProgress.style.width = `${(currentDepth / maxDepth) * 100}%`;
                 
-                // Rotate entire stack for perspective, with a simpler version for mobile
-                if (isMobile) {
-                    layersStack.style.transform = `rotateX(-15deg) scale(0.8)`;
-                } else {
-                    layersStack.style.transform = `rotateY(-27deg) rotateX(-15deg) rotateZ(10deg) scale(0.8)`;
-                }
+                layersStack.style.transform = 'none';
             }
             
             // Enhanced hover effect with depth
@@ -874,28 +862,8 @@
                         hoveredLayer = this;
 
                         const depthDiff = parseInt(this.dataset.depthDiff);
-                        const absDepth = Math.abs(depthDiff);
-                        const originalTranslateY = -absDepth * 20;
-
-                        // A more direct "peek" that comes forward and turns to the user.
-                        const hoverTranslateZ = 1; // Bring forward
-                        const hoverScale = 1.15;     // Scale up
-                        const peekTranslateX = 500;  // Move right
-                        const peekRotateY = -10;      // Turn significantly to face the user, counteracting the stack's rotation.
-                        
-                        this.style.transform = `
-                            translate(-50%, -50%)
-                            translateY(${originalTranslateY}px)
-                            translateZ(${hoverTranslateZ}px)
-                            scale(${hoverScale})
-                            rotateY(${peekRotateY}deg) /* Turn the card first... */
-                            translateX(${peekTranslateX}px) /* ...then move it right */
-                        `;
+                        this.style.transform = layerTransform(depthDiff, true);
                         this.style.zIndex = layers.length + 10;
-                        
-                        // Show depth cursor effect
-                        depthCursor.style.opacity = 1;
-                        depthShadow.style.opacity = 0.8;
                     });
 
                     layer.addEventListener('mouseleave', function() {
@@ -903,26 +871,8 @@
                         hoveredLayer = null;
                         
                         const depthDiff = parseInt(this.dataset.depthDiff);
-                        const absDepth = Math.abs(depthDiff);
-                        
-                        // Return to original position
-                        const translateZ = depthDiff * -zStep;
-                        const scale = 1 - absDepth * scaleStep;
-                        const translateX = depthDiff * 50; // Corrected to match positionLayers()
-                        const translateY = -absDepth * 20;
-                        
-                        this.style.transform = `
-                            translate(-50%, -50%)
-                            translateX(${translateX}px)
-                            translateY(${translateY}px)
-                            translateZ(${translateZ}px)
-                            scale(${scale})
-                        `;
-                        this.style.zIndex = layers.length - absDepth;
-                        
-                        // Hide depth cursor effect
-                        depthCursor.style.opacity = 0;
-                        depthShadow.style.opacity = 0;
+                        this.style.transform = layerTransform(depthDiff);
+                        this.style.zIndex = layers.length - Math.abs(depthDiff);
                     });
                 });
             }
@@ -939,36 +889,13 @@
                 positionLayers();
             });
             
-            // Reset to center
+            // Return to the first project
             resetBtn.addEventListener('click', () => {
-                currentDepth = Math.floor(layers.length / 2);
+                currentDepth = 0;
                 positionLayers();
             });
             
-            // Mouse wheel scrolling
-            if (!isMobile) {
-                window.addEventListener('wheel', function(e) {
-                    if (this.throttleScroll) return;
-                    this.throttleScroll = true;
-                    setTimeout(() => { this.throttleScroll = false; }, 700);
-                    
-                    const changeAndPositionLayers = () => {
-                        if (e.deltaY > 0) {
-                            currentDepth = (currentDepth + 1) % layers.length;
-                        } else {
-                            currentDepth = (currentDepth - 1 + layers.length) % layers.length;
-                        }
-                        positionLayers();
-                    };
-
-                    if (hoveredLayer) {
-                        hoveredLayer.dispatchEvent(new Event('mouseleave'));
-                        setTimeout(changeAndPositionLayers, 150);
-                    } else {
-                        changeAndPositionLayers();
-                    }
-                });
-            } else {
+            if (isMobile) {
                 // Add swipe gestures for mobile
                 let touchStartX = 0;
                 layersStack.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
@@ -1029,34 +956,8 @@
             
             modalOverlay.addEventListener('click', closeModal);
 
-            // Auto-explore for demonstration
-            let autoExplore = true;
-            const autoExploreInterval = setInterval(() => {
-                if (autoExplore && !document.body.classList.contains('modal-active')) {
-                    currentDepth = (currentDepth + 1) % layers.length;
-                    positionLayers();
-                }
-            }, 5000);
-            
-            // Stop auto-explore on any user interaction
-            const stopAutoExplore = () => { autoExplore = false; };
-            ['click', 'wheel', 'touchstart', 'mouseenter'].forEach(evt => {
-                document.body.addEventListener(evt, stopAutoExplore, { once: true });
-            });
-            
-            // Depth cursor effect on mouse move
-            if (!isMobile) {
-                document.addEventListener('mousemove', (e) => {
-                    depthCursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-                    depthShadow.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-                });
-            } else {
-                depthCursor.style.display = 'none';
-                depthShadow.style.display = 'none';
-            }
-
             // Set initial state
-            instructions.textContent = isMobile ? 'Swipe or use buttons to explore | Tap to expand' : 'Scroll or use buttons to explore | Hover for details | Click to expand';
+            instructions.textContent = isMobile ? 'Swipe or use the buttons to change projects. Tap a card for details.' : 'Use the buttons to change projects. Click a card for details.';
             positionLayers();
         });
     </script>
