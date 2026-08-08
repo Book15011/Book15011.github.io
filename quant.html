@@ -275,6 +275,8 @@
     border-radius:20px;
     margin-bottom:20px;
   }
+  .card-status--active{ color:var(--signal); border-color:rgba(62,207,142,.45); background:rgba(62,207,142,.06); }
+  .card-status--idea{ color:#d8b46a; border-color:rgba(216,180,106,.45); background:rgba(216,180,106,.05); }
   .card-title{ font-size:1.28rem; font-weight:600; color:var(--paper); margin-bottom:12px; line-height:1.3; }
   .card-desc{ font-size:.95rem; color:var(--slate); line-height:1.6; margin-bottom:20px; }
   .card-tags{ display:flex; flex-wrap:wrap; gap:8px; }
@@ -292,6 +294,18 @@
   .stat-value{ display:block; font-family:'Roboto Mono', monospace; font-size:1.02rem; font-weight:700; color:var(--signal); }
 
   .disclaimer{ margin-top:40px; font-size:.82rem; color:var(--slate); font-style:italic; max-width:680px; line-height:1.6; }
+
+  .pivot-callout{
+    display:flex; align-items:center; justify-content:space-between; gap:28px;
+    margin:0 0 32px; padding:22px 24px;
+    border:1px solid rgba(62,207,142,.22); border-left:3px solid var(--signal);
+    border-radius:10px; background:linear-gradient(100deg, rgba(62,207,142,.08), rgba(13,19,31,.2));
+  }
+  .pivot-info{ max-width:760px; }
+  .pivot-title{ display:flex; align-items:center; gap:8px; font-family:'Roboto Mono', monospace; font-size:.72rem; letter-spacing:1.3px; text-transform:uppercase; color:var(--signal); }
+  .pivot-desc{ margin:9px 0 0; color:var(--slate); font-size:.92rem; line-height:1.65; }
+  .btn--robotics{ flex-shrink:0; border-color:rgba(62,207,142,.42); color:var(--signal); }
+  .btn--robotics:hover{ background:var(--signal); color:var(--ink); }
 
   /* ================= Tracked Exposure (donut + legend) ================= */
   .exposure-intro{ font-size:1rem; color:var(--slate); max-width:640px; line-height:1.7; margin-bottom:56px; }
@@ -417,6 +431,7 @@
 
     .skills-grid{ grid-template-columns:1fr; gap:44px; }
     .project-grid{ grid-template-columns:1fr; }
+    .pivot-callout{ align-items:flex-start; flex-direction:column; gap:18px; }
     .masthead-strip{ flex-direction:column; }
     .strip-item + .strip-item{ border-left:none; border-top:1px solid var(--hairline); padding-left:0; padding-top:22px; }
     .exposure-grid{ grid-template-columns:1fr; gap:40px; }
@@ -561,7 +576,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           Quantitative Transition Note
         </div>
-        <p class="pivot-desc">As a recent pivot from Robotics to Quantitative Strategy, Project 1 represents my primary active finance codebase. Projects 2 &amp; 3 are structured design concepts [Idea]. To evaluate my existing production C++, PyTorch RL, and real-time systems work, please check my Robotics section below.</p>
+        <p class="pivot-desc">As I transition from Robotics to Quantitative Strategy, the LOB &amp; RL execution agent is my only quant project currently in development. Projects 2 and 3 are research ideas—not started yet. For my established C++, PyTorch reinforcement learning, and real-time systems work, explore the Robotics portfolio.</p>
       </div>
       <a href="robotics.html" class="btn btn--robotics">View Robotics Engineering ↗</a>
     </div>
@@ -569,6 +584,7 @@
     <div class="project-grid reveal-stagger">
       <article class="project-card" tabindex="0">
         <span class="card-ticker">LOB · RL</span>
+        <span class="card-status card-status--active">In Development</span>
         <h3 class="card-title">C++ Limit Order Book Engine &amp; RL Execution Agent</h3>
         <p class="card-desc">A price-time-priority matching engine in C++, exposed to Python via pybind11. A PPO/SAC agent — remapped from my Unitree RL robotics framework — trades against it to minimize implementation shortfall and manage inventory risk.</p>
         <div class="card-tags">
@@ -587,9 +603,9 @@
 
       <article class="project-card" tabindex="0">
         <span class="card-ticker">VOL · OPT</span>
-        <span class="card-status">Concept</span>
+        <span class="card-status card-status--idea">Idea · Not Started</span>
         <h3 class="card-title">Volatility Surface &amp; Multi-Asset Derivatives Pricer</h3>
-        <p class="card-desc">Monte Carlo and Black-Scholes pricing engine generating 3D implied volatility surfaces and real-time Greeks (&Delta;, &Gamma;, <em>V</em>) for equity and FX derivatives.</p>
+        <p class="card-desc">Planned research build for pricing equity and FX derivatives with Black-Scholes and Monte Carlo methods, then visualising implied-volatility surfaces and Greeks.</p>
         <div class="card-tags">
           <span class="card-tag">Python</span>
           <span class="card-tag">NumPy</span>
@@ -597,18 +613,18 @@
           <span class="card-tag">Monte Carlo</span>
         </div>
         <div class="card-stats">
-          <div class="stat"><span class="stat-label">Simulations</span><span class="stat-value">100k</span></div>
-          <div class="stat"><span class="stat-label">Surface</span><span class="stat-value">3D Vol</span></div>
-          <div class="stat"><span class="stat-label">Greeks</span><span class="stat-value">Real-Time</span></div>
-          <div class="stat"><span class="stat-label">Stack</span><span class="stat-value">NumPy / SciPy</span></div>
+          <div class="stat"><span class="stat-label">Focus</span><span class="stat-value">Pricing</span></div>
+          <div class="stat"><span class="stat-label">Method</span><span class="stat-value">Monte Carlo</span></div>
+          <div class="stat"><span class="stat-label">Output</span><span class="stat-value">Vol / Greeks</span></div>
+          <div class="stat"><span class="stat-label">Planned Stack</span><span class="stat-value">NumPy / SciPy</span></div>
         </div>
       </article>
 
       <article class="project-card" tabindex="0">
         <span class="card-ticker">VAR · MKT</span>
-        <span class="card-status">Concept</span>
+        <span class="card-status card-status--idea">Idea · Not Started</span>
         <h3 class="card-title">High-Frequency Market Microstructure &amp; Risk Simulator</h3>
-        <p class="card-desc">A stochastic simulation environment modeling order-flow toxicity (VPIN), bid-ask spread dynamics, and real-time Value-at-Risk tracking across multi-asset trading books.</p>
+        <p class="card-desc">Planned simulation environment for studying order-flow toxicity (VPIN), bid-ask spread dynamics, and Value-at-Risk across multi-asset trading books.</p>
         <div class="card-tags">
           <span class="card-tag">C++</span>
           <span class="card-tag">Dash</span>
@@ -616,15 +632,15 @@
           <span class="card-tag">VPIN</span>
         </div>
         <div class="card-stats">
-          <div class="stat"><span class="stat-label">Toxicity</span><span class="stat-value">VPIN</span></div>
-          <div class="stat"><span class="stat-label">VaR</span><span class="stat-value">99%</span></div>
+          <div class="stat"><span class="stat-label">Focus</span><span class="stat-value">VPIN</span></div>
+          <div class="stat"><span class="stat-label">Risk Lens</span><span class="stat-value">VaR</span></div>
           <div class="stat"><span class="stat-label">Model</span><span class="stat-value">Stochastic</span></div>
-          <div class="stat"><span class="stat-label">Stack</span><span class="stat-value">C++ / Dash</span></div>
+          <div class="stat"><span class="stat-label">Planned Stack</span><span class="stat-value">C++ / Dash</span></div>
         </div>
       </article>
     </div>
 
-    <p class="disclaimer reveal">The LOB engine &amp; RL agent is a completed personal build — latency and fill-rate figures are from local simulation, not a production trading environment. Projects marked <em>Concept</em> are in active development: the architecture is final, the build is ongoing. None of this is investment advice.</p>
+    <p class="disclaimer reveal">The LOB engine &amp; RL agent is a personal project in development; any latency and fill-rate figures are from local simulation, not a production trading environment. Projects marked <em>Idea · Not Started</em> describe intended research builds, not completed work. None of this is investment advice.</p>
   </div>
 </section>
 
