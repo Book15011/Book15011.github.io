@@ -19,13 +19,12 @@
             color: #fff;
             min-height: 100vh;
             overflow-x: hidden;
-            perspective: 1200px;
             scroll-behavior: smooth;
         }
         
         /* Consistent Header Styles */
         header {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -104,7 +103,22 @@
             width: 100%;
         }
 
-        /* Cross-track link to the Quant Developer side, colored with that
+        /* Fallback pill for the Robot Garage link if robotics-theme.css
+           doesn't load — the theme file restyles this further. */
+        nav a.nav-garage {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 238, 255, 0.4);
+            color: #00eeff;
+        }
+        nav a.nav-garage::after { display: none; }
+        nav a.nav-garage:hover, nav a.nav-garage:focus {
+            color: #00eeff;
+            background: rgba(0, 238, 255, 0.12);
+            border-color: #00eeff;
+        }
+
+        /* Cross-track link to the Quant Developer side — colored with that
            track's own accent so the color itself signals the destination. */
         nav a.nav-cross {
             padding: 6px 16px;
@@ -128,11 +142,14 @@
             justify-content: center;
             align-items: center;
             padding: 150px 20px 60px; /* Adjusted top padding */
-            overflow: hidden;
+            overflow: visible;
         }
         
         .page-heading {
             text-align: center;
+            margin-top: 56px; /* Extra clearance so the fixed header never
+                                  overlaps the title, even if robotics-theme.css
+                                  reduces .container's own top padding. */
             margin-bottom: 50px;
             z-index: 10;
             animation: fadeInDown 1s ease-out;
@@ -166,18 +183,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transform-style: preserve-3d;
-            perspective: 2000px;
             margin-top: 30px;
-            transform: translateX(-10%);
         }
 
         .layers-stack {
             position: relative;
             width: 85%;
             height: 100%;
-            transform-style: preserve-3d;
-            transform: rotateY(-25deg) scale(0.9);
         }
 
         .layer {
@@ -194,13 +206,14 @@
             justify-content: center;
             align-items: flex-start;
             text-align: left;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: box-shadow 0.3s ease;
             transform-style: preserve-3d;
             backface-visibility: hidden;
             cursor: pointer;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transform-origin: center center;
+            will-change: transform, filter, opacity;
             z-index: 1;
         }
 
@@ -562,10 +575,6 @@
             h1 {
                 font-size: 3rem;
             }
-
-            .shelf-container {
-                transform: translateX(-5%);
-            }
         }
         
         @media (max-width: 768px) {
@@ -585,9 +594,13 @@
             h1 {
                 font-size: 2.5rem;
             }
+
+            .page-heading {
+                margin-top: 96px;
+            }
+
             .shelf-container {
                 height: 450px;
-                transform: translateX(0);
             }
             
             .layer {
@@ -623,6 +636,10 @@
             .subtitle {
                 font-size: 0.9rem;
                 letter-spacing: 4px;
+            }
+
+            .page-heading {
+                margin-top: 130px;
             }
             
             .layer {
@@ -699,7 +716,7 @@
             <a href="quant.html" class="nav-cross"><i class="fas fa-chart-line"></i> Quant</a>
         </nav>
     </header>
-    <div class="container">
+    <div class="container" id="container">
         <div class="page-heading">
             <h1>My Projects</h1>
             <div class="subtitle">A SELECTION OF MY WORK</div>
@@ -792,174 +809,177 @@
     </div>
     <div class="instructions">Scroll or use buttons to explore | Hover for details | Click to expand</div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const layers = document.querySelectorAll('.layer');
-            const layersStack = document.getElementById('layersStack');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const resetBtn = document.getElementById('resetBtn');
-            const depthValue = document.getElementById('depthValue');
-            const depthProgress = document.getElementById('depthProgress');
-            const modalOverlay = document.getElementById('modalOverlay');
-            const modalContent = document.getElementById('modalContent');
-            const instructions = document.querySelector('.instructions');
-            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || /Mobi/i.test(navigator.userAgent);
-            
-            let hoveredLayer = null;
-            let currentDepth = 0;
-            const maxDepth = layers.length - 1;
-            const scaleStep = isMobile ? 0.04 : 0.055;
-            const horizontalStep = isMobile ? 12 : 28;
-            const verticalStep = isMobile ? 10 : 16;
+document.addEventListener('DOMContentLoaded', function () {
+  const layers = Array.from(document.querySelectorAll('.layer'));
+  const layersStack = document.getElementById('layersStack');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const depthValue = document.getElementById('depthValue');
+  const depthProgress = document.getElementById('depthProgress');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalContent = document.getElementById('modalContent');
+  const instructions = document.querySelector('.instructions');
+  const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || /Mobi/i.test(navigator.userAgent);
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            function layerTransform(depthDiff, isHovered = false) {
-                const distance = Math.abs(depthDiff);
-                const scale = Math.max(0.78, 1 - distance * scaleStep) + (isHovered ? 0.025 : 0);
-                return `translate(-50%, -50%) translateX(${depthDiff * horizontalStep}px) translateY(${-distance * verticalStep}px) scale(${scale})`;
-            }
-            
-            // Update layers based on current depth
-            function positionLayers() {
-                layers.forEach((layer, index) => {
-                    // If a modal is active, don't alter its styles from here.
-                    if (layer.classList.contains('is-modal')) return;
+  const maxIndex = layers.length - 1;
+  /* Flat 2D depth cues only — robotics-theme.css forces the stack's own
+     transform to none, and removes perspective from the shelf container,
+     so 3D rotation/translateZ would be invisible anyway. Depth reads
+     through offset + scale + opacity + blur + saturation instead. */
+  const xStep = isMobile ? 55 : 115;
+  const yStep = isMobile ? 14 : 22;
+  const scaleStep = 0.13;
 
-                    // Calculate depth difference from current layer
-                    const depthDiff = index - currentDepth;
-                    
-                    layer.style.transform = layerTransform(depthDiff);
-                    
-                    // Set z-index for proper stacking
-                    layer.style.zIndex = layers.length - Math.abs(depthDiff);
-                    
-                    // Store depth difference for hover effect
-                    layer.dataset.depthDiff = depthDiff;
-                    layer.style.opacity = Math.max(0.35, 1 - Math.abs(depthDiff) * 0.16);
-                });
-                
-                // Update depth indicator
-                depthValue.textContent = `${currentDepth + 1}/${layers.length}`;
-                depthProgress.style.width = `${(currentDepth / maxDepth) * 100}%`;
-                
-                layersStack.style.transform = 'none';
-            }
-            
-            // Enhanced hover effect with depth
-            if (!isMobile) {
-                layers.forEach(layer => {
-                    layer.addEventListener('mouseenter', function(e) {
-                        if (document.body.classList.contains('modal-active')) return;
+  let hoveredLayer = null;
+  const state = { depth: 0 };
 
-                        // Find the topmost layer at the cursor's position to prevent
-                        // hover effects from firing on multiple overlapping layers.
-                        const elements = document.elementsFromPoint(e.clientX, e.clientY);
-                        const topLayer = elements.find(el => el.classList.contains('layer'));
+  function renderLayers(depth) {
+    layers.forEach((layer, index) => {
+      if (layer === hoveredLayer) return;
 
-                        // If this layer is not the topmost one, do nothing.
-                        if (topLayer !== this) return;
+      const depthDiff = index - depth;
+      const absDiff = Math.abs(depthDiff);
+      const scale = Math.max(0.55, 1 - absDiff * scaleStep);
+      const translateX = depthDiff * xStep;
+      const translateY = -absDiff * yStep;
+      const opacity = Math.max(0.16, 1 - absDiff * 0.3);
+      const blur = Math.min(9, absDiff * 2.5);
+      const saturate = Math.max(0.4, 1 - absDiff * 0.22);
 
-                        hoveredLayer = this;
+      layer.style.transform = `translate(-50%, -50%) translateX(${translateX}px) translateY(${translateY}px) scale(${scale})`;
+      layer.style.opacity = String(opacity);
+      layer.style.filter = `blur(${blur}px) saturate(${saturate})`;
+      layer.style.zIndex = String(Math.max(1, Math.round(layers.length - absDiff)));
+      layer.dataset.depthDiff = String(depthDiff);
+    });
 
-                        const depthDiff = parseInt(this.dataset.depthDiff);
-                        this.style.transform = layerTransform(depthDiff, true);
-                        this.style.zIndex = layers.length + 10;
-                    });
+    const nearestIndex = Math.round(Math.min(Math.max(depth, 0), maxIndex));
+    depthValue.textContent = `${nearestIndex + 1}/${layers.length}`;
+    depthProgress.style.width = `${(nearestIndex / maxIndex) * 100}%`;
+  }
 
-                    layer.addEventListener('mouseleave', function() {
-                        if (document.body.classList.contains('modal-active')) return;
-                        hoveredLayer = null;
-                        
-                        const depthDiff = parseInt(this.dataset.depthDiff);
-                        this.style.transform = layerTransform(depthDiff);
-                        this.style.zIndex = layers.length - Math.abs(depthDiff);
-                    });
-                });
-            }
-            
-            // Move to next layer
-            nextBtn.addEventListener('click', () => {
-                currentDepth = (currentDepth + 1) % layers.length;
-                positionLayers();
-            });
-            
-            // Move to previous layer
-            prevBtn.addEventListener('click', () => {
-                currentDepth = (currentDepth - 1 + layers.length) % layers.length;
-                positionLayers();
-            });
-            
-            // Return to the first project
-            resetBtn.addEventListener('click', () => {
-                currentDepth = 0;
-                positionLayers();
-            });
-            
-            if (isMobile) {
-                // Add swipe gestures for mobile
-                let touchStartX = 0;
-                layersStack.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-                layersStack.addEventListener('touchend', e => {
-                    const touchEndX = e.changedTouches[0].screenX;
-                    if (Math.abs(touchEndX - touchStartX) < 50) return; // Swipe threshold
-                    if (touchEndX < touchStartX) {
-                        nextBtn.click(); // Swipe left
-                    } else {
-                        prevBtn.click(); // Swipe right
-                    }
-                }, { passive: true });
-            }
-            
-            // NEW MODAL LOGIC
-            function openModal(layer) {
-                // Set the modal's background to match the clicked layer
-                modalContent.style.background = layer.style.background;
+  function goToIndex(index) {
+    const clamped = Math.min(Math.max(index, 0), maxIndex);
+    if (reduced) {
+      state.depth = clamped;
+      renderLayers(state.depth);
+      return;
+    }
+    gsap.to(state, {
+      depth: clamped,
+      duration: 0.6,
+      ease: 'power2.out',
+      onUpdate: () => renderLayers(state.depth)
+    });
+  }
 
-                // Populate the modal with the layer's inner content
-                modalContent.innerHTML = layer.innerHTML;
+  /* ---------- Wheel drives depth, but never fights real page scroll ---------- */
+  let wheelLock = false;
+  window.addEventListener('wheel', function (e) {
+    if (document.body.classList.contains('modal-active')) return;
+    const pageScrollable = document.documentElement.scrollHeight > window.innerHeight + 4;
+    if (pageScrollable) return; // let the browser scroll normally, don't intercept
+    e.preventDefault();
+    if (wheelLock) return;
+    wheelLock = true;
+    setTimeout(() => { wheelLock = false; }, 420);
+    goToIndex(Math.round(state.depth) + (e.deltaY > 0 ? 1 : -1));
+  }, { passive: false });
 
-                // Re-query for elements inside the new modal content to adjust them
-                const title = modalContent.querySelector('.layer-title');
-                if (title) title.className = 'modal-layer-title';
+  /* ---------- Hover peek (flat: pop forward, no rotation) ---------- */
+  if (!isMobile) {
+    layers.forEach((layer) => {
+      layer.addEventListener('mouseenter', function (e) {
+        if (document.body.classList.contains('modal-active')) return;
+        const elements = document.elementsFromPoint(e.clientX, e.clientY);
+        const topLayer = elements.find((el) => el.classList.contains('layer'));
+        if (topLayer !== this) return;
 
-                const hoverIndicator = modalContent.querySelector('.hover-indicator');
-                if (hoverIndicator) hoverIndicator.remove();
-                
-                // Add a close button to the modal
-                const closeBtn = document.createElement('button');
-                closeBtn.className = 'modal-close-btn';
-                closeBtn.innerHTML = '&times;';
-                closeBtn.addEventListener('click', closeModal);
-                modalContent.appendChild(closeBtn);
-                
-                // Activate the modal view
-                document.body.classList.add('modal-active');
-                modalContent.classList.add('active');
-            }
+        hoveredLayer = this;
+        this.style.transition = 'transform .4s cubic-bezier(0.16,1,0.3,1), filter .3s ease, opacity .3s ease';
+        this.style.transform = 'translate(-50%, -50%) translateX(0px) translateY(-10px) scale(1.08)';
+        this.style.filter = 'blur(0px) saturate(1)';
+        this.style.opacity = '1';
+        this.style.zIndex = String(layers.length + 10);
+      });
 
-            function closeModal() {
-                document.body.classList.remove('modal-active');
-                modalContent.classList.remove('active');
-                // Reset background for the next modal
-                modalContent.style.background = '';
-            }
+      layer.addEventListener('mouseleave', function () {
+        if (document.body.classList.contains('modal-active')) return;
+        hoveredLayer = null;
+        this.style.transition = 'none';
+        renderLayers(state.depth);
+      });
+    });
+  }
 
-            layers.forEach(layer => {
-                layer.addEventListener('click', function(event) {
-                    // Don't open modal if a link was clicked or if a modal is already active
-                    if (event.target.closest('a') || document.body.classList.contains('modal-active')) {
-                        return;
-                    }
-                    openModal(this);
-                });
-            });
-            
-            modalOverlay.addEventListener('click', closeModal);
+  /* ---------- Buttons / keyboard / swipe (all identical, all unified) ---------- */
+  nextBtn.addEventListener('click', () => goToIndex(Math.round(state.depth) + 1));
+  prevBtn.addEventListener('click', () => goToIndex(Math.round(state.depth) - 1));
+  resetBtn.addEventListener('click', () => goToIndex(0));
 
-            // Set initial state
-            instructions.textContent = isMobile ? 'Swipe or use the buttons to change projects. Tap a card for details.' : 'Use the buttons to change projects. Click a card for details.';
-            positionLayers();
-        });
+  document.addEventListener('keydown', (e) => {
+    if (document.body.classList.contains('modal-active')) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goToIndex(Math.round(state.depth) + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goToIndex(Math.round(state.depth) - 1);
+  });
+
+  if (isMobile) {
+    let touchStartX = 0;
+    layersStack.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    layersStack.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].screenX;
+      if (Math.abs(touchEndX - touchStartX) < 50) return;
+      if (touchEndX < touchStartX) goToIndex(Math.round(state.depth) + 1);
+      else goToIndex(Math.round(state.depth) - 1);
+    }, { passive: true });
+  }
+
+  /* ---------- Modal ---------- */
+  function openModal(layer) {
+    modalContent.style.background = layer.style.background;
+    modalContent.innerHTML = layer.innerHTML;
+
+    const title = modalContent.querySelector('.layer-title');
+    if (title) title.className = 'modal-layer-title';
+
+    const hoverIndicator = modalContent.querySelector('.hover-indicator');
+    if (hoverIndicator) hoverIndicator.remove();
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'modal-close-btn';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', closeModal);
+    modalContent.appendChild(closeBtn);
+
+    document.body.classList.add('modal-active');
+    modalContent.classList.add('active');
+  }
+
+  function closeModal() {
+    document.body.classList.remove('modal-active');
+    modalContent.classList.remove('active');
+    modalContent.style.background = '';
+  }
+
+  layers.forEach((layer) => {
+    layer.addEventListener('click', function (event) {
+      if (event.target.closest('a') || document.body.classList.contains('modal-active')) return;
+      openModal(this);
+    });
+  });
+
+  modalOverlay.addEventListener('click', closeModal);
+
+  instructions.textContent = isMobile
+    ? 'Swipe or use the buttons to explore | Tap a card to expand'
+    : 'Scroll, use the arrow keys, or the buttons to explore | Hover to peek | Click to expand';
+
+  renderLayers(0);
+});
     </script>
 </body>
 </html>
