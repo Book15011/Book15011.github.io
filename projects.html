@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Projects - Thanisorn J.</title>
+    <script>
+        // Runs immediately, before layout, so the CSS lock below and the
+        // wheel handler in the main script always agree on the same check.
+        if (!('ontouchstart' in window || navigator.maxTouchPoints > 0 || /Mobi/i.test(navigator.userAgent))) {
+            document.documentElement.classList.add('is-precise-pointer');
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -20,6 +27,15 @@
             min-height: 100vh;
             overflow-x: hidden;
             scroll-behavior: smooth;
+        }
+
+        /* Desktop/trackpad only: lock to one viewport so wheel input can be
+           dedicated entirely to changing the project layer. Mobile keeps
+           natural scroll, since it uses touch-swipe on the cards instead. */
+        html.is-precise-pointer,
+        html.is-precise-pointer body {
+            height: 100%;
+            overflow: hidden;
         }
         
         /* Consistent Header Styles */
@@ -144,13 +160,21 @@
             padding: 150px 20px 60px; /* Adjusted top padding */
             overflow: visible;
         }
+
+        /* Higher specificity than robotics-theme.css's ".project-page
+           .container" so this page keeps direct control of its own
+           vertical rhythm — needed to reliably fit one viewport. */
+        body.project-page .container {
+            padding: 108px 20px 20px;
+        }
+
+        body.project-page .shelf-container {
+            height: clamp(280px, 42vh, 400px);
+        }
         
         .page-heading {
             text-align: center;
-            margin-top: 56px; /* Extra clearance so the fixed header never
-                                  overlaps the title, even if robotics-theme.css
-                                  reduces .container's own top padding. */
-            margin-bottom: 50px;
+            margin-bottom: 20px;
             z-index: 10;
             animation: fadeInDown 1s ease-out;
         }
@@ -595,12 +619,12 @@
                 font-size: 2.5rem;
             }
 
-            .page-heading {
-                margin-top: 96px;
+            body.project-page .container {
+                padding-top: 152px;
             }
 
             .shelf-container {
-                height: 450px;
+                height: 420px;
             }
             
             .layer {
@@ -638,8 +662,8 @@
                 letter-spacing: 4px;
             }
 
-            .page-heading {
-                margin-top: 130px;
+            body.project-page .container {
+                padding-top: 196px;
             }
             
             .layer {
@@ -822,10 +846,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const modalOverlay = document.getElementById('modalOverlay');
   const modalContent = document.getElementById('modalContent');
   const instructions = document.querySelector('.instructions');
-  const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || /Mobi/i.test(navigator.userAgent);
+  const isMobile = !document.documentElement.classList.contains('is-precise-pointer');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const maxIndex = layers.length - 1;
+  const n = layers.length;
+  const maxIndex = n - 1;
   /* Flat 2D depth cues only — robotics-theme.css forces the stack's own
      transform to none, and removes perspective from the shelf container,
      so 3D rotation/translateZ would be invisible anyway. Depth reads
@@ -835,13 +860,21 @@ document.addEventListener('DOMContentLoaded', function () {
   const scaleStep = 0.13;
 
   let hoveredLayer = null;
-  const state = { depth: 0 };
+  const state = { depth: 0 }; // unbounded — allowed to grow/shrink past [0, maxIndex]
+
+  // Shortest signed distance from `depth` to `index` on a circle of size n,
+  // so the stack wraps around continuously instead of snapping at the ends.
+  function circularDiff(index, depth) {
+    let diff = index - depth;
+    diff = (((diff + n / 2) % n) + n) % n - n / 2;
+    return diff;
+  }
 
   function renderLayers(depth) {
     layers.forEach((layer, index) => {
       if (layer === hoveredLayer) return;
 
-      const depthDiff = index - depth;
+      const depthDiff = circularDiff(index, depth);
       const absDiff = Math.abs(depthDiff);
       const scale = Math.max(0.55, 1 - absDiff * scaleStep);
       const translateX = depthDiff * xStep;
@@ -853,42 +886,43 @@ document.addEventListener('DOMContentLoaded', function () {
       layer.style.transform = `translate(-50%, -50%) translateX(${translateX}px) translateY(${translateY}px) scale(${scale})`;
       layer.style.opacity = String(opacity);
       layer.style.filter = `blur(${blur}px) saturate(${saturate})`;
-      layer.style.zIndex = String(Math.max(1, Math.round(layers.length - absDiff)));
+      layer.style.zIndex = String(Math.max(1, Math.round(n - absDiff)));
       layer.dataset.depthDiff = String(depthDiff);
     });
 
-    const nearestIndex = Math.round(Math.min(Math.max(depth, 0), maxIndex));
-    depthValue.textContent = `${nearestIndex + 1}/${layers.length}`;
+    const nearestIndex = Math.round((((Math.round(depth) % n) + n) % n));
+    depthValue.textContent = `${nearestIndex + 1}/${n}`;
     depthProgress.style.width = `${(nearestIndex / maxIndex) * 100}%`;
   }
 
   function goToIndex(index) {
-    const clamped = Math.min(Math.max(index, 0), maxIndex);
     if (reduced) {
-      state.depth = clamped;
+      state.depth = index;
       renderLayers(state.depth);
       return;
     }
     gsap.to(state, {
-      depth: clamped,
+      depth: index,
       duration: 0.6,
       ease: 'power2.out',
       onUpdate: () => renderLayers(state.depth)
     });
   }
 
-  /* ---------- Wheel drives depth, but never fights real page scroll ---------- */
+  /* ---------- Wheel drives depth — desktop is CSS-locked to one
+     viewport (see html.is-precise-pointer), so there is nothing to
+     scroll and no need to defensively check for it here. ---------- */
   let wheelLock = false;
-  window.addEventListener('wheel', function (e) {
-    if (document.body.classList.contains('modal-active')) return;
-    const pageScrollable = document.documentElement.scrollHeight > window.innerHeight + 4;
-    if (pageScrollable) return; // let the browser scroll normally, don't intercept
-    e.preventDefault();
-    if (wheelLock) return;
-    wheelLock = true;
-    setTimeout(() => { wheelLock = false; }, 420);
-    goToIndex(Math.round(state.depth) + (e.deltaY > 0 ? 1 : -1));
-  }, { passive: false });
+  if (!isMobile) {
+    window.addEventListener('wheel', function (e) {
+      if (document.body.classList.contains('modal-active')) return;
+      e.preventDefault();
+      if (wheelLock) return;
+      wheelLock = true;
+      setTimeout(() => { wheelLock = false; }, 420);
+      goToIndex(Math.round(state.depth) + (e.deltaY > 0 ? 1 : -1));
+    }, { passive: false });
+  }
 
   /* ---------- Hover peek (flat: pop forward, no rotation) ---------- */
   if (!isMobile) {
@@ -919,7 +953,12 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ---------- Buttons / keyboard / swipe (all identical, all unified) ---------- */
   nextBtn.addEventListener('click', () => goToIndex(Math.round(state.depth) + 1));
   prevBtn.addEventListener('click', () => goToIndex(Math.round(state.depth) - 1));
-  resetBtn.addEventListener('click', () => goToIndex(0));
+  resetBtn.addEventListener('click', () => {
+    const currentMod = ((state.depth % n) + n) % n;
+    let toZero = -currentMod;
+    toZero = (((toZero + n / 2) % n) + n) % n - n / 2; // shortest signed path
+    goToIndex(state.depth + toZero);
+  });
 
   document.addEventListener('keydown', (e) => {
     if (document.body.classList.contains('modal-active')) return;
