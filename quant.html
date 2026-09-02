@@ -537,7 +537,7 @@
           <div class="skill-track"><div class="skill-fill"></div></div>
         </div>
         <div class="skill-row" data-pct="75">
-          <div class="skill-row-top"><span class="skill-name">Low-Latency C++</span><span class="skill-pct">0%</span></div>
+          <div class="skill-row-top"><span class="skill-name">Embedded C++</span><span class="skill-pct">0%</span></div>
           <div class="skill-track"><div class="skill-fill"></div></div>
         </div>
         <div class="skill-row" data-pct="90">
@@ -550,7 +550,7 @@
     <div class="tag-cloud reveal">
       <p class="tag-cloud-label">Also Working With</p>
       <div class="tags">
-        <span class="tag">pybind11</span>
+        <span class="tag">Gymnasium</span>
         <span class="tag">Stable-Baselines3</span>
         <span class="tag">PyTorch</span>
         <span class="tag">NumPy</span>
@@ -576,7 +576,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           Quantitative Transition Note
         </div>
-        <p class="pivot-desc">I am moving from robotics into quantitative strategy, so the LOB and RL execution agent is the one quant project I am actively building right now. Projects 2 and 3 are ideas for future work and have not started yet. For more of my C++, PyTorch, reinforcement learning, and real-time systems work, take a look at the Robotics portfolio.</p>
+        <p class="pivot-desc">I am moving from robotics into quantitative strategy. The LOB execution system is complete — a three-tier RL stack benchmarked against TWAP under pre-registered success criteria, with the full experimental record written up. Projects 2 and 3 are ideas for future work and have not started yet. For more of my C++, PyTorch, reinforcement learning, and real-time systems work, take a look at the Robotics portfolio.</p>
       </div>
       <a href="robotics-home.html" class="btn btn--robotics">View Robotics Engineering ↗</a>
     </div>
@@ -584,20 +584,20 @@
     <div class="project-grid reveal-stagger">
       <article class="project-card" tabindex="0">
         <span class="card-ticker">LOB · RL</span>
-        <span class="card-status card-status--active">In Development</span>
-        <h3 class="card-title">C++ Limit Order Book Engine &amp; RL Execution Agent</h3>
-        <p class="card-desc">A C++ price-time-priority matching engine with Python bindings through pybind11. I am adapting ideas from my robotics RL work to train a PPO or SAC agent that can balance execution cost and inventory risk.</p>
+        <span class="card-status card-status--active">Complete</span>
+        <h3 class="card-title">Hierarchical Multi-Agent RL for Limit Order Book Execution [Shadowbook-RL]</h3>
+        <p class="card-desc">A three-tier execution stack — local-LLM macro analyst, SAC strategist, RecurrentPPO executioner — trained on 441 days of BTCUSDT L2 order-book data against a queue-position-aware fill simulator. Matched a TWAP benchmark on implementation shortfall while leaving a far less predictable order footprint.</p>
         <div class="card-tags">
-          <span class="card-tag">C++17</span>
-          <span class="card-tag">pybind11</span>
-          <span class="card-tag">PPO / SAC</span>
-          <span class="card-tag">PyTorch</span>
+          <span class="card-tag">Python</span>
+          <span class="card-tag">Stable-Baselines3</span>
+          <span class="card-tag">SAC / RecurrentPPO</span>
+          <span class="card-tag">Ollama</span>
         </div>
         <div class="card-stats">
-          <div class="stat"><span class="stat-label">Latency</span><span class="stat-value">&lt; 1.2ms</span></div>
-          <div class="stat"><span class="stat-label">Fill Rate</span><span class="stat-value">98.4%</span></div>
-          <div class="stat"><span class="stat-label">Agent</span><span class="stat-value">PPO</span></div>
-          <div class="stat"><span class="stat-label">Stack</span><span class="stat-value">C++17 / PyTorch</span></div>
+          <div class="stat"><span class="stat-label">IS (bps)</span><span class="stat-value">0.99 vs 0.89</span></div>
+          <div class="stat"><span class="stat-label">Predictability</span><span class="stat-value">78% vs 99.7%</span></div>
+          <div class="stat"><span class="stat-label">Fill Ratio</span><span class="stat-value">91.9%</span></div>
+          <div class="stat"><span class="stat-label">Stack</span><span class="stat-value">Python / SB3</span></div>
         </div>
       </article>
 
@@ -640,7 +640,7 @@
       </article>
     </div>
 
-    <p class="disclaimer reveal">The LOB engine &amp; RL agent is a personal project in development; any latency and fill-rate figures are from local simulation, not a production trading environment. Projects marked <em>Idea · Not Started</em> describe intended research builds, not completed work. None of this is investment advice.</p>
+    <p class="disclaimer reveal">The LOB execution system is a personal research project; all figures come from historical replay simulation, not a production trading environment. The simulator has no adversarial participants, so the predictability gap is a measured property of the two policies, not a demonstrated trading advantage. Projects marked <em>Idea · Not Started</em> describe intended research builds, not completed work. None of this is investment advice.</p>
   </div>
 </section>
 
