@@ -120,7 +120,7 @@
         }
 
         /* Fallback pill for the Robot Garage link if robotics-theme.css
-           doesn't load — the theme file restyles this further. */
+           doesn't load; the theme file restyles this further. */
         nav a.nav-garage {
             padding: 6px 16px;
             border-radius: 20px;
@@ -134,7 +134,7 @@
             border-color: #00eeff;
         }
 
-        /* Cross-track link to the Quant Developer side — colored with that
+        /* Cross-track link to the Quant Developer side, colored with that
            track's own accent so the color itself signals the destination. */
         nav a.nav-cross {
             padding: 6px 16px;
@@ -163,7 +163,7 @@
 
         /* Higher specificity than robotics-theme.css's ".project-page
            .container" so this page keeps direct control of its own
-           vertical rhythm — needed to reliably fit one viewport. */
+           vertical rhythm, needed to reliably fit one viewport. */
         body.project-page .container {
             padding: 108px 20px 20px;
         }
@@ -760,7 +760,7 @@
                     <div class="layer-title">3D Robot Portfolio</div>
                     <div class="divider"></div>
                     <div class="content">
-                        The interactive robot space you are exploring, built with Three.js and GSAP. Pick a model, change its colour, and see how it reacts.
+                        An interactive 3D robot environment built with Three.js and GSAP. Select a model, adjust its colour, and view its responses.
                         <a href="robotics.html" target="_blank" class="project-link">Open Robot Garage</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -770,7 +770,7 @@
                     <div class="layer-title">HearthVoice</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A voice-first AI companion concept for older adults, with personalised voices and animated avatars designed to make everyday conversations feel warmer. 💬
+                        A voice-first AI companion concept for older adults, with personalised voices and animated avatars for more engaging everyday conversations.
                         <a href="https://github.com/Book15011/HearthVoice" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -780,7 +780,7 @@
                     <div class="layer-title">GVHMR2PBHC</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A motion-processing pipeline that converts GVHMR output to PBHC format and helps make the resulting movement more stable for robotics work.
+                        A motion-processing pipeline that converts GVHMR output to PBHC format and improves motion stability for robotics applications.
                         <a href="https://github.com/Book15011/GVHMR2PBHC" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -790,7 +790,7 @@
                     <div class="layer-title">Minigame_ML</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A simplified Chinese Checkers bot trained with Q-learning. I made it to experiment with how an agent learns better moves through repeated play. 🧠🎯
+                        A simplified Chinese Checkers bot trained with Q-learning to study how an agent improves its moves through repeated play.
                         <a href="https://github.com/Book15011/Minigame_ML" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -800,7 +800,7 @@
                     <div class="layer-title">HandTremors Project</div>
                     <div class="divider"></div>
                     <div class="content">
-                        A robotic-arm concept with an active ball joint that aims to filter unwanted movement and support people living with hand tremors. 🤖💡
+                        A robotic-arm concept with an active ball joint designed to filter unwanted movement and support people with hand tremors.
                         <a href="https://github.com/Book15011/HandTremors_Project" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -810,7 +810,7 @@
                     <div class="layer-title">VERITAS</div>
                     <div class="divider"></div>
                     <div class="content">
-                        An inclusive learning app with Braille practice and multilingual tools, built around the goal of making education easier to access.
+                        An inclusive learning app with Braille practice and multilingual tools intended to improve access to education.
                         <a href="https://github.com/Book15011/VERITAS" target="_blank" class="project-link">View on GitHub</a>
                     </div>
                     <div class="hover-indicator"></div>
@@ -851,7 +851,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const n = layers.length;
   const maxIndex = n - 1;
-  /* Flat 2D depth cues only — robotics-theme.css forces the stack's own
+  /* Flat 2D depth cues only; robotics-theme.css forces the stack's own
      transform to none, and removes perspective from the shelf container,
      so 3D rotation/translateZ would be invisible anyway. Depth reads
      through offset + scale + opacity + blur + saturation instead. */
@@ -860,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const scaleStep = 0.13;
 
   let hoveredLayer = null;
-  const state = { depth: 0 }; // unbounded — allowed to grow/shrink past [0, maxIndex]
+  const state = { depth: 0 }; // unbounded; allowed to grow/shrink past [0, maxIndex]
 
   // Shortest signed distance from `depth` to `index` on a circle of size n,
   // so the stack wraps around continuously instead of snapping at the ends.
@@ -909,7 +909,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* ---------- Wheel drives depth — desktop is CSS-locked to one
+  /* ---------- Wheel drives depth; desktop is CSS-locked to one
      viewport (see html.is-precise-pointer), so there is nothing to
      scroll and no need to defensively check for it here. ---------- */
   let wheelLock = false;

@@ -1,4 +1,4 @@
-# ⚡🤖 Thanisorn J. — Dual-Track Portfolio
+# ⚡🤖 Thanisorn J.: Dual-Track Portfolio
 
 **Demo**
 
@@ -8,24 +8,24 @@ A personal portfolio split into two tracks from a single Gateway: a **Quantitati
 
 ## 🗺️ Site Map
 
-- **`index.html`** — the Gateway. Split-screen chooser between the two tracks.
-- **Quant track** — `quant.html` (single scrolling page: hero, profile, skillset, projects, tracked exposure, contact)
-- **Robotics track** — `robotics.html` (the original interactive 3D robot experience, formerly `index.html`) → `about.html` → `projects.html` → `contact.html` → `thanks.html`
+- **`index.html`**: the Gateway. Split-screen chooser between the two tracks.
+- **Quant track**: `quant.html` (single scrolling page: hero, profile, skillset, projects, tracked exposure, contact)
+- **Robotics track**: `robotics.html` (the original interactive 3D robot experience, formerly `index.html`) → `about.html` → `projects.html` → `contact.html` → `thanks.html`
 
 ## ✨ Key Features
 
-**Gateway** — GSAP-driven split-screen with hover/focus expansion and a live canvas background per track.
+**Gateway**: GSAP-driven split-screen with hover/focus expansion and a live canvas background per track.
 
 **Quant track** (positioned for Quantitative Strategist / Global Markets Trading roles)
 - Canvas hero animation blending an oscilloscope-style trace with a live ticker line
 - Scroll-triggered skill bars and tag reveals (GSAP ScrollTrigger)
 - Project cards for a completed C++ limit-order-book engine + RL execution agent, plus two clearly-marked *Concept*-stage projects (vol-surface pricer, microstructure/risk simulator)
-- A **Tracked Exposure** section: an animated SVG donut chart + legend showing a paper book's allocation. Allocation is always manual (no public API can see a personal brokerage book); price/24h-change can optionally go live via a free Finnhub API key — see `FINNHUB_API_KEY` near the bottom of `quant.html`'s script. Empty key = static snapshot, page still looks complete.
+- A **Tracked Exposure** section: an animated SVG donut chart + legend showing a paper book's allocation. Allocation is always manual (no public API can see a personal brokerage book); price/24h-change can optionally go live via a free Finnhub API key. See `FINNHUB_API_KEY` near the bottom of `quant.html`'s script. An empty key uses the static snapshot.
 - Cross-track nav pill to Robotics, colored in *that track's* accent as a wayfinding cue
 
 **Robotics track**
 - Interactive 3D robot model with cursor head-tracking (Three.js + GLTFLoader), model switching, color-shift, dance mode
-- Typography refreshed to Inter / Roboto Mono (from the system font stack) to match the Quant track's type system, plus small HUD-style eyebrow/control labels — purely visual, the Three.js/GSAP engine underneath is untouched
+- Typography refreshed to Inter / Roboto Mono (from the system font stack) to match the Quant track's type system, plus small HUD-style eyebrow/control labels; the Three.js/GSAP engine underneath is untouched.
 - Cross-track nav pill to Quant, same wayfinding convention
 
 ## 🛠 Technical Implementation
@@ -42,17 +42,17 @@ A personal portfolio split into two tracks from a single Gateway: a **Quantitati
 [https://book15011.github.io](https://book15011.github.io)
 
 ## 📂 Project Structure
-- index.html      # Gateway — choose Quant or Robotics
+- index.html      # Gateway: choose Quant or Robotics
 - quant.html      # Quantitative Strategist portfolio (self-contained)
 - robotics.html   # Interactive 3D robot homepage (formerly index.html)
-- about.html      # Robotics track — professional background
-- projects.html   # Robotics track — project showcase
-- contact.html    # Robotics track — contact form
-- thanks.html     # Robotics track — submission confirmation
+- about.html      # Robotics track: professional background
+- projects.html   # Robotics track: project showcase
+- contact.html    # Robotics track: contact form
+- thanks.html     # Robotics track: submission confirmation
 - robot_1.glb, robot_2.glb, robot_3.glb   # 3D robot models
-- style.css, script.js   # Legacy assets — not currently linked from any page
+- style.css, script.js   # Legacy assets; not currently linked from any page
 
 ## 📝 Notes for next cleanup
-- `robotics.html`'s model selector references a fourth model, `robot_4.glb` ("Heavy Bot"), which isn't in this repo — add the file or drop that entry from the `models` array.
-- The contact email (`thanisornjarudilokkil@gmail.com`) and LinkedIn slug (`thanisorn-jarudilokkul`) spell the surname differently — worth confirming which is correct.
-- The Tracked Exposure holdings/prices in `quant.html` are placeholder data — edit the `HOLDINGS` array near the bottom of the script to reflect a real (or intentionally illustrative) book.
+- `robotics.html`'s model selector references a fourth model, `robot_4.glb` ("Heavy Bot"), which isn't in this repo; add the file or remove that entry from the `models` array.
+- The contact email (`thanisornjarudilokkil@gmail.com`) and LinkedIn slug (`thanisorn-jarudilokkul`) spell the surname differently; confirm which is correct.
+- The Tracked Exposure holdings/prices in `quant.html` are placeholder data; edit the `HOLDINGS` array near the bottom of the script to reflect a real or intentionally illustrative book.
