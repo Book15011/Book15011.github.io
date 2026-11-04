@@ -292,6 +292,10 @@
   }
   .stat-label{ display:block; font-family:'Roboto Mono', monospace; font-size:.62rem; letter-spacing:1.3px; text-transform:uppercase; color:var(--slate); margin-bottom:4px; }
   .stat-value{ display:block; font-family:'Roboto Mono', monospace; font-size:1.02rem; font-weight:700; color:var(--signal); }
+  .stat-value--down{ color:#e2637a; }
+
+  .card-link{ display:inline-block; margin-top:18px; font-family:'Roboto Mono', monospace; font-size:.76rem; color:var(--slate); text-decoration:none; transition:color .3s ease; }
+  .card-link:hover{ color:var(--signal); }
 
   .disclaimer{ margin-top:40px; font-size:.82rem; color:var(--slate); font-style:italic; max-width:680px; line-height:1.6; }
 
@@ -576,7 +580,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           Quantitative Transition Note
         </div>
-        <p class="pivot-desc">I am transitioning from robotics to quantitative strategy. The completed LOB execution system is a three-tier RL stack benchmarked against TWAP using pre-registered success criteria, with the full experimental record documented. Projects 2 and 3 are planned research builds and have not yet started. My Robotics portfolio includes additional C++, PyTorch, reinforcement-learning, and real-time systems work.</p>
+        <p class="pivot-desc">I am transitioning from robotics to quantitative strategy. The completed LOB execution system is a three-tier RL stack benchmarked against TWAP using pre-registered success criteria, with the full experimental record documented. MiniMax, a team trading bot, lost money in live competition, and I keep it here for what the testing taught me. The projects marked as ideas are planned research builds and have not yet started. My Robotics portfolio includes additional C++, PyTorch, reinforcement-learning, and real-time systems work.</p>
       </div>
       <a href="robotics-home.html" class="btn btn--robotics">View Robotics Engineering ↗</a>
     </div>
@@ -599,6 +603,26 @@
           <div class="stat"><span class="stat-label">Fill Ratio</span><span class="stat-value">91.9%</span></div>
           <div class="stat"><span class="stat-label">Stack</span><span class="stat-value">Python / SB3</span></div>
         </div>
+      </article>
+
+      <article class="project-card" tabindex="0">
+        <span class="card-ticker">CRYPTO</span>
+        <span class="card-status">Complete · Lost Money</span>
+        <h3 class="card-title">Autonomous Crypto Trading Bot, Roostoo Hackathon [MiniMax]</h3>
+        <p class="card-desc">A team of three built a bot that traded by itself for a 14-day competition on a $100k mock account. I owned data, backtesting, and validation. The round did not go our way: the strategy lost money and most later fixes failed their tests. What held up was the process: pre-registered tests, and live orders that disproved a scalping edge our replay had shown.</p>
+        <div class="card-tags">
+          <span class="card-tag">Python</span>
+          <span class="card-tag">Backtesting</span>
+          <span class="card-tag">Pre-Registration</span>
+          <span class="card-tag">AWS EC2</span>
+        </div>
+        <div class="card-stats">
+          <div class="stat"><span class="stat-label">Paper, 11 Days</span><span class="stat-value stat-value--down">−17.5%</span></div>
+          <div class="stat"><span class="stat-label">BTC, Same Period</span><span class="stat-value stat-value--down">−4.7%</span></div>
+          <div class="stat"><span class="stat-label">Backtest Windows</span><span class="stat-value">2,298</span></div>
+          <div class="stat"><span class="stat-label">Automated Tests</span><span class="stat-value">275</span></div>
+        </div>
+        <a href="https://github.com/Book15011/MiniMax" target="_blank" rel="noopener" class="card-link">View on GitHub ↗</a>
       </article>
 
       <article class="project-card" tabindex="0">
@@ -640,7 +664,7 @@
       </article>
     </div>
 
-    <p class="disclaimer reveal">The LOB execution system is a personal research project; all figures come from historical replay simulation, not a production trading environment. The simulator has no adversarial participants, so the predictability gap is a measured property of the two policies, not a demonstrated trading advantage. Projects marked <em>Idea · Not Started</em> describe intended research builds, not completed work. None of this is investment advice.</p>
+    <p class="disclaimer reveal">The LOB execution system is a personal research project; all figures come from historical replay simulation, not a production trading environment. The simulator has no adversarial participants, so the predictability gap is a measured property of the two policies, not a demonstrated trading advantage. MiniMax traded a mock competition account; its −17.5% comes from a paper bot running the launch model on live quotes. Projects marked <em>Idea · Not Started</em> describe intended research builds, not completed work. None of this is investment advice.</p>
   </div>
 </section>
 
