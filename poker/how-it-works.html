@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How the Poker AI Works | Thanisorn J.</title>
+<meta name="description" content="How a heads-up poker AI was trained with counterfactual regret minimization, solves the turn and river live in the browser, and how it measured against independent opponents.">
+<link rel="icon" href="../favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #05080f; --panel: #0d131f; --hair: rgba(255, 255, 255, .09); --paper: #eef1f6; --slate: #9aa3b5; --signal: #3ecf8e; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--ink); color: var(--paper); font-family: 'Inter', 'Segoe UI', sans-serif; line-height: 1.6; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 16px clamp(20px, 5vw, 60px); border-bottom: 1px solid var(--hair); font-size: .85rem; flex-wrap: wrap; }
+  .bar a { color: var(--slate); text-decoration: none; }
+  .bar a:hover { color: var(--paper); }
+  .bar nav { display: flex; gap: 20px; }
+  main { max-width: 980px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 40px) 90px; }
+  section { padding: 56px 0 8px; scroll-margin-top: 20px; }
+  .eyebrow { font-family: 'Roboto Mono', monospace; font-size: .72rem; letter-spacing: 2.4px; text-transform: uppercase; color: var(--signal); margin-bottom: 12px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.3rem, 6vw, 3.8rem); line-height: 1.06; margin-bottom: 18px; }
+  h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3.6vw, 2.3rem); line-height: 1.15; margin-bottom: 14px; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 26px 0 8px; }
+  p { color: #c4cad6; max-width: 720px; margin-bottom: 12px; }
+  p.lead { font-size: 1.1rem; color: var(--paper); font-weight: 300; }
+  .play { display: inline-flex; align-items: center; gap: 10px; margin-top: 12px; padding: 13px 26px; border-radius: 10px; background: linear-gradient(180deg, #3ecf8e, #27a970); color: #04140d; font-weight: 700; text-decoration: none; transition: transform .15s, filter .15s; }
+  .play:hover { transform: translateY(-2px); filter: brightness(1.08); }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 20px 0; }
+  .step { background: var(--panel); border: 1px solid var(--hair); border-radius: 12px; padding: 16px; }
+  .step b { display: block; margin-bottom: 6px; font-size: .95rem; }
+  .step span { display: block; font-family: 'Roboto Mono', monospace; font-size: .64rem; letter-spacing: 1px; text-transform: uppercase; color: var(--signal); margin-bottom: 8px; }
+  .step p { font-size: .84rem; margin: 0; color: var(--slate); }
+  .table-wrap { overflow-x: auto; margin: 14px 0; border: 1px solid var(--hair); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: .85rem; min-width: 480px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  th { color: var(--slate); font-weight: 500; font-size: .74rem; letter-spacing: .4px; background: rgba(255, 255, 255, .02); }
+  td.num, th.num { text-align: right; font-family: 'Roboto Mono', monospace; white-space: nowrap; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 18px 0; }
+  .tile { background: var(--panel); border: 1px solid var(--hair); border-radius: 12px; padding: 16px; }
+  .tile b { display: block; font-family: 'Roboto Mono', monospace; font-size: 1.5rem; line-height: 1.2; margin-bottom: 4px; }
+  .tile small { color: var(--slate); font-size: .78rem; line-height: 1.35; display: block; }
+  .chart { position: relative; background: var(--panel); border: 1px solid var(--hair); border-radius: 12px; padding: 14px 14px 8px; margin: 14px 0; }
+  .chart svg { display: block; width: 100%; height: auto; }
+  .chart-title { font-size: .86rem; font-weight: 600; margin-bottom: 8px; }
+  .chart-tip { position: absolute; pointer-events: none; background: #05080f; border: 1px solid var(--hair); border-radius: 8px; padding: 7px 10px; font-size: .74rem; white-space: nowrap; opacity: 0; transition: opacity .1s; z-index: 2; }
+  .note { font-size: .82rem; color: var(--slate); }
+  ul { margin: 0 0 12px 18px; color: #c4cad6; max-width: 720px; }
+  li { margin-bottom: 7px; }
+  .pending { color: var(--slate); font-style: italic; }
+  footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--hair); font-size: .82rem; color: var(--slate); display: flex; flex-wrap: wrap; gap: 18px; }
+</style>
+</head>
+<body>
+<header class="bar">
+  <a href="../quant.html">&larr; Thanisorn J.</a>
+  <nav>
+    <a href="index.html">Play</a>
+    <a href="#benchmarks">Benchmarks</a>
+    <a href="https://github.com/Book15011/Book15011.github.io/tree/main/poker" target="_blank" rel="noopener">GitHub &#8599;</a>
+  </nav>
+</header>
+<main>
+  <section>
+    <p class="eyebrow">Game theory &middot; Imperfect information</p>
+    <h1>How the poker AI works</h1>
+    <p class="lead">In chess you can see the whole board. In poker you can't, so the right move depends on what your opponent might hold, and that depends on what they think you might hold. This project is a working attempt at that problem: a heads-up No-Limit Hold'em AI, trained offline and solving live in your browser.</p>
+    <a class="play" href="index.html">Play against it &#9824;</a>
+  </section>
+
+  <section>
+    <h2>The approach in four steps</h2>
+    <div class="steps">
+      <div class="step"><span>Offline</span><b>Group similar hands</b><p>K-means clustering reduces billions of situations to a few thousand buckets per street.</p></div>
+      <div class="step"><span>Offline</span><b>Learn by self-play</b><p>Monte Carlo counterfactual regret minimization plays billions of hands against itself, moving toward a strategy that is hard to exploit.</p></div>
+      <div class="step"><span>Offline</span><b>Ship only what's needed</b><p>Only preflop and flop strategies are exported, as compact tables. No server is needed after this.</p></div>
+      <div class="step"><span>In your browser</span><b>Solve the rest live</b><p>On the turn and river, a WebAssembly solver in a background thread works out the rest of the hand, including the exact size you bet.</p></div>
+    </div>
+    <p>This is the recipe from <a href="https://arxiv.org/abs/1805.08195">Modicum</a> and <a href="https://noambrown.github.io/papers/19-Science-Superhuman.pdf">Pluribus</a>, at a far smaller scale. I also looked at Deep CFR and DeepStack-style value networks. Value networks were out of reach (DeepStack's turn network alone took over 175 core-years of solving), and a neural policy had no evidence of beating this design on the hardware available. The <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/RESEARCH.md">research notes</a> cover the comparison.</p>
+  </section>
+
+  <section>
+    <h2>What runs where</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Part</th><th>When</th><th>What it does</th></tr>
+      <tr><td>Card buckets</td><td>Offline</td><td>Clusters hands by strength and how they may develop, on every board</td></tr>
+      <tr><td>Blueprint</td><td>Offline</td><td>Average strategy from self-play, one table per stack depth</td></tr>
+      <tr><td>Range tracking</td><td>Live</td><td>Updates what each player could hold, from public betting only</td></tr>
+      <tr><td>Preflop and flop</td><td>Live</td><td>Looks up the trained strategy, translating unusual bet sizes</td></tr>
+      <tr><td>Turn and river</td><td>Live</td><td>Solves the rest of the hand with Discounted CFR, about a second or two</td></tr>
+    </table></div>
+    <p>The AI runs in a Web Worker that only ever receives its own view of the table: its two cards, the board and the betting. It has no route to your cards or the deck. There is no language model and no paid API, and nothing leaves your browser.</p>
+  </section>
+
+  <section id="benchmarks">
+    <p class="eyebrow">Measured, not claimed</p>
+    <h2>Benchmark results</h2>
+    <p>All results run the same JavaScript and WebAssembly that ship to your browser. Hand-written opponents play duplicate deals (each deck twice, with seats swapped) to cancel card luck. Ranges are 95% confidence intervals. Win rates are in big blinds per 100 hands.</p>
+    <div id="results"><p class="pending">Results are loading.</p></div>
+  </section>
+
+  <section>
+    <h2>What this doesn't show</h2>
+    <ul>
+      <li><b>It is not a solution of poker.</b> The blueprint is an equilibrium of a simplified game, and the solver uses estimated ranges and a limited set of bet sizes.</li>
+      <li><b>It has not played professionals.</b> Beating bots, including strong ones, is not the same as beating people who can adapt over thousands of hands.</li>
+      <li><b>It does not adapt to you.</b> It aims to be hard to exploit, rather than to punish your specific habits, so it can win less from weak players than a good human would.</li>
+      <li><b>One quick match is mostly luck.</b> A win or loss over 15 hands says little either way.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/AI_EXPLAINED.md">AI explained</a>
+    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/RESEARCH.md">Research notes</a>
+    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/ARCHITECTURE.md">Architecture</a>
+    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/TRAINING.md">Training</a>
+    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/BENCHMARKS.md">Full benchmarks</a>
+  </footer>
+</main>
+<script type="module">
+  const el = document.getElementById('results');
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const num = (x, d = 1) => `${x >= 0 ? '+' : ''}${x.toFixed(d)}`;
+
+  /** Dot-and-whisker chart: one series, a zero baseline, a 95% interval per row. */
+  function intervalChart(title, rows, unit) {
+    const W = 760, rowH = 34, left = 170, right = 24, top = 8, bottom = 30, H = top + bottom + rows.length * rowH;
+    const lo = Math.min(0, ...rows.map((r) => r.value - r.ci)), hi = Math.max(0, ...rows.map((r) => r.value + r.ci));
+    const pad = (hi - lo) * 0.06 || 1;
+    const x = (v) => left + ((v - (lo - pad)) / (hi - lo + 2 * pad)) * (W - left - right);
+    const step = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000].find((s) => (hi - lo + 2 * pad) / s <= 6) ?? 10000;
+    let grid = '';
+    for (let t = Math.ceil((lo - pad) / step) * step; t <= hi + pad; t += step) {
+      grid += `<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H - bottom}" stroke="${t === 0 ? 'rgba(255,255,255,.4)' : 'rgba(255,255,255,.07)'}"/>
+        <text x="${x(t)}" y="${H - bottom + 18}" fill="#9aa3b5" font-size="11" text-anchor="middle" font-family="Roboto Mono, monospace">${t}</text>`;
+    }
+    const marks = rows.map((r, i) => {
+      const y = top + i * rowH + rowH / 2;
+      return `<g class="row" data-tip="${esc(r.label)}: ${num(r.value)} &#177; ${r.ci.toFixed(1)} ${esc(unit)}">
+        <rect x="0" y="${y - rowH / 2}" width="${W}" height="${rowH}" fill="transparent"/>
+        <text x="${left - 12}" y="${y + 4}" fill="#eef1f6" font-size="12.5" text-anchor="end" font-family="Inter, sans-serif">${esc(r.label)}</text>
+        <line x1="${x(r.value - r.ci)}" x2="${x(r.value + r.ci)}" y1="${y}" y2="${y}" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="${x(r.value)}" cy="${y}" r="5" fill="#3ecf8e" stroke="#0d131f" stroke-width="2"/></g>`;
+    }).join('');
+    const box = document.createElement('div');
+    box.className = 'chart';
+    box.innerHTML = `<div class="chart-title">${esc(title)}</div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}. The table below has the same numbers.">${grid}${marks}</svg><div class="chart-tip"></div>`;
+    const tip = box.querySelector('.chart-tip');
+    box.querySelectorAll('.row').forEach((g) => {
+      g.addEventListener('pointermove', (e) => {
+        const b = box.getBoundingClientRect();
+        tip.textContent = g.dataset.tip.replace('&#177;', '±');
+        tip.style.opacity = 1;
+        tip.style.left = `${Math.min(b.width - 230, Math.max(6, e.clientX - b.left + 12))}px`;
+        tip.style.top = `${e.clientY - b.top - 34}px`;
+      });
+      g.addEventListener('pointerleave', () => { tip.style.opacity = 0; });
+    });
+    return box;
+  }
+
+  function table(headers, rows) {
+    const wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    const numeric = headers.map((h) => h.startsWith('#'));
+    wrap.innerHTML = `<table><tr>${headers.map((h, i) => `<th class="${numeric[i] ? 'num' : ''}">${esc(h.replace(/^#/, ''))}</th>`).join('')}</tr>${rows.map((r) => `<tr>${r.map((c, i) => `<td class="${numeric[i] ? 'num' : ''}">${esc(c)}</td>`).join('')}</tr>`).join('')}</table>`;
+    return wrap;
+  }
+
+  function h3(t) { const x = document.createElement('h3'); x.textContent = t; return x; }
+  function para(t, cls) { const x = document.createElement('p'); x.textContent = t; if (cls) x.className = cls; return x; }
+
+  try {
+    const res = await fetch('data/benchmarks.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+    el.innerHTML = '';
+    const tiles = document.createElement('div');
+    tiles.className = 'tiles';
+    for (const t of d.tiles) tiles.innerHTML += `<div class="tile"><b>${esc(t.value)}</b><small>${esc(t.label)}</small></div>`;
+    el.appendChild(tiles);
+    for (const s of d.sections) {
+      el.appendChild(h3(s.title));
+      if (s.text) el.appendChild(para(s.text));
+      if (s.chart) el.appendChild(intervalChart(s.chart.title, s.chart.rows, s.chart.unit));
+      if (s.table) el.appendChild(table(s.table.headers, s.table.rows));
+      if (s.note) el.appendChild(para(s.note, 'note'));
+    }
+  } catch (e) {
+    el.innerHTML = `<p class="pending">The results file could not load. They are also in <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/BENCHMARKS.md">docs/BENCHMARKS.md</a>.</p>`;
+  }
+</script>
+</body>
+</html>

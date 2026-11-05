@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can You Beat My Poker AI? | Thanisorn J.</title>
+<meta name="description" content="Play heads-up No-Limit Texas Hold'em against an AI trained with counterfactual regret minimization that solves the turn and river live in your browser. Virtual chips only.">
+<link rel="icon" href="../favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;family=Inter:wght@400;500;600;700;800&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/poker.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #05080f; }
+  body { display: flex; flex-direction: column; height: 100dvh; font-family: 'Inter', 'Segoe UI', sans-serif; color: #eef1f6; }
+  .pk-page-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px; font-size: .8rem; border-bottom: 1px solid rgba(255, 255, 255, .09); flex: none; }
+  .pk-page-bar a { color: #9aa3b5; text-decoration: none; }
+  .pk-page-bar a:hover { color: #eef1f6; }
+  .pk-page-bar nav { display: flex; gap: 16px; }
+  #game { flex: 1; min-height: 0; }
+</style>
+</head>
+<body>
+<header class="pk-page-bar">
+  <a href="../quant.html">&larr; Thanisorn J.</a>
+  <nav>
+    <a href="how-it-works.html">How it works</a>
+    <a href="how-it-works.html#benchmarks">Benchmarks</a>
+    <a href="https://github.com/Book15011/Book15011.github.io/tree/main/poker" target="_blank" rel="noopener">GitHub &#8599;</a>
+  </nav>
+</header>
+<main id="game"></main>
+<script type="module">
+  import { mountPokerGame } from './js/ui/game.js';
+  const params = new URLSearchParams(location.search);
+  mountPokerGame(document.getElementById('game'), {
+    format: params.get('format') === 'deep' ? 'deep' : 'quick',
+    links: { howItWorks: 'how-it-works.html', benchmarks: 'how-it-works.html#benchmarks', source: 'https://github.com/Book15011/Book15011.github.io/tree/main/poker' },
+  });
+</script>
+<noscript>This game needs JavaScript. The rest of the portfolio works without it.</noscript>
+</body>
+</html>
