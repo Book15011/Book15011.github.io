@@ -27,7 +27,7 @@ const bot = new ExpertBot({
   blueprintFor: (bb) => blueprints.get(nearestDepth(depths, bb)),
   bucketsFor: buckets,
   rng: seededRng(seed),
-  solver: new RealtimeSolver(core, { turn: { iterations: Number(turnArg) }, river: { iterations: Number(riverArg) } }),
+  solver: new RealtimeSolver(core, { turn: { iterations: Number(turnArg) }, river: { iterations: Number(riverArg) }, riverStride: 4 }),
 });
 
 async function post(path, body, attempt = 0) {

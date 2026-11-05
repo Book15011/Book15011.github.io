@@ -203,7 +203,7 @@ export class BlueprintWalker {
     while (lo + 1 < raises.length && raises[lo + 1].frac <= realFraction) lo++;
     if (realFraction <= raises[0].frac || lo === raises.length - 1) {
       const pick = realFraction <= raises[0].frac ? raises[0] : raises[raises.length - 1];
-      if (Math.abs(pick.frac - realFraction) > 0.03) this.translated = true;
+      if (Number.isFinite(realFraction) && Math.abs(pick.frac - realFraction) > 0.03) this.translated = true;
       this.#updateReach([[pick.a, 1]]);
       this.#moveTo(pick.child);
       return !this.offTree;

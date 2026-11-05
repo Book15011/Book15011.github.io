@@ -151,13 +151,13 @@ class PokerGame {
     this.tab = 'log';
     this.#buildShell();
     this.keyHandler = (/** @type {KeyboardEvent} */ e) => this.#onKey(e);
-    root.addEventListener('keydown', this.keyHandler);
+    document.addEventListener('keydown', this.keyHandler);
     this.#showMenu();
   }
 
   destroy() {
     this.token++;
-    this.root.removeEventListener('keydown', this.keyHandler);
+    document.removeEventListener('keydown', this.keyHandler);
     this.ai?.destroy();
     this.root.innerHTML = '';
   }
@@ -193,6 +193,7 @@ class PokerGame {
             </div>
             <div class="pk-bet" data-el="betYou"></div>
             <div class="pk-seat pk-seat--you" data-el="seatYou">
+              <div class="pk-handname" data-el="handName" data-test="hand-name"></div>
               <div class="pk-hole" data-el="youHole" data-test="my-cards"></div>
               <div class="pk-plate"><div class="pk-avatar">YOU</div><div><div class="pk-name">You</div><div class="pk-stack" data-el="youStack" data-test="my-stack">0</div></div><div class="pk-dealer" data-el="dYou" hidden>D</div></div>
             </div>
@@ -203,6 +204,7 @@ class PokerGame {
           <div class="pk-tabs" role="tablist">
             <button class="pk-tab" role="tab" data-tab="log" aria-selected="true">Hand history</button>
             <button class="pk-tab" role="tab" data-tab="review" aria-selected="false">AI review</button>
+            <button class="pk-tab" role="tab" data-tab="help" aria-selected="false" data-test="help-tab">Rules</button>
             <button class="pk-iconbtn pk-only-narrow" data-act="toggleSide" aria-label="Close this panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
           </div>
           <div class="pk-panel-body" data-el="panel"></div>
@@ -259,7 +261,9 @@ class PokerGame {
 
   /** @param {KeyboardEvent} e */
   #onKey(e) {
+    if (!this.app || this.app.offsetParent === null) return; // the game is hidden behind a closed modal
     if (e.key === 'Escape' && this.options.onClose) { this.options.onClose(); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (/** @type {HTMLElement} */ (e.target).tagName === 'INPUT' && e.key !== 'Enter') return;
     if (this.handOver && (e.key === 'Enter' || e.key === ' ') && this.#el('next')) { e.preventDefault(); this.#nextHand(); return; }
     if (!this.awaitingHuman || !this.match?.hand) return;
@@ -419,9 +423,30 @@ class PokerGame {
     }
   }
 
+  /** Slide a chip between two elements. Purely decorative, and skipped if the user prefers reduced motion. @param {HTMLElement} from @param {HTMLElement} to */
+  #flyChip(from, to) {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || !from.isConnected || !to.isConnected) return;
+    const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+    if (!a.width || !b.width) return;
+    for (let i = 0; i < 3; i++) {
+      const c = document.createElement('i');
+      c.className = 'pk-chip pk-chip-fly';
+      c.style.left = `${a.left + a.width / 2 - 8}px`;
+      c.style.top = `${a.top + a.height / 2 - 8}px`;
+      this.app.appendChild(c);
+      const dx = b.left + b.width / 2 - a.left - a.width / 2, dy = b.top + b.height / 2 - a.top - a.height / 2;
+      const anim = c.animate([{ transform: 'translate(0,0)', opacity: 1 }, { transform: `translate(${dx}px,${dy}px)`, opacity: 0.9 }], { duration: 300 + i * 40, delay: i * 35, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'both' });
+      anim.onfinish = () => c.remove();
+      anim.oncancel = () => c.remove();
+    }
+  }
+
   /** @param {any} action @param {number} seat */
   #apply(action, seat) {
     const m = /** @type {Match} */ (this.match);
+    const plate = /** @type {HTMLElement} */ ((seat === HUMAN ? this.els.seatYou : this.els.seatAi).querySelector('.pk-plate'));
+    const betSpot = seat === HUMAN ? this.els.betYou : this.els.betAi;
+    const hadBets = /** @type {any} */ (m.hand).bets.some((/** @type {number} */ x) => x > 0);
     try {
       m.act(action);
     } catch (err) {
@@ -430,7 +455,14 @@ class PokerGame {
       const l = /** @type {any} */ (m.hand).legalActions();
       m.act(l.canCheck ? { type: 'check' } : { type: 'fold' });
     }
-    if (action.type === 'raise' || action.type === 'call') this.sound.chip();
+    if (action.type === 'raise' || action.type === 'call') { this.sound.chip(); this.#flyChip(plate, betSpot); }
+    const handNow = /** @type {any} */ (m.hand);
+    if (hadBets && !handNow.bets.some((/** @type {number} */ x) => x > 0)) {
+      // The street closed: the bets slide into the pot.
+      const pot = /** @type {HTMLElement} */ (this.els.pot);
+      this.#flyChip(this.els.betYou, pot);
+      this.#flyChip(this.els.betAi, pot);
+    }
     this.#syncLog();
     this.#renderState();
     this.#renderPanel();
@@ -460,6 +492,7 @@ class PokerGame {
       this.els.board.replaceChild(c, slots[i]);
     }
     this.boardShown = count;
+    this.#renderHandName(h);
   }
 
   /** @param {any} action */
@@ -506,6 +539,10 @@ class PokerGame {
       line = youWon ? `AI folds. You win ${fmt(r.net[HUMAN])}` : `You fold. AI wins ${fmt(r.net[AI])}`;
     }
     if (youWon) this.sound.win(); else if (!tie) this.sound.lose();
+    if (!tie) {
+      const target = /** @type {HTMLElement} */ ((youWon ? this.els.seatYou : this.els.seatAi).querySelector('.pk-plate'));
+      this.#flyChip(this.els.pot, target);
+    }
     this.currentLog.result = `${line}${detail ? ` (${detail})` : ''}`;
     this.#renderState();
     this.#renderPanel();
@@ -595,9 +632,20 @@ class PokerGame {
     const showBet = (/** @type {HTMLElement} */ el, /** @type {number} */ v) => { el.innerHTML = v > 0 ? `<i class="pk-chip"></i>${fmt(v)}` : ''; };
     showBet(this.els.betYou, h.finished ? 0 : h.bets[HUMAN]);
     showBet(this.els.betAi, h.finished ? 0 : h.bets[AI]);
+    this.#renderHandName(h);
     this.els.seatYou.classList.toggle('is-active', !h.finished && h.toAct === HUMAN);
     this.els.seatAi.classList.toggle('is-active', !h.finished && h.toAct === AI);
     this.#renderTop();
+  }
+
+  /** Tells a newcomer what they currently hold, from their own cards and the visible board. @param {any} h */
+  #renderHandName(h) {
+    const hole = h.holeCards(HUMAN);
+    const visible = h.board.slice(0, this.boardShown);
+    let text = '';
+    if (visible.length >= 3) text = categoryName(evaluate([...hole, ...visible]));
+    else if ((hole[0] >> 2) === (hole[1] >> 2)) text = 'Pair';
+    this.els.handName.textContent = text;
   }
 
   #renderControls() {
@@ -703,7 +751,26 @@ class PokerGame {
 
   #renderPanel() {
     this.root.querySelectorAll('.pk-tab').forEach((t) => t.setAttribute('aria-selected', String(/** @type {HTMLElement} */ (t).dataset.tab === this.tab)));
-    this.els.panel.innerHTML = this.tab === 'log' ? this.#logHtml() : this.#reviewHtml();
+    this.els.panel.innerHTML = this.tab === 'log' ? this.#logHtml() : this.tab === 'review' ? this.#reviewHtml() : this.#helpHtml();
+  }
+
+  #helpHtml() {
+    const hands = [
+      ['Straight flush', 'Five in a row, same suit'], ['Four of a kind', 'Four cards of one rank'], ['Full house', 'Three of a kind plus a pair'],
+      ['Flush', 'Five of the same suit'], ['Straight', 'Five in a row'], ['Three of a kind', 'Three cards of one rank'],
+      ['Two pair', 'Two different pairs'], ['Pair', 'Two cards of one rank'], ['High card', 'None of the above'],
+    ];
+    return `<p style="margin:0 0 8px"><b>Never played? It takes a minute.</b></p>
+      <p class="pk-muted" style="margin:0 0 10px">You and the AI each get two private cards, then five shared cards are dealt in stages. Whoever makes the best five-card hand wins the pot, unless someone folds first. So you can win with the best cards, or by betting enough that the AI gives up.</p>
+      <p style="margin:0 0 4px"><b>Your options</b></p>
+      <div class="pk-log-line"><b>Fold</b>: give up the hand.</div>
+      <div class="pk-log-line"><b>Check</b>: pass, when there is nothing to pay.</div>
+      <div class="pk-log-line"><b>Call</b>: match the AI's bet.</div>
+      <div class="pk-log-line"><b>Bet or raise</b>: put in more and make the AI pay to continue.</div>
+      <p style="margin:12px 0 4px"><b>Hands, best first</b></p>
+      ${hands.map(([a, b]) => `<div class="pk-log-line"><b>${a}</b>: ${b}</div>`).join('')}
+      <p style="margin:12px 0 4px"><b>Shortcuts</b></p>
+      <p class="pk-muted" style="margin:0">F fold, C check or call, R bet or raise, Enter next hand.</p>`;
   }
 
   #logHtml() {

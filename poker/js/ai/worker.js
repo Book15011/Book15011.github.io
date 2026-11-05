@@ -28,8 +28,10 @@ async function init(level) {
     rng,
     analysis: true,
     solver: new RealtimeSolver(store.core, {
-      turn: { budgetMs: 1800, minIterations: 6, iterations: 60 },
-      river: { budgetMs: 700, minIterations: 40, iterations: 500 },
+      turn: { budgetMs: 1500, minIterations: 8, iterations: 80 },
+      river: { budgetMs: 700, minIterations: 40, iterations: 400 },
+      riverStride: 4,
+      adaptive: true,
       analysis: true,
     }),
   });

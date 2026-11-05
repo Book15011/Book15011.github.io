@@ -39,6 +39,8 @@ class RealState {
     } else {
       this.inv[h.seat] += h.amount; this.bets[h.seat] += h.amount;
     }
+    // A raise that puts the effective stack in is an all-in, whatever size it works out to.
+    if (h.type === 'raise' && this.inv[h.seat] >= Math.min(this.startStacks[0], this.startStacks[1])) return Infinity;
     return frac;
   }
 }

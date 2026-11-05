@@ -31,7 +31,7 @@ export class Subgame {
   /**
    * @param {any} core wasm exports
    * @param {{ board:number[], inv:number[], behind:number, ranges:Float32Array[], path?:{player:number,type:number,to:number}[],
-   *           minBet:number, sizes?:any, handFloor?:number, keep?:number[] }} p
+   *           minBet:number, sizes?:any, handFloor?:number, keep?:number[], riverStride?:number }} p
    *   inv: chips each tree player has invested at the start of this street. behind: chips each player can still bet.
    *   ranges: per tree player (0 = button, 1 = big blind), 1326 weights. path: real actions so far on this street.
    */
@@ -44,12 +44,13 @@ export class Subgame {
     this.minBet = p.minBet;
     this.path = p.path ?? [];
     this.sizes = p.sizes ?? SIZES;
+    this.riverStride = p.riverStride ?? 1;
 
     // Hands in play: not blocked by the board and with non-trivial weight for at least one player.
     const blocked = new Uint8Array(52);
     for (const c of p.board) blocked[c] = 1;
     // Hands far below the most likely ones barely affect the result, and dropping them speeds up every pass.
-    const floor = p.handFloor ?? 1e-3;
+    const floor = p.handFloor ?? 5e-3;
     const keep = new Set(p.keep ?? []);
     const norm = [0, 1].map((i) => { let m = 0; for (let h = 0; h < NUM_HANDS; h++) if (p.ranges[i][h] > m) m = p.ranges[i][h]; return m || 1; });
     this.handList = /** @type {number[]} */ ([]);
@@ -179,12 +180,9 @@ export class Subgame {
     const inv = [st.inv[0] + bets[0], st.inv[1] + bets[1]];
     const allIn = Math.max(bets[0], bets[1]) >= this.behind;
     if (st.river) return this.#showdownNode(inv, st.card);
-    // Turn street ended: deal each possible river.
+    // Turn street ended: deal the rivers.
     const idx = this.nodes.length;
-    const seen = new Uint8Array(52);
-    for (const c of this.board) seen[c] = 1;
-    const cards = [];
-    for (let c = 0; c < 52; c++) if (!seen[c]) cards.push(c);
+    const cards = this.#riverCards();
     this.nodes.push({ type: N_CHANCE, player: 0, na: cards.length, first: this.kids.length, off: 0, river: 0 });
     const base = this.kids.length;
     for (const c of cards) { this.kids.push(-1); this.kidCard.push(c); }
@@ -196,6 +194,28 @@ export class Subgame {
         : new RiverBuilder(this).build(inv, leftBehind, c);
     }
     return idx;
+  }
+
+  /**
+   * Which rivers to model. The river is re-solved exactly once it is dealt, so the turn solve only needs a good
+   * estimate of river play. A stride of k keeps every k-th card, stratified so flush cards, board pairs and
+   * ranks all stay represented in proportion.
+   */
+  #riverCards() {
+    if (this.riverCardList) return this.riverCardList;
+    const seen = new Uint8Array(52);
+    const suitCount = [0, 0, 0, 0], rankCount = new Array(13).fill(0);
+    for (const c of this.board) { seen[c] = 1; suitCount[c & 3]++; rankCount[c >> 2]++; }
+    const all = [];
+    for (let c = 0; c < 52; c++) if (!seen[c]) all.push(c);
+    if (this.riverStride <= 1) { this.riverCardList = all; return all; }
+    const klass = (/** @type {number} */ c) => (suitCount[c & 3] >= 2 ? 2 : 0) + (rankCount[c >> 2] > 0 ? 1 : 0);
+    const ordered = [...all].sort((a, b) => klass(a) - klass(b) || (a >> 2) - (b >> 2) || (a & 3) - (b & 3));
+    const out = [];
+    const start = Math.floor(this.riverStride / 2);
+    for (let i = start; i < ordered.length; i += this.riverStride) out.push(ordered[i]);
+    this.riverCardList = out;
+    return out;
   }
 
   /** Internal: build a river decision in the turn subgame. */
@@ -211,7 +231,9 @@ export class Subgame {
   #writeToWasm(/** @type {Float32Array[]} */ ranges) {
     const c = this.core;
     c.sv_reset();
-    c.sv_setup(this.H, this.nodes.length, this.kids.length, this.floats, this.rivers.length, this.isRiver ? 1 : 44);
+    // Of the 48 rivers, 44 are possible for any given pair of hands. A stride scales that to the cards kept.
+    const chanceN = this.isRiver ? 1 : (44 * this.#riverCards().length) / 48;
+    c.sv_setup(this.H, this.nodes.length, this.kids.length, this.floats, this.rivers.length, chanceN);
     const mem = () => c.memory.buffer;
     // Node records.
     const dv = new DataView(mem());
@@ -265,6 +287,7 @@ export class Subgame {
         for (let k = i; k < j; k++) gend[k] = j;
         i = j;
       }
+      c.sv_finish_showdown(r);
     }
   }
 

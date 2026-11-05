@@ -50,6 +50,7 @@
 .pk-name { font-size: .7rem; color: var(--pk-slate); white-space: nowrap; }
 .pk-stack { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: .92rem; }
 .pk-dealer { position: absolute; right: -9px; top: -9px; width: 22px; height: 22px; border-radius: 50%; background: var(--pk-paper); color: #10131b; font-size: .66rem; font-weight: 800; display: grid; place-items: center; box-shadow: 0 2px 6px rgba(0, 0, 0, .5); }
+.pk-handname { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); margin-bottom: 3px; white-space: nowrap; font-family: 'Roboto Mono', monospace; font-size: .68rem; color: var(--pk-amber); }
 .pk-status { font-family: 'Roboto Mono', monospace; font-size: .68rem; color: var(--pk-signal); min-height: 1em; text-align: center; }
 
 .pk-hole { display: flex; gap: 5px; min-height: calc(var(--pk-card-w) * 1.4); }
@@ -110,7 +111,7 @@
 /* ---------- Side panel ---------- */
 .pk-side { width: 320px; flex: none; border-left: 1px solid var(--pk-hair); background: var(--pk-panel); display: flex; flex-direction: column; min-height: 0; }
 .pk-tabs { display: flex; border-bottom: 1px solid var(--pk-hair); flex: none; }
-.pk-tab { flex: 1; padding: 11px 6px; font-size: .74rem; font-weight: 600; color: var(--pk-slate); border-bottom: 2px solid transparent; }
+.pk-tab { flex: 1; padding: 11px 4px; font-size: .74rem; font-weight: 600; color: var(--pk-slate); border-bottom: 2px solid transparent; }
 .pk-tab[aria-selected="true"] { color: var(--pk-paper); border-bottom-color: var(--pk-signal); }
 .pk-panel-body { flex: 1; overflow-y: auto; padding: 10px 12px 18px; font-size: .78rem; overscroll-behavior: contain; }
 .pk-log-hand { margin-bottom: 12px; }

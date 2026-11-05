@@ -13,7 +13,7 @@ import { scoreFromMasks } from '../engine/evaluator.js';
 
 const TYPE = { check: ACT_CHECK, call: ACT_CALL, raise: ACT_RAISE };
 
-/** Equity of `hand` against a weighted range on this board, enumerating the remaining cards when one is left. */
+/** Equity of `hand` against a weighted range on a turn or river board (4 or 5 cards), enumerating any remaining card. */
 export function equityVsRange(hand, board, range) {
   const a = HAND_A[hand], b = HAND_B[hand];
   const m = [0, 0, 0, 0];
@@ -53,7 +53,7 @@ export class RealtimeSolver {
    * @param {any} core wasm exports
    * @param {{turn:{iterations?:number,budgetMs?:number,minIterations?:number},
    *          river:{iterations?:number,budgetMs?:number,minIterations?:number},
-   *          sizes?:any, purifyBelow?:number, rangeFloor?:number, analysis?:boolean, adapt?:any}} cfg
+   *          sizes?:any, purifyBelow?:number, rangeFloor?:number, analysis?:boolean, riverStride?:number, adaptive?:boolean}} cfg
    */
   constructor(core, cfg) {
     this.core = core;
@@ -152,7 +152,7 @@ export class RealtimeSolver {
       const ranges = /** @type {Float32Array[]} */ (this.ranges);
       this.sg = new Subgame(this.core, {
         board: obs.board, inv: start.inv, behind: start.behind, ranges, path,
-        minBet: obs.bigBlind, sizes: this.cfg.sizes, keep: [keepHand],
+        minBet: obs.bigBlind, sizes: this.cfg.sizes, keep: [keepHand], riverStride: street === 2 ? (this.cfg.riverStride ?? 4) : 1,
       });
       this.sgStreet = street;
       for (const [pos, sigma] of this.locks) {
@@ -160,6 +160,8 @@ export class RealtimeSolver {
         if (nodeIdx !== undefined && this.sg.nodes[nodeIdx].na * this.sg.H === sigma.length) this.sg.lockNode(nodeIdx, sigma);
       }
       this.sg.run(budget);
+      // On a slow device, fewer modelled rivers gives a better answer inside the time budget (see BENCHMARKS.md).
+      if (this.cfg.adaptive && street === 2 && (this.sg.lastRunMs ?? 0) / Math.max(1, this.sg.iterations) > 45) this.cfg.riverStride = 6;
     }
     return { sg: /** @type {Subgame} */ (this.sg), path, reused };
   }

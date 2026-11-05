@@ -58,11 +58,15 @@ static int8_t* hand_a;
 static int8_t* hand_b;
 static float* reach_root[2];
 static int num_rivers;
-static int chance_cards;       /* number of possible cards at a chance node, for normalising */
+static float chance_cards;     /* effective number of cards at a chance node, for normalising */
 /* Showdown contexts. Each holds the hand indices sorted by strength and the tie-group end per position. */
 static int16_t* sd_order[MAX_RIVERS];
 static int16_t* sd_group_end[MAX_RIVERS];
 static int sd_count[MAX_RIVERS];
+static int8_t* sd_card_a[MAX_RIVERS];
+static int8_t* sd_card_b[MAX_RIVERS];
+static float* sorted_reach;
+static float* sorted_value;
 static float* card_scratch;
 static float* stack_mem;       /* per-depth scratch vectors */
 static int32_t* locked_off;     /* per-node strategy override: byte offset from `nodes`, or -1 */
@@ -70,7 +74,7 @@ static float* sigma_scratch;
 static float* root_out;
 
 WASM_EXPORT(sv_setup)
-void sv_setup(int hands, int num_nodes, int num_kids, int total_floats, int rivers, int chance_n) {
+void sv_setup(int hands, int num_nodes, int num_kids, int total_floats, int rivers, float chance_n) {
   H = hands;
   num_rivers = rivers;
   chance_cards = chance_n;
@@ -88,6 +92,8 @@ void sv_setup(int hands, int num_nodes, int num_kids, int total_floats, int rive
   card_scratch = sv_alloc(52 * 4);
   stack_mem = sv_alloc(MAX_DEPTH * 10 * H * 4);
   sigma_scratch = sv_alloc(H * 4);
+  sorted_reach = sv_alloc(H * 4);
+  sorted_value = sv_alloc(H * 4);
   root_out = 0;
   locked_off = sv_alloc(num_nodes * 4);
   for (int i = 0; i < num_nodes; i++) locked_off[i] = -1;
@@ -109,9 +115,15 @@ void* sv_set_showdown(int r, int count) {
   sd_count[r] = count;
   sd_order[r] = sv_alloc(count * 2);
   sd_group_end[r] = sv_alloc(count * 2);
+  sd_card_a[r] = sv_alloc(count);
+  sd_card_b[r] = sv_alloc(count);
   return sd_order[r];
 }
 WASM_EXPORT(sv_group_end) void* sv_group_end(int r) { return sd_group_end[r]; }
+/* Call after filling the order array, to cache the cards of each sorted hand. */
+WASM_EXPORT(sv_finish_showdown) void sv_finish_showdown(int r) {
+  for (int i = 0; i < sd_count[r]; i++) { sd_card_a[r][i] = hand_a[sd_order[r][i]]; sd_card_b[r][i] = hand_b[sd_order[r][i]]; }
+}
 
 /* Pin a node's strategy (a past decision by the AI that cannot be changed) to na*H floats. */
 WASM_EXPORT(sv_lock_node)
@@ -162,58 +174,42 @@ static void fold_values(const Node* n, int me, const float* restrict opp, float*
   }
 }
 
-/* Same for a showdown: a single sweep in ascending strength order. */
+/* Same for a showdown. At showdown both players have invested the same, so value = stake * (beats - loses).
+ * One forward sweep over hands in ascending strength counts what each hand beats, one backward sweep what beats
+ * it, each correcting for card removal. Reach is copied into sorted order first, which keeps both sweeps
+ * cache-friendly. Hands that tie contribute to neither. */
 static void showdown_values(const Node* n, int me, const float* restrict opp, float* restrict out) {
   const int r = n->river;
-  const int16_t* order = sd_order[r];
-  const int16_t* gend = sd_group_end[r];
+  const int16_t* restrict order = sd_order[r];
+  const int16_t* restrict gend = sd_group_end[r];
+  const int8_t* restrict ca = sd_card_a[r];
+  const int8_t* restrict cb = sd_card_b[r];
   const int cnt = sd_count[r];
-  const float win = n->win[me], lose = n->lose[me], tie = n->tie[me];
-  float cs_low[52], cs_tie[52];
-  for (int c = 0; c < 52; c++) { cs_low[c] = 0; cs_tie[c] = 0; }
-  float low = 0, grand = 0;
-  float cs_all[52];
-  for (int c = 0; c < 52; c++) cs_all[c] = 0;
-  for (int i = 0; i < cnt; i++) {
-    int h = order[i];
-    float x = opp[h];
-    grand += x;
-    cs_all[hand_a[h]] += x;
-    cs_all[hand_b[h]] += x;
-  }
-  for (int h = 0; h < H; h++) out[h] = 0;
-  int i = 0;
-  while (i < cnt) {
-    int e = gend[i];
-    float tie_total = 0;
-    for (int j = i; j < e; j++) {
-      int h = order[j];
-      float x = opp[h];
-      tie_total += x;
-      cs_tie[hand_a[h]] += x;
-      cs_tie[hand_b[h]] += x;
-    }
-    for (int j = i; j < e; j++) {
-      int h = order[j];
-      int a = hand_a[h], b = hand_b[h];
-      float self = opp[h];
-      float beats = low - cs_low[a] - cs_low[b];
-      float ties = tie_total - cs_tie[a] - cs_tie[b] + self;
-      float all = grand - cs_all[a] - cs_all[b] + self;
-      float loses = all - beats - ties;
-      out[h] = win * beats + tie * ties - lose * loses;
-    }
-    for (int j = i; j < e; j++) {
-      int h = order[j];
-      float x = opp[h];
-      low += x;
-      cs_low[hand_a[h]] += x;
-      cs_low[hand_b[h]] += x;
-      cs_tie[hand_a[h]] -= x;
-      cs_tie[hand_b[h]] -= x;
-    }
+  float* restrict sr = sorted_reach;
+  float* restrict sv = sorted_value;
+  for (int i = 0; i < cnt; i++) sr[i] = opp[order[i]];
+  float cs[52];
+  for (int c = 0; c < 52; c++) cs[c] = 0;
+  float total = 0;
+  for (int i = 0; i < cnt;) {
+    const int e = gend[i];
+    for (int j = i; j < e; j++) sv[j] = total - cs[ca[j]] - cs[cb[j]];
+    for (int j = i; j < e; j++) { const float x = sr[j]; total += x; cs[ca[j]] += x; cs[cb[j]] += x; }
     i = e;
   }
+  for (int c = 0; c < 52; c++) cs[c] = 0;
+  total = 0;
+  for (int i = cnt; i > 0;) {
+    /* Walk tie groups from the strongest down: gstart is the first index of the group ending at i. */
+    int gstart = i - 1;
+    while (gstart > 0 && gend[gstart - 1] == i) gstart--;
+    for (int j = gstart; j < i; j++) sv[j] -= total - cs[ca[j]] - cs[cb[j]];
+    for (int j = gstart; j < i; j++) { const float x = sr[j]; total += x; cs[ca[j]] += x; cs[cb[j]] += x; }
+    i = gstart;
+  }
+  const float stake = n->win[me];
+  for (int h = 0; h < H; h++) out[h] = 0;
+  for (int i = 0; i < cnt; i++) out[order[i]] = stake * sv[i];
 }
 
 static float disc_pos, disc_neg, disc_avg;
@@ -242,7 +238,7 @@ static void walk(int idx, int me, const float* restrict my, const float* restric
         }
       }
       /* Each river is equally likely among the cards unseen by this hand pair. */
-      float w = 1.0f / (float)(chance_cards);
+      float w = 1.0f / chance_cards;
       for (int h = 0; h < H; h++) out[h] *= w;
       return;
     }
@@ -349,7 +345,7 @@ static void br_walk(int idx, int me, const float* restrict opp, float* restrict 
       br_walk(kids[n->first + a], me, oppc, tmp, depth + 1);
       for (int h = 0; h < H; h++) if (hand_a[h] != card && hand_b[h] != card) out[h] += tmp[h];
     }
-    float w = 1.0f / (float)(chance_cards);
+    float w = 1.0f / chance_cards;
     for (int h = 0; h < H; h++) out[h] *= w;
     return;
   }
@@ -411,7 +407,7 @@ static void avg_eval(int idx, int me, const float* restrict opp, float* restrict
       avg_eval(kids[n->first + a], me, oppc, tmp, depth + 1);
       for (int h = 0; h < H; h++) if (hand_a[h] != card && hand_b[h] != card) out[h] += tmp[h];
     }
-    float w = 1.0f / (float)(chance_cards);
+    float w = 1.0f / chance_cards;
     for (int h = 0; h < H; h++) out[h] *= w;
     return;
   }

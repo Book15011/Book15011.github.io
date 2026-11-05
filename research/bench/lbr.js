@@ -3,32 +3,37 @@
 // LBR is told the agent's strategy, so it knows the agent's range and how often it folds to each bet. At each
 // decision it picks the action with the best value, assuming the hand checks down afterwards.
 //
-// To match the setting in the DeepStack and ReBeL tables, LBR calls on preflop and flop ("fc") and plays its
-// best response on the turn and river. It may bet only the sizes in the agent's tree, so it costs no extra solves.
+// fromStreet sets where LBR starts responding. Before that it calls everything.
+//   2 = calls through preflop and flop, responds on turn and river (the setting in the ReBeL table)
+//   1 = calls preflop only, responds from the flop onward
+//   0 = responds from the first decision (the hardest test here, and the fair one at short stacks,
+//       where calling every preflop shove would cost LBR far more than it could ever win back)
+// It may bet only the sizes in the agent's tree, so it costs no extra solves.
 //
-// node lbr.js <mode:expert|blueprint> <bpDir> <dataDir> <depth> <stackBB> <hands> <turnIters> <riverIters> <seed>
+// node lbr.js <mode:expert|blueprint> <bpDir> <dataDir> <depth> <stackBB> <hands> <turnIters> <riverIters> <seed> <fromStreet>
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { HandState } from '../../poker/js/engine/game.js';
 import { seededRng, shuffledDeck } from '../../poker/js/engine/cards.js';
 import { ExpertBot } from '../../poker/js/ai/expert.js';
 import { RealtimeSolver, equityVsRange } from '../../poker/js/ai/realtime.js';
+import { monteCarloEquity } from '../../poker/js/ai/bots.js';
 import { loadSolverCore, ACT_FOLD, ACT_RAISE } from '../../poker/js/ai/solver.js';
 import { NUM_HANDS, HAND_A, HAND_B, pairIdx } from '../../poker/js/ai/hands.js';
-import { A_FOLD, A_RAISE } from '../../poker/js/ai/blueprint.js';
+import { A_FOLD } from '../../poker/js/ai/blueprint.js';
 import { loadBlueprint, loadBuckets } from './node_models.js';
 
-const [mode, bpDir, dataDir, depthArg, stackArg, handsArg, turnArg, riverArg, seedArg] = process.argv.slice(2);
+const [mode, bpDir, dataDir, depthArg, stackArg, handsArg, turnArg, riverArg, seedArg, fromArg] = process.argv.slice(2);
+const fromStreet = Number(fromArg ?? 2);
 const depth = Number(depthArg), stackBB = Number(stackArg), hands = Number(handsArg), seed = Number(seedArg || 1);
 const BB = 100;
 const core = await loadSolverCore(readFileSync(fileURLToPath(new URL('../../poker/js/ai/solver.wasm', import.meta.url))));
 const isExpert = mode === 'expert';
 const bp = loadBlueprint(`${bpDir}/bp_${depth}${isExpert ? '' : '_full'}.bin`);
 const buckets = loadBuckets(dataDir, isExpert ? 1 : 3);
-const rng = seededRng(seed);
 const agent = new ExpertBot({
   name: mode, blueprintFor: () => bp, bucketsFor: buckets, rng: seededRng(seed * 3 + 1),
-  solver: isExpert ? new RealtimeSolver(core, { turn: { iterations: Number(turnArg) }, river: { iterations: Number(riverArg) } }) : null,
+  solver: isExpert ? new RealtimeSolver(core, { turn: { iterations: Number(turnArg) }, river: { iterations: Number(riverArg) }, riverStride: 4 }) : null,
 });
 
 /** The agent's range and its fold probability after each candidate bet at the current state. */
@@ -66,7 +71,7 @@ function optionsFromExpert(agentObs, lbrHole) {
 
 function optionsFromBlueprint(agentObs, lbrHole, lbrObs) {
   const w = agent.syncTo(agentObs);
-  if (w.offTree || w.leaf) return null;
+  if (w.offTree || w.leaf || w.bp.type[w.node] !== 0) return null;
   w.syncBuckets();
   if (w.offTree) return null;
   const me = agentObs.seat === agentObs.button ? 0 : 1;
@@ -94,18 +99,21 @@ function optionsFromBlueprint(agentObs, lbrHole, lbrObs) {
     const to = Math.round(cur + r.frac * (lbrObs.pot + l.callAmount));
     opts.push({ to: Math.min(l.maxRaiseTo, Math.max(l.minRaiseTo, to)), fold: tot > 0 ? fold / tot : 0 });
   }
-  void A_RAISE;
   return { range, opts };
 }
 
 function lbrAct(obs, agentObs) {
   const l = obs.legal;
   const passive = l.canCheck ? { type: 'check' } : { type: 'call' };
-  if (obs.street < 2) return passive; // the "fc" setting: call through preflop and flop
-  const view = isExpert ? optionsFromExpert(agentObs, obs.hole) : optionsFromBlueprint(agentObs, obs.hole, obs);
+  if (obs.street < fromStreet) return passive;
+  // The Expert's flop comes from its table, the same as the blueprint-only bot's. Later streets come from its solver.
+  const view = isExpert && obs.street >= 2 ? optionsFromExpert(agentObs, obs.hole) : optionsFromBlueprint(agentObs, obs.hole, obs);
   if (!view) return passive;
   const hand = pairIdx(obs.hole[0], obs.hole[1]);
-  const wp = equityVsRange(hand, obs.board, view.range);
+  // Exact on the turn and river. Earlier streets have too many runouts to enumerate per decision.
+  const wp = obs.board.length >= 4
+    ? equityVsRange(hand, obs.board, view.range)
+    : monteCarloEquity(obs.hole, obs.board, 1500, equityRng, (a, b) => view.range[pairIdx(a, b)]);
   const pot = obs.pot, owe = l.callAmount;
   const myBet = obs.bets[obs.seat], oppBet = obs.bets[1 - obs.seat];
   const uCall = wp * pot - (1 - wp) * owe;
@@ -123,6 +131,7 @@ function lbrAct(obs, agentObs) {
 }
 
 const deckRng = seededRng(seed + 1000);
+const equityRng = seededRng(seed + 2000);
 let sum = 0, sq = 0, n = 0;
 const t0 = Date.now();
 for (let i = 0; i < hands; i++) {
@@ -144,7 +153,6 @@ for (let i = 0; i < hands; i++) {
     const mean = sum / n, sd = Math.sqrt(sq / n - mean * mean);
     console.error(`${n} hands: LBR ${((mean / BB) * 1000).toFixed(0)} +- ${((1.96 * sd / Math.sqrt(n) / BB) * 1000).toFixed(0)} mbb/hand, ${(n / ((Date.now() - t0) / 1000)).toFixed(1)} hands/s`);
   }
-  void rng;
 }
 const mean = sum / n, sd = Math.sqrt(sq / n - mean * mean);
-console.log(JSON.stringify({ mode, depth, stackBB, hands: n, lbrMbb: (mean / BB) * 1000, ci95: (1.96 * sd / Math.sqrt(n) / BB) * 1000, seconds: (Date.now() - t0) / 1000, seed }));
+console.log(JSON.stringify({ mode, fromStreet, depth, stackBB, hands: n, lbrMbb: (mean / BB) * 1000, ci95: (1.96 * sd / Math.sqrt(n) / BB) * 1000, seconds: (Date.now() - t0) / 1000, seed }));

@@ -75,5 +75,36 @@ export async function runMatch(makeA, makeB, opts) {
   };
 }
 
+/** The quick format from the website. Reports how often A wins a whole match and how long matches last. */
+export async function runQuickMatches(makeA, makeB, { matches, seed }) {
+  const blinds = [[50, 100], [75, 150], [100, 200], [150, 300], [200, 400], [300, 600], [400, 800], [500, 1000]];
+  const a = makeA(), b = makeB();
+  const rng = seededRng(seed);
+  let wins = 0, totalHands = 0;
+  const net = [];
+  for (let m = 0; m < matches; m++) {
+    const aSeat = m % 2;
+    const players = aSeat === 0 ? [a, b] : [b, a];
+    const stacks = [2000, 2000];
+    let button = m % 4 < 2 ? 0 : 1;
+    let handNo = 0;
+    while (stacks[0] > 0 && stacks[1] > 0 && stacks[0] < 3000 && stacks[1] < 3000) {
+      const lv = Math.min(blinds.length - 1, Math.floor(handNo / 5));
+      const [sb, bb] = blinds[lv];
+      const hand = await playHand(players[0], players[1], { stacks, smallBlind: sb, bigBlind: bb, button, deck: shuffledDeck(rng.int) });
+      stacks[0] = hand.stacks[0]; stacks[1] = hand.stacks[1];
+      button = 1 - button;
+      handNo++;
+      if (handNo > 400) throw new Error('match did not end');
+    }
+    totalHands += handNo;
+    const won = stacks[aSeat] > stacks[1 - aSeat];
+    if (won) wins++;
+    net.push(won ? 1 : 0);
+  }
+  const p = wins / matches;
+  return { a: a.name, b: b.name, matches, wins, winRate: p, ci95: 1.96 * Math.sqrt((p * (1 - p)) / matches), handsPerMatch: totalHands / matches, seed };
+}
+
 const role = (/** @type {{sum:number,n:number}} */ r, /** @type {(x:number)=>number} */ f) => (r.n ? f(r.sum / r.n) : 0);
 const avg = (/** @type {number[]} */ a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
