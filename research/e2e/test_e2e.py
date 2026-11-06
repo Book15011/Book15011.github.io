@@ -59,6 +59,13 @@ def play_hands(page, max_hands, total):
         faces = page.locator('[data-el=aiHole] .pk-card[data-card]').count()
         if faces or down != 2:
             check(False, f'AI cards hidden during the hand (down={down}, faces={faces})')
+        # Facing a bet after the flop, the AI's seat must say what it did.
+        board = page.locator('[data-test=board] .pk-card').count()
+        if board >= 3 and page.query_selector('[data-test=call]'):
+            tag = page.locator('[data-test=ai-action]')
+            text = tag.inner_text() if tag.is_visible() else ''
+            if not text.startswith(('Bet', 'Raise to', 'All-in')):
+                check(False, f'AI action shown when facing a bet (got {text!r})')
         roll = rng.random()
         fold = page.query_selector('[data-test=fold]:not([disabled])')
         raise_btn = page.query_selector('[data-test=raise]:not([disabled])')

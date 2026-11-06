@@ -4,7 +4,7 @@
  * The page holds the rules engine; the AI runs in a worker and only ever receives its own observation.
  */
 import { Match, PREFLOP, STREET_NAMES } from '../engine/game.js';
-import { RANKS, cardToString } from '../engine/cards.js';
+import { cardToString } from '../engine/cards.js';
 import { evaluate, categoryName } from '../engine/evaluator.js';
 import { HAND_A, HAND_B, NUM_HANDS } from '../ai/hands.js';
 
@@ -40,6 +40,25 @@ const SUIT_PATHS = [
 const suitSvg = (/** @type {number} */ s, /** @type {string} */ cls) => `<svg class="${cls}" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor" d="${SUIT_PATHS[s]}"/></svg>`;
 const SUIT_WORD = ['clubs', 'diamonds', 'hearts', 'spades'];
 const RANK_WORD = ['two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king', 'ace'];
+// Ranks as players read them: 10 rather than the T of poker notation, which the engine keeps internally.
+const RANK_LABEL = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+const SUIT_SYMBOL = ['♣', '♦', '♥', '♠'];
+/** A card as display text, e.g. "10♣". @param {number} c */
+const cardText = (c) => RANK_LABEL[c >> 2] + SUIT_SYMBOL[c & 3];
+
+/**
+ * Whether a raise entry was the first bet of a postflop street ("bet 300") rather than a raise over
+ * an earlier bet ("raise to 900"). Preflop the blinds count as bets, so every raise there is a raise.
+ * @param {any[]} list the hand's history @param {any} e an entry in it
+ */
+function opensBetting(list, e) {
+  if (e.type !== 'raise' || e.street === 0) return false;
+  for (const x of list) {
+    if (x === e) return true;
+    if (x.street === e.street && x.type === 'raise') return false;
+  }
+  return true;
+}
 
 /** @param {number|null} c @param {{down?:boolean,dealt?:boolean,delay?:number,small?:boolean}} [o] */
 function cardEl(c, o = {}) {
@@ -63,7 +82,7 @@ function fillCard(el, c, down) {
   el.dataset.card = cardToString(c);
   el.setAttribute('role', 'img');
   el.setAttribute('aria-label', `${RANK_WORD[r]} of ${SUIT_WORD[s]}`);
-  el.innerHTML = `<div class="pk-card-in"><div class="pk-face"><span class="pk-rank">${RANKS[r]}</span>${suitSvg(s, 'pk-suit-s')}${suitSvg(s, 'pk-suit-b')}</div><div class="pk-back"></div></div>`;
+  el.innerHTML = `<div class="pk-card-in"><div class="pk-face"><span class="pk-rank${r === 8 ? ' pk-rank-10' : ''}">${RANK_LABEL[r]}</span>${suitSvg(s, 'pk-suit-s')}${suitSvg(s, 'pk-suit-b')}</div><div class="pk-back"></div></div>`;
 }
 
 /** The five cards that make up the best hand. @param {number[]} hole @param {number[]} board */
@@ -182,7 +201,7 @@ class PokerGame {
         <div class="pk-stage">
           <div class="pk-table-wrap"><div class="pk-felt">
             <div class="pk-seat pk-seat--ai" data-el="seatAi">
-              <div class="pk-plate"><div class="pk-avatar">AI</div><div><div class="pk-name" data-el="aiName">Expert AI</div><div class="pk-stack" data-el="aiStack" data-test="ai-stack">0</div></div><div class="pk-dealer" data-el="dAi" hidden>D</div></div>
+              <div class="pk-plate"><div class="pk-avatar">AI</div><div><div class="pk-act" data-el="actAi" data-test="ai-action" hidden></div><div class="pk-name" data-el="aiName">Expert AI</div><div class="pk-stack" data-el="aiStack" data-test="ai-stack">0</div></div><div class="pk-dealer" data-el="dAi" hidden>D</div></div>
               <div class="pk-hole" data-el="aiHole"></div>
             </div>
             <div class="pk-status" data-el="status" aria-live="polite"></div>
@@ -195,7 +214,7 @@ class PokerGame {
             <div class="pk-seat pk-seat--you" data-el="seatYou">
               <div class="pk-handname" data-el="handName" data-test="hand-name"></div>
               <div class="pk-hole" data-el="youHole" data-test="my-cards"></div>
-              <div class="pk-plate"><div class="pk-avatar">YOU</div><div><div class="pk-name">You</div><div class="pk-stack" data-el="youStack" data-test="my-stack">0</div></div><div class="pk-dealer" data-el="dYou" hidden>D</div></div>
+              <div class="pk-plate"><div class="pk-avatar">YOU</div><div><div class="pk-act" data-el="actYou" data-test="my-action" hidden></div><div class="pk-name">You</div><div class="pk-stack" data-el="youStack" data-test="my-stack">0</div></div><div class="pk-dealer" data-el="dYou" hidden>D</div></div>
             </div>
           </div></div>
           <div class="pk-controls" data-el="controls"></div>
@@ -353,6 +372,29 @@ class PokerGame {
     this.els.pot.textContent = '0';
     this.els.seatAi.classList.remove('is-active', 'is-thinking');
     this.els.seatYou.classList.remove('is-active');
+    for (const seat of [HUMAN, AI]) this.#setAction(seat, null);
+  }
+
+  /**
+   * Shows a player's latest action on their seat in place of their name, so the AI's move is obvious
+   * without opening the hand history. It stays until that player acts again, dimmed once a new card comes.
+   * @param {number} seat @param {any} e a history entry, or null to clear @param {any[]} [list] the hand's history
+   */
+  #setAction(seat, e, list = []) {
+    const el = seat === HUMAN ? this.els.actYou : this.els.actAi;
+    const seatEl = seat === HUMAN ? this.els.seatYou : this.els.seatAi;
+    seatEl.classList.toggle('has-act', !!e);
+    if (!e) { el.hidden = true; el.textContent = ''; return; }
+    const isBet = opensBetting(list, e);
+    const kind = e.allIn ? 'allin' : e.type === 'raise' ? 'raise' : e.type;
+    el.textContent = e.allIn ? `All-in ${fmt(e.type === 'raise' ? e.to : e.amount)}`
+      : e.type === 'raise' ? `${isBet ? 'Bet' : 'Raise to'} ${fmt(e.to)}`
+      : e.type === 'call' ? `Call ${fmt(e.amount)}`
+      : e.type === 'check' ? 'Check' : 'Fold';
+    el.className = 'pk-act';
+    void el.offsetWidth; // restart the pop animation when the same label repeats
+    el.className = `pk-act pk-act--${kind}`;
+    el.hidden = false;
   }
 
   async #nextHand() {
@@ -418,7 +460,7 @@ class PokerGame {
       this.els.status.textContent = '';
       this.review.push({ obs, info: reply.info, action: reply.action, ms: spent });
       this.#apply(reply.action, AI);
-      await this.#afterAction(token);
+      await this.#afterAction(token, AI);
       if (token !== this.token) return;
     }
   }
@@ -466,14 +508,25 @@ class PokerGame {
     this.#syncLog();
     this.#renderState();
     this.#renderPanel();
+    const last = [...handNow.history].reverse().find((/** @type {any} */ x) => x.seat === seat && ['fold', 'check', 'call', 'raise'].includes(x.type));
+    if (last) this.#setAction(seat, last, handNow.history);
     this.#announceLast(seat);
   }
 
-  /** @param {number} token Reveal any newly dealt board cards with a short pause. */
-  async #afterAction(token) {
+  /**
+   * Reveal any newly dealt board cards with a short pause. When the AI's action closed the round, the pause
+   * is longer, so its move can be read before the next card lands.
+   * @param {number} token @param {number} seat who just acted
+   */
+  async #afterAction(token, seat) {
     const h = /** @type {any} */ (/** @type {Match} */ (this.match).hand);
     const target = h.board.length;
-    if (target > this.boardShown) await this.#wait(240);
+    if (target > this.boardShown) {
+      await this.#wait(seat === AI ? 800 : 240);
+      if (token !== this.token) return;
+      this.els.actAi.classList.add('is-old');
+      this.els.actYou.classList.add('is-old');
+    }
     while (this.boardShown < target) {
       if (token !== this.token) return;
       const stage = this.boardShown === 0 ? 3 : this.boardShown + 1;
@@ -502,7 +555,7 @@ class PokerGame {
     this.awaitingHuman = false;
     this.els.controls.innerHTML = '';
     this.#apply(action, HUMAN);
-    await this.#afterAction(token);
+    await this.#afterAction(token, HUMAN);
     if (token !== this.token) return;
     this.#loop(token);
   }
@@ -723,8 +776,8 @@ class PokerGame {
     this.currentLog.board = h.board.slice();
   }
 
-  /** @param {any} e */
-  #logText(e) {
+  /** @param {any} e @param {any[]} list the hand's history, to tell a bet from a raise */
+  #logText(e, list) {
     const you = e.seat === HUMAN;
     const who = you ? '<b>You</b>' : '<b>AI</b>';
     const v = (/** @type {string} */ base, /** @type {string} */ third) => (you ? base : third);
@@ -734,7 +787,7 @@ class PokerGame {
       case 'fold': return `${who} ${v('fold', 'folds')}`;
       case 'check': return `${who} ${v('check', 'checks')}`;
       case 'call': return `${who} ${v('call', 'calls')} ${fmt(e.amount)}${e.allIn ? ' (all-in)' : ''}`;
-      case 'raise': return `${who} ${e.to === e.amount ? v('bet', 'bets') : v('raise to', 'raises to')} ${fmt(e.to)}${e.allIn ? ' (all-in)' : ''}`;
+      case 'raise': return `${who} ${opensBetting(list, e) ? v('bet', 'bets') : v('raise to', 'raises to')} ${fmt(e.to)}${e.allIn ? ' (all-in)' : ''}`;
       case 'uncalled_return': return `${fmt(e.amount)} uncalled returned to ${you ? 'you' : 'the AI'}`;
       default: return e.type;
     }
@@ -744,7 +797,7 @@ class PokerGame {
   #announceLast(seat) {
     const h = /** @type {any} */ (/** @type {Match} */ (this.match).hand);
     const e = [...h.history].reverse().find((x) => x.seat === seat && x.type !== 'uncalled_return');
-    if (e) this.#announce(this.#logText(e).replace(/<\/?b>/g, ''));
+    if (e) this.#announce(this.#logText(e, h.history).replace(/<\/?b>/g, ''));
   }
   /** @param {string} s */
   #announce(s) { this.els.announce.textContent = s; }
@@ -782,10 +835,10 @@ class PokerGame {
       for (const e of hand.entries) {
         if (e.street !== street) {
           street = e.street;
-          const cards = hand.board.slice(0, boardFor[street]).map(cardToString).join(' ');
+          const cards = hand.board.slice(0, boardFor[street]).map(cardText).join(' ');
           html += `<div class="pk-log-street">${STREET_NAMES[street]}${street > 0 && cards ? ` · ${cards}` : ''}</div>`;
         }
-        html += `<div class="pk-log-line">${this.#logText(e)}</div>`;
+        html += `<div class="pk-log-line">${this.#logText(e, hand.entries)}</div>`;
       }
       if (hand.result) html += `<div class="pk-log-result">${hand.result}</div>`;
       return `${html}</div>`;
@@ -798,7 +851,7 @@ class PokerGame {
     if (!this.reviewReady) return `<p class="pk-muted">The review unlocks when this hand ends, so it cannot give away the AI's cards.</p>`;
     const h = /** @type {any} */ (this.match.hand);
     if (!this.review.length) return `<p class="pk-muted">The AI made no decision this hand.</p>`;
-    const aiCards = this.review[0].obs.hole.map(cardToString).join(' ');
+    const aiCards = this.review[0].obs.hole.map(cardText).join(' ');
     const cards = this.review.map((r) => this.#reviewCard(r)).join('');
     return `<p class="pk-muted" style="margin:0 0 8px">The AI held <b class="pk-mono" style="color:var(--pk-paper)">${aiCards}</b> in hand ${h.handNumber}.</p>${cards}
       <p class="pk-caveat">These numbers come from the AI's own model: estimated hand ranges and a limited set of bet sizes. They explain what it computed, and they do not prove any move was optimal.</p>`;
@@ -903,7 +956,8 @@ class PokerGame {
     let html = '<div class="pk-heat" aria-hidden="true">';
     for (let r = 0; r < 13; r++) for (let c = 0; c < 13; c++) {
       const v = avg[r * 13 + c] / max;
-      const label = r === c ? `${RANKS[12 - r]}${RANKS[12 - c]}` : '';
+      // Pairs sit on the diagonal; label each with its rank.
+      const label = r === c ? RANK_LABEL[12 - r] : '';
       html += `<div style="background:rgba(62,207,142,${(v * 0.9 + (v > 0 ? 0.04 : 0)).toFixed(2)})">${label}</div>`;
     }
     return `${html}</div>`;
