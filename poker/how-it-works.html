@@ -62,7 +62,7 @@
   <nav>
     <a href="index.html">Play</a>
     <a href="#benchmarks">Benchmarks</a>
-    <a href="https://github.com/Book15011/Book15011.github.io/tree/main/poker" target="_blank" rel="noopener">GitHub &#8599;</a>
+    <a href="https://github.com/Book15011/Poker_bot_web" target="_blank" rel="noopener">GitHub &#8599;</a>
   </nav>
 </header>
 <main>
@@ -81,7 +81,7 @@
       <div class="step"><span>Offline</span><b>Ship only what's needed</b><p>Only preflop and flop strategies are exported, as compact tables. No server is needed after this.</p></div>
       <div class="step"><span>In your browser</span><b>Solve the rest live</b><p>On the turn and river, a WebAssembly solver in a background thread works out the rest of the hand, including the exact size you bet.</p></div>
     </div>
-    <p>This is the recipe from <a href="https://arxiv.org/abs/1805.08195">Modicum</a> and <a href="https://noambrown.github.io/papers/19-Science-Superhuman.pdf">Pluribus</a>, at a far smaller scale. I also looked at Deep CFR and DeepStack-style value networks. Value networks were out of reach (DeepStack's turn network alone took over 175 core-years of solving), and a neural policy had no evidence of beating this design on the hardware available. The <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/RESEARCH.md">research notes</a> cover the comparison.</p>
+    <p>This is the recipe from <a href="https://arxiv.org/abs/1805.08195">Modicum</a> and <a href="https://noambrown.github.io/papers/19-Science-Superhuman.pdf">Pluribus</a>, at a far smaller scale. I also looked at Deep CFR and DeepStack-style value networks. Value networks were out of reach (DeepStack's turn network alone took over 175 core-years of solving), and a neural policy had no evidence of beating this design on the hardware available. The <a href="https://github.com/Book15011/Poker_bot_web/blob/main/docs/RESEARCH.md">research notes</a> cover the comparison.</p>
   </section>
 
   <section>
@@ -115,11 +115,11 @@
   </section>
 
   <footer>
-    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/AI_EXPLAINED.md">AI explained</a>
-    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/RESEARCH.md">Research notes</a>
-    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/ARCHITECTURE.md">Architecture</a>
-    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/TRAINING.md">Training</a>
-    <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/BENCHMARKS.md">Full benchmarks</a>
+    <a href="https://github.com/Book15011/Poker_bot_web/blob/main/docs/AI_EXPLAINED.md">AI explained</a>
+    <a href="https://github.com/Book15011/Poker_bot_web/blob/main/docs/RESEARCH.md">Research notes</a>
+    <a href="https://github.com/Book15011/Poker_bot_web/blob/main/docs/ARCHITECTURE.md">Architecture</a>
+    <a href="https://github.com/Book15011/Poker_bot_web/blob/main/docs/TRAINING.md">Training</a>
+    <a href="https://github.com/Book15011/Poker_bot_web/blob/main/docs/BENCHMARKS.md">Full benchmarks</a>
   </footer>
 </main>
 <script type="module">
@@ -192,7 +192,7 @@
       if (s.note) el.appendChild(para(s.note, 'note'));
     }
   } catch (e) {
-    el.innerHTML = `<p class="pending">The results file could not load. They are also in <a href="https://github.com/Book15011/Book15011.github.io/blob/main/docs/BENCHMARKS.md">docs/BENCHMARKS.md</a>.</p>`;
+    el.innerHTML = `<p class="pending">The results file could not load. They are also in <a href="https://github.com/Book15011/Poker_bot_web/blob/main/docs/BENCHMARKS.md">docs/BENCHMARKS.md</a>.</p>`;
   }
 </script>
 </body>

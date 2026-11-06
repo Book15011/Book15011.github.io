@@ -47,7 +47,7 @@ export async function openPokerModal() {
     links: {
       howItWorks: PAGE_URL,
       benchmarks: `${PAGE_URL}#benchmarks`,
-      source: 'https://github.com/Book15011/Book15011.github.io/tree/main/poker',
+      source: 'https://github.com/Book15011/Poker_bot_web',
     },
   });
   /** @type {HTMLElement|null} */ (modal.querySelector('.pk-app'))?.focus();
