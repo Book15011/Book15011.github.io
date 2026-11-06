@@ -19,7 +19,7 @@ Poker is a hard kind of AI problem because you can't see the other player's card
 - The solver reproduces the exact solution of a river game with a known answer.
 - Property tests check chip conservation and legal play over tens of thousands of random hands.
 - Browser tests play full matches through the real buttons in Chrome, at desktop and phone sizes.
-- Strength was tested against [Slumbot](https://slumbot.com), an independent competition winner, and with Local Best Response.
+- 185,178 evaluated hands. At 20bb it beats the Competitive bot on the site by +21.5 ± 13.1 bb/100. Local Best Response never found a positive exploit. Against [Slumbot](https://slumbot.com), an independent competition winner trained with roughly 4,500 times the compute, it lost −35.5 ± 50.6 bb/100 over 4,500 hands. Details in [BENCHMARKS.md](../docs/BENCHMARKS.md).
 
 ## Run it
 
