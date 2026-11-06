@@ -3,124 +3,343 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Robotics Engineering | Thanisorn J.</title>
+  <title>Thanisorn J. | Robotics &amp; Automation Engineer</title>
+  <meta name="description" content="Robotics portfolio of Thanisorn J. (CUHK Mechanical &amp; Automation Engineering): human motion from video deployed on a Unitree G1 humanoid, assistive mechatronics, and robot learning.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Thanisorn J. | Robotics &amp; Automation Engineer">
+  <meta property="og:description" content="Human motion from ordinary video, deployed on a real Unitree G1 humanoid. Plus assistive mechatronics and self-play learning.">
+  <meta property="og:image" content="https://book15011.github.io/media/robotics/g1-hardware.jpg">
+  <meta property="og:url" content="https://book15011.github.io/robotics-home.html">
+  <meta name="theme-color" content="#060a14">
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-    :root{ --ink:#090d1b; --panel:#11182d; --panel-soft:#151e37; --cyan:#00eeff; --violet:#8a72ff; --text:#f4f7ff; --muted:#a8b4d1; --line:rgba(180,205,255,.15); }
-    *{ box-sizing:border-box; }
-    html{ scroll-behavior:smooth; }
-    body{ margin:0; min-height:100vh; overflow-x:hidden; color:var(--text); background:var(--ink); font-family:Inter,system-ui,sans-serif; }
-    body::before,body::after{ content:""; position:fixed; border-radius:50%; filter:blur(20px); pointer-events:none; z-index:-1; }
-    body::before{ width:42vw; height:42vw; top:-18vw; right:-10vw; background:rgba(0,238,255,.12); }
-    body::after{ width:42vw; height:42vw; bottom:-24vw; left:-14vw; background:rgba(138,114,255,.14); }
-    a:focus-visible{ outline:2px solid var(--cyan); outline-offset:4px; }
-    .shell{ width:min(1180px,calc(100% - 48px)); margin:0 auto; }
-    header{ display:flex; align-items:center; justify-content:space-between; gap:28px; min-height:88px; border-bottom:1px solid var(--line); }
-    .logo{ color:var(--text); font-size:1.15rem; font-weight:600; letter-spacing:3px; text-decoration:none; white-space:nowrap; }
-    nav{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:22px; }
-    nav a{ color:var(--muted); font-size:.84rem; letter-spacing:.6px; text-decoration:none; transition:color .2s ease; }
-    nav a:hover,nav a.active{ color:var(--cyan); }
-    nav a.nav-garage{ display:inline-flex; align-items:center; padding:7px 11px; margin:-7px 0; border:1px solid rgba(0,238,255,.42); border-radius:6px; color:var(--cyan); background:rgba(0,238,255,.05); }
-    nav a.nav-garage:hover{ color:#031116; background:var(--cyan); }
-    .hero{ display:grid; grid-template-columns:1.18fr .82fr; gap:64px; align-items:center; min-height:calc(100vh - 88px); padding:80px 0 100px; }
-    .eyebrow{ margin:0 0 20px; color:var(--cyan); font:500 .72rem 'Roboto Mono',monospace; letter-spacing:2.1px; text-transform:uppercase; }
-    h1{ max-width:760px; margin:0; font-size:clamp(3.3rem,7vw,6.8rem); line-height:.94; letter-spacing:-.075em; }
-    h1 span{ color:var(--cyan); }
-    .intro{ max-width:650px; margin:28px 0 0; color:var(--muted); font-size:1.08rem; line-height:1.75; }
-    .actions{ display:flex; flex-wrap:wrap; gap:14px; margin-top:36px; }
-    .button{ display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:48px; padding:0 20px; border:1px solid var(--line); border-radius:6px; color:var(--text); font-size:.85rem; font-weight:600; letter-spacing:.3px; text-decoration:none; transition:transform .2s ease,background .2s ease,border-color .2s ease; }
-    .button:hover{ transform:translateY(-2px); border-color:var(--cyan); }
-    .button--primary{ color:#031116; background:var(--cyan); border-color:var(--cyan); }
-    .button--primary:hover{ background:#77f6ff; }
-    .hero-note{ display:flex; gap:9px; align-items:center; margin-top:20px; color:#7685a9; font:400 .72rem 'Roboto Mono',monospace; }
-    .hero-note i{ color:var(--cyan); }
-    .garage-card{ position:relative; overflow:hidden; min-height:400px; padding:30px; border:1px solid rgba(0,238,255,.35); border-radius:16px; background:linear-gradient(145deg,rgba(20,32,61,.96),rgba(10,14,29,.9)); box-shadow:0 24px 80px rgba(0,0,0,.3); }
-    .garage-card::before{ content:""; position:absolute; inset:0; background:linear-gradient(120deg,transparent 20%,rgba(0,238,255,.12),transparent 75%); transform:translateX(-100%); animation:sweep 6s ease-in-out infinite; }
-    .garage-card > *{ position:relative; }
-    .garage-number{ color:var(--cyan); font:500 .72rem 'Roboto Mono',monospace; letter-spacing:2px; }
-    .garage-visual{ display:grid; place-items:center; min-height:210px; }
-    .bot-mark{ position:relative; display:grid; place-items:center; width:150px; height:150px; border:1px solid rgba(0,238,255,.6); border-radius:48px 48px 34px 34px; color:var(--cyan); font-size:4rem; box-shadow:0 0 0 15px rgba(0,238,255,.035),0 0 42px rgba(0,238,255,.18); }
-    .bot-mark::before,.bot-mark::after{ content:""; position:absolute; top:58px; width:10px; height:10px; border-radius:50%; background:var(--cyan); box-shadow:0 0 12px var(--cyan); }
-    .bot-mark::before{ left:43px; }.bot-mark::after{ right:43px; }
-    .garage-card h2{ margin:0; font-size:1.5rem; }
-    .garage-card p{ margin:10px 0 0; color:var(--muted); font-size:.9rem; line-height:1.6; }
-    .garage-link{ display:inline-flex; align-items:center; gap:8px; margin-top:22px; color:var(--cyan); font:500 .77rem 'Roboto Mono',monospace; letter-spacing:.9px; text-decoration:none; }
-    .garage-link:hover{ color:#fff; }
-    .section{ padding:22px 0 110px; }
-    .section-heading{ display:flex; justify-content:space-between; gap:32px; align-items:end; margin-bottom:28px; }
-    .section-heading h2{ margin:0; font-size:1.65rem; letter-spacing:-.04em; }
-    .section-heading p{ max-width:440px; margin:0; color:var(--muted); font-size:.9rem; line-height:1.6; }
-    .capabilities{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-    .capability{ min-height:190px; padding:25px; border:1px solid var(--line); border-radius:12px; background:rgba(17,24,45,.72); }
-    .capability i{ color:var(--cyan); font-size:1.2rem; }
-    .capability h3{ margin:22px 0 8px; font-size:1rem; }
-    .capability p{ margin:0; color:var(--muted); font-size:.86rem; line-height:1.6; }
-    .route-bar{ display:flex; align-items:center; justify-content:space-between; gap:24px; margin-top:50px; padding:25px 28px; border:1px solid var(--line); border-radius:12px; background:rgba(17,24,45,.52); }
-    .route-bar p{ margin:0; color:var(--muted); line-height:1.55; }
-    footer{ padding:24px 0 34px; border-top:1px solid var(--line); color:#7380a0; font:400 .72rem 'Roboto Mono',monospace; letter-spacing:.5px; }
-    @keyframes sweep{ 0%,40%{transform:translateX(-100%)} 58%,100%{transform:translateX(100%)} }
-    @media(max-width:850px){ .hero{ grid-template-columns:1fr; gap:40px; padding-top:62px; } .garage-card{ min-height:0; } .garage-visual{ min-height:160px; } .capabilities{ grid-template-columns:1fr; } }
-    @media(max-width:620px){ .shell{ width:min(100% - 36px,1180px); } header{ min-height:unset; padding:22px 0; align-items:flex-start; } nav{ gap:10px 16px; justify-content:flex-start; } nav a{ font-size:.76rem; } .hero{ min-height:auto; padding:58px 0 82px; } h1{ font-size:clamp(3rem,16vw,5rem); } .section-heading,.route-bar{ align-items:flex-start; flex-direction:column; gap:14px; } .route-bar{ padding:22px; } }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&amp;family=Roboto+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="robotics-site.css">
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
-  <div class="shell">
-    <header>
-      <a href="index.html" class="logo">THANISORN J.</a>
-      <nav aria-label="Primary navigation">
-        <a href="robotics-home.html" class="active">Robotics</a>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell">
+      <a href="index.html" class="brand" aria-label="Thanisorn J., back to the gateway">
+        <svg class="brand-mark" viewBox="0 0 26 26" fill="none" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 23h11"/><path d="M9.5 22.5 7.5 14l9-5.5"/><path d="m18 7.5 3.5-2.5M18.5 9.5l4 .5"/><circle cx="7.5" cy="14" r="2.2" fill="#060a14"/><circle cx="16.5" cy="8.5" r="2.2" fill="#060a14"/></svg>
+        THANISORN J.
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        Menu
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a href="#humanoid">Humanoid</a>
+        <a href="#work">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
         <a href="robotics.html" class="nav-garage">Robot Garage</a>
-        <a href="about.html">About</a>
-        <a href="projects.html">Projects</a>
-        <a href="contact.html">Contact</a>
-        <a href="quant.html">Quant</a>
+        <a href="quant.html" class="nav-cross">Quant &#8599;</a>
       </nav>
-    </header>
+    </div>
+  </header>
 
-    <main>
-      <section class="hero" aria-labelledby="page-title">
-        <div>
-          <p class="eyebrow">Robotics Portfolio · Engineering Track</p>
-          <h1 id="page-title">Build systems<br>that <span>move.</span></h1>
-          <p class="intro">I develop robotics, AI, and interactive engineering projects, taking ideas from early concepts to tested systems.</p>
-          <div class="actions">
-            <a class="button button--primary" href="projects.html"><i class="fas fa-layer-group" aria-hidden="true"></i> Explore projects</a>
-            <a class="button" href="robotics.html"><i class="fas fa-robot" aria-hidden="true"></i> Enter Robot Garage</a>
+  <main id="main">
+    <!-- Hero -->
+    <section class="shell hero" data-arm-zone aria-labelledby="hero-title">
+      <div>
+        <p class="hero-kicker"><span class="dot" aria-hidden="true"></span>Thanisorn J. · Robotics &amp; Automation Engineer</p>
+        <h1 id="hero-title">Robots that move, sense and <em>learn</em>.</h1>
+        <p class="hero-lede">Mechanical &amp; Automation Engineering at CUHK, <strong>First Class Honours</strong>. I work across the stack: mechanism design and CAD, embedded control on microcontrollers, and reinforcement learning in simulation. Most recently I took <strong>human motion from ordinary video onto a real Unitree G1 humanoid</strong>.</p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="#humanoid">
+            See the humanoid project
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+          </a>
+          <a class="btn" href="#contact">Get in touch</a>
+          <a class="icon-link" href="https://github.com/Book15011" target="_blank" rel="noopener" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+          <a class="icon-link" href="https://hk.linkedin.com/in/thanisorn-jarudilokkul-048870326" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <div class="arm-panel">
+          <div class="arm-bar">
+            <span>3-DoF arm · closed-form IK</span>
+            <span class="arm-status" id="arm-status" data-state="idle">Demo</span>
           </div>
-          <p class="hero-note"><i class="fas fa-bolt" aria-hidden="true"></i> The 3D models only load when you enter the Garage.</p>
+          <canvas id="arm-canvas" tabindex="0" aria-label="Interactive robot arm. Use the arrow keys to steer it and Space to grip the block."></canvas>
+          <dl class="arm-readout" aria-live="off">
+            <div><dt>Shoulder <i>θ1</i></dt><dd id="arm-t1">–</dd></div>
+            <div><dt>Elbow <i>θ2</i></dt><dd id="arm-t2">–</dd></div>
+            <div><dt>Wrist <i>θ3</i></dt><dd id="arm-t3">–</dd></div>
+            <div><dt>Tip x, y (mm)</dt><dd id="arm-ee">–</dd></div>
+          </dl>
+        </div>
+        <p class="arm-caption" id="arm-hint">Move your cursor to steer the arm.</p>
+      </div>
+    </section>
+
+    <!-- Facts -->
+    <section class="shell" aria-label="Highlights">
+      <div class="facts">
+        <div class="fact"><strong>Unitree G1</strong><span>Human motion from video, deployed on a real 29-joint humanoid</span></div>
+        <div class="fact"><strong>ROBOCON 2025</strong><span>CUHK team member, basketball-playing robot</span></div>
+        <div class="fact"><strong>First Class Honours</strong><span>Mechanical &amp; Automation Engineering, CUHK</span></div>
+        <div class="fact"><strong>IMMC</strong><span>Mathematical Modeling Award</span></div>
+      </div>
+    </section>
+
+    <!-- Featured: humanoid -->
+    <section class="section" id="humanoid" aria-labelledby="humanoid-title">
+      <div class="shell">
+        <div class="case">
+          <div class="case-media reveal">
+            <figure class="media-frame">
+              <span class="badge">Real hardware</span>
+              <picture>
+                <source media="(prefers-reduced-motion: reduce)" srcset="media/robotics/g1-hardware.jpg">
+                <img src="media/robotics/g1-hardware.webp" width="390" height="520" loading="lazy" decoding="async" alt="A Unitree G1 humanoid robot on a safety gantry in a lab, moving its arms through the trained motion.">
+              </picture>
+              <figcaption>The trained motion running on the physical Unitree G1.</figcaption>
+            </figure>
+          </div>
+
+          <div class="case-body reveal">
+            <p class="eyebrow">Featured · Humanoid robot learning</p>
+            <h2 id="humanoid-title">Teaching a Unitree G1 humanoid to move from ordinary video</h2>
+            <p class="case-summary"><strong>GVHMR2PBHC</strong> is a pipeline that turns a phone video of a person into motion a humanoid robot can learn. A reinforcement-learning policy learns to track that motion in Isaac Gym. It's checked in simulation, then deployed on the physical robot.</p>
+
+            <h3>Pipeline</h3>
+            <ol class="pipeline">
+              <li><b>Video</b><span>30 fps clip of a person</span></li>
+              <li><b>Pose</b><span>GVHMR to SMPL body model</span></li>
+              <li><b>Convert</b><span>.pt to .npz, with checks</span></li>
+              <li><b>Retarget</b><span>Mink IK onto the G1's 29 joints</span></li>
+              <li><b>Stabilize</b><span>Selective locking and smoothing</span></li>
+              <li><b>Train</b><span>RL motion tracking, Isaac Gym, 4,096 envs</span></li>
+              <li class="is-hw"><b>Deploy</b><span>Physical Unitree G1</span></li>
+            </ol>
+
+            <h3>What I built</h3>
+            <ul class="checklist">
+              <li><strong>Selective motion locking.</strong> Full-body motion made RL training unstable, so the tool freezes chosen joint groups (legs, root, upper body: six presets and an adjustable split) and keeps the expressive part of the motion. It can even hold poses no human could, like a 90° waist twist with still legs.</li>
+              <li><strong>A working retargeting stage.</strong> The stock script's output had swapped Y and Z axes and the wrong parameter types, so it couldn't feed training. My version writes training-ready motion.</li>
+              <li><strong>The glue between research tools.</strong> Converters and checkers for every hand-off (.pt, .npz, .pkl) and a motion inspector, so each stage's output can be verified before the next.</li>
+              <li><strong>Smoothing and transitions.</strong> Interpolates the motion and adds an intro transition before training.</li>
+            </ul>
+
+            <div class="case-foot">
+              <ul class="tags" aria-label="Tools">
+                <li>Python</li><li>PyTorch</li><li>GVHMR / SMPL</li><li>Mink IK</li><li>Isaac Gym</li><li>MuJoCo</li><li>RL motion tracking</li>
+              </ul>
+              <a class="text-link" href="https://github.com/Book15011/GVHMR2PBHC" target="_blank" rel="noopener">View on GitHub
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </a>
+            </div>
+          </div>
         </div>
 
-        <aside class="garage-card" aria-label="Robot Garage preview">
-          <span class="garage-number">01 / INTERACTIVE SPACE</span>
-          <div class="garage-visual" aria-hidden="true"><div class="bot-mark"><i class="fas fa-robot"></i></div></div>
-          <h2>Robot Garage</h2>
-          <p>Explore the interactive models in a dedicated space, so this page remains quick to load.</p>
-          <a href="robotics.html" class="garage-link">OPEN THE GARAGE <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
-        </aside>
-      </section>
+        <figure class="media-frame case-wide reveal">
+          <picture>
+            <source media="(prefers-reduced-motion: reduce)" srcset="media/robotics/g1-stabilization.jpg">
+            <img src="media/robotics/g1-stabilization.webp" width="600" height="460" loading="lazy" decoding="async" alt="Side-by-side simulation of the G1 robot. Before: the retargeted motion with the legs stepping. After: the legs held still while the waist and arms follow the original motion.">
+          </picture>
+          <figcaption>Selective motion locking in simulation. Left: the motion as retargeted. Right: the legs held still while the waist and arms keep the original movement.</figcaption>
+        </figure>
+      </div>
+    </section>
 
-      <section class="section" aria-labelledby="focus-title">
-        <div class="section-heading">
-          <h2 id="focus-title">What I build</h2>
-          <p>Projects combining mechanical systems, software, and learning-based control.</p>
+    <!-- More projects -->
+    <section class="section" id="work" aria-labelledby="work-title" style="padding-top:24px">
+      <div class="shell">
+        <div class="section-head reveal">
+          <h2 id="work-title">More projects</h2>
+          <p>Hardware, learning agents and applied AI. Each one links to its code.</p>
         </div>
-        <div class="capabilities">
-          <article class="capability"><i class="fas fa-robot" aria-hidden="true"></i><h3>Robotics systems</h3><p>I work across mechanism design, sensing, and control to build reliable hardware.</p></article>
-          <article class="capability"><i class="fas fa-brain" aria-hidden="true"></i><h3>Learning &amp; simulation</h3><p>I use simulation and reinforcement learning to evaluate how agents improve their decisions over time.</p></article>
-          <article class="capability"><i class="fas fa-code" aria-hidden="true"></i><h3>Engineering software</h3><p>I develop tools and pipelines that turn technical ideas into usable systems.</p></article>
-        </div>
-        <div class="route-bar">
-          <p>Explore the interactive models in the Robot Garage.</p>
-          <a class="button" href="robotics.html">Launch Robot Garage <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-        </div>
-      </section>
-    </main>
 
-    <footer>THANISORN J. · ROBOTICS ENGINEERING</footer>
-  </div>
+        <div class="cards">
+          <article class="card reveal">
+            <div class="card-top"><span class="card-kind">Assistive robotics · Hardware</span></div>
+            <h3>Tremor-filtering active ball joint</h3>
+            <p>A shoulder-like robotic joint to help people with hand tremors: it senses motion, filters out the tremor and drives smooth movement.</p>
+            <ul class="checklist">
+              <li>Built around an ABENICS-style spherical-gear ball joint, modelled in Fusion 360 and 3D printed.</li>
+              <li>Accelerometer and flex-sensor input processed on an Arduino Uno, driving stepper motors.</li>
+              <li>The prototype reproduced shoulder-like motion and filtered tremor-induced movement.</li>
+            </ul>
+            <ul class="tags" aria-label="Tools"><li>Fusion 360</li><li>3D printing</li><li>Arduino</li><li>Sensors</li><li>Stepper motors</li></ul>
+            <div class="card-foot">
+              <a class="text-link" href="https://github.com/Book15011/HandTremors_Project" target="_blank" rel="noopener">View on GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-top"><span class="card-kind">Reinforcement learning · C</span></div>
+            <h3>Self-play Q-learning bot for Chinese Checkers</h3>
+            <p>A simplified Chinese Checkers game and a bot that learns it by playing itself, written in C, with Human vs Human and Human vs Bot modes.</p>
+            <ul class="checklist">
+              <li>Stage 1: two bots build Q-tables by playing each other.</li>
+              <li>Stage 2: a challenger has to beat the reigning best bot over a 100-game streak to replace it.</li>
+              <li>Stage 3: reward weights are re-tuned and a tournament picks the final bot.</li>
+            </ul>
+            <ul class="tags" aria-label="Tools"><li>C</li><li>Q-learning</li><li>Self-play</li><li>Reward design</li></ul>
+            <div class="card-foot">
+              <a class="text-link" href="https://github.com/Book15011/Minigame_ML" target="_blank" rel="noopener">View on GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-top"><span class="card-kind">Conversational AI</span></div>
+            <h3>HearthVoice: a voice companion for older adults</h3>
+            <p>Older adults talk to an animated, voice-cloned likeness of a family member, in six languages.</p>
+            <ol class="flow" aria-label="Pipeline">
+              <li><span>Whisper speech-to-text</span></li>
+              <li><span>DeepSeek LLM</span></li>
+              <li><span>CosyVoice voice clone</span></li>
+              <li><span>SadTalker avatar</span></li>
+            </ol>
+            <ul class="checklist">
+              <li>Clones a voice from a 10 to 15 second sample and animates a single photo with lip sync.</li>
+              <li>English, Mandarin, Cantonese, Japanese, Korean and Arabic.</li>
+            </ul>
+            <ul class="tags" aria-label="Tools"><li>Python</li><li>LLMs</li><li>Speech</li><li>Docker</li></ul>
+            <div class="card-foot">
+              <a class="text-link" href="https://github.com/Book15011/HearthVoice" target="_blank" rel="noopener">View on GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-top"><span class="card-kind">Accessible education · Android</span><span class="card-note">Team of 4</span></div>
+            <h3>VERITAS: an inclusive learning app</h3>
+            <p>Built with a Korean and international student team for UN Sustainable Development Goal 4, quality education for all.</p>
+            <ul class="checklist">
+              <li>Braille practice with interactive buttons and text-to-speech, multilingual learning and a Q&amp;A chatbot.</li>
+              <li>Diagnostic quizzes with progress tracking, and a scholarship search.</li>
+            </ul>
+            <ul class="tags" aria-label="Tools"><li>Java</li><li>Kotlin</li><li>Android Studio</li></ul>
+            <div class="card-foot">
+              <a class="text-link" href="https://github.com/Book15011/VERITAS" target="_blank" rel="noopener">View on GitHub <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+        </div>
+
+        <p class="subhead reveal">Also on this site</p>
+        <div class="cards cards--small">
+          <article class="card reveal">
+            <div class="card-top"><span class="card-kind">Game AI · C++ / WebAssembly</span></div>
+            <h3>A poker AI you can play in the browser</h3>
+            <p>Trained by self-play (Monte Carlo CFR) in multithreaded C++, with a C solver compiled to WebAssembly that solves the turn and river live on your device. Benchmarked against Slumbot, the 2018 computer poker champion.</p>
+            <div class="card-foot">
+              <a class="text-link" href="quant.html#poker">Play it <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+          <article class="card reveal">
+            <div class="card-top"><span class="card-kind">Interactive 3D · Three.js</span><span class="card-note">~45 MB of models</span></div>
+            <h3>Robot Garage</h3>
+            <p>A 3D robot viewer built with Three.js and GSAP: choose a model, recolour it and make it dance.</p>
+            <div class="card-foot">
+              <a class="text-link" href="robotics.html">Open the garage <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="section" id="skills" aria-labelledby="skills-title">
+      <div class="shell">
+        <div class="section-head reveal">
+          <h2 id="skills-title">Toolbox</h2>
+          <p>What I reach for, from the CAD model to the trained policy.</p>
+        </div>
+        <div class="skills">
+          <div class="skill reveal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.5v9L12 21l9-4.5v-9L12 3Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>
+            <h3>Mechanical design</h3>
+            <p>Mechanisms, CAD and fabrication</p>
+            <ul class="tags"><li>SolidWorks</li><li>Fusion 360</li><li>SketchUp</li><li>3D printing</li></ul>
+          </div>
+          <div class="skill reveal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></svg>
+            <h3>Embedded &amp; control</h3>
+            <p>Sensors, actuators and the code between</p>
+            <ul class="tags"><li>Arduino</li><li>Raspberry Pi</li><li>C</li><li>C++</li><li>Stepper motors</li></ul>
+          </div>
+          <div class="skill reveal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><path d="M6.8 7.2 10.3 10.8M6.8 16.8l3.5-3.6M14 12h3"/></svg>
+            <h3>Robot learning</h3>
+            <p>Simulation, motion and reinforcement learning</p>
+            <ul class="tags"><li>Isaac Gym</li><li>MuJoCo</li><li>PyTorch</li><li>Motion retargeting</li><li>Q-learning</li></ul>
+          </div>
+          <div class="skill reveal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/></svg>
+            <h3>Software</h3>
+            <p>Tools, apps and pipelines</p>
+            <ul class="tags"><li>Python</li><li>Java</li><li>Kotlin</li><li>Git</li><li>Linux</li><li>Docker</li><li>Three.js</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="shell about">
+        <figure class="portrait reveal">
+          <img src="media/robotics/portrait.jpg" width="640" height="800" loading="lazy" decoding="async" alt="Thanisorn in profile, in front of a large aquarium tank.">
+        </figure>
+        <div class="about-body reveal">
+          <p class="eyebrow">About</p>
+          <h2 class="section-title" id="about-title" style="margin-bottom:22px">Hardware, code and learning, working as one system.</h2>
+          <p>I'm Thanisorn, and I study <strong>Mechanical and Automation Engineering at CUHK</strong>. I like problems where mechanics, electronics, software and learning all have to work together.</p>
+          <p>My approach is practical: understand the mechanics, write the code, test on the real system, and refine it until the parts behave as one. Recently that meant humanoid motion and robot learning on a Unitree G1. Before that, an assistive ball joint on an Arduino and self-play agents written in C.</p>
+          <p>I bring the same systems thinking to markets too, on my <a href="quant.html" style="color:var(--accent)">Quant track</a>.</p>
+          <ul class="creds">
+            <li><span>Study</span><b>Mechanical &amp; Automation Engineering, CUHK · First Class Honours</b></li>
+            <li><span>Competition</span><b>CUHK ROBOCON 2025 team</b></li>
+            <li><span>Recognition</span><b>IMMC Mathematical Modeling Award</b></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section" id="contact" aria-labelledby="contact-title" style="padding-top:24px">
+      <div class="shell">
+        <div class="contact reveal">
+          <p class="eyebrow">Contact</p>
+          <h2 id="contact-title">Let's build something that moves.</h2>
+          <p>I'm interested in robotics, automation and robot-learning work. Email or LinkedIn is the fastest way to reach me.</p>
+          <div class="contact-actions">
+            <a class="btn btn--primary" href="mailto:thanisornjarudilokkil@gmail.com">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+              Email me
+            </a>
+            <a class="btn" href="https://hk.linkedin.com/in/thanisorn-jarudilokkul-048870326" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="btn" href="https://github.com/Book15011" target="_blank" rel="noopener">GitHub</a>
+            <a class="btn" href="contact.html">Send a message</a>
+          </div>
+          <p class="contact-email">or write to <a href="mailto:thanisornjarudilokkil@gmail.com">thanisornjarudilokkil@gmail.com</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <nav aria-label="Footer">
+        <a href="index.html">&larr; Gateway</a>
+        <a href="robotics.html">Robot Garage</a>
+        <a href="quant.html" class="footer-cross">Quant track &#8599;</a>
+      </nav>
+      <span>&copy; 2026 Thanisorn J.</span>
+    </div>
+  </footer>
+
+  <script src="robotics-site.js" defer></script>
+  <script src="robotics-arm.js" defer></script>
 </body>
 </html>

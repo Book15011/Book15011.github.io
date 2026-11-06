@@ -1,194 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank You! - Thanisorn J.</title>
-    <style>
-        /* Common styles */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        
-        /* Updated Luxurious Header */
-        header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 3;
-            background: rgba(10, 10, 20, 0.7);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-decoration: none;
-            color: white;
-            position: relative;
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-            transition: all 0.3s ease;
-        }
-        .logo::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: #00eeff;
-            transition: width 0.4s ease;
-        }
-        .logo:hover::after {
-            width: 100%;
-        }
-        nav a {
-            margin-left: 40px;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 400;
-            font-size: 1.1rem;
-            letter-spacing: 1.5px;
-            position: relative;
-            padding-bottom: 5px;
-            transition: color 0.3s ease;
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-        }
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: #00eeff;
-            transition: width 0.4s ease;
-        }
-        nav a:hover {
-            color: white;
-        }
-        nav a:hover::after {
-            width: 100%;
-        }
-        nav a.active {
-            color: white;
-            font-weight: 500;
-        }
-        nav a.active::after {
-            width: 100%;
-            background: #00eeff;
-        }
-
-        /* Cross-track link to the Quant Developer side, colored with that
-           track's own accent so the color itself signals the destination. */
-        nav a.nav-cross {
-            padding: 6px 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(62, 207, 142, 0.4);
-            color: #3ecf8e;
-        }
-        nav a.nav-cross::after { display: none; }
-        nav a.nav-cross:hover {
-            color: #3ecf8e;
-            background: rgba(62, 207, 142, 0.12);
-            border-color: #3ecf8e;
-        }
-        
-        /* Page-specific styles */
-        .container {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(0, 238, 255, 0.3);
-            border-radius: 15px;
-            padding: 50px;
-            backdrop-filter: blur(8px);
-            max-width: 600px;
-            margin-top: 30px;
-        }
-        h1 {
-            font-size: 3.5rem;
-            text-shadow: 0 0 10px #00eeff;
-            margin-bottom: 20px;
-            font-weight: 300;
-        }
-        p {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 40px;
-        }
-        .btn {
-            background: linear-gradient(135deg, #00eeff, #00aaff);
-            border: none;
-            color: #000;
-            padding: 12px 30px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 238, 255, 0.5);
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 25px rgba(0, 238, 255, 0.8);
-        }
-        
-        @media (max-width: 768px) {
-            header {
-                padding: 15px 30px;
-            }
-            nav a {
-                margin-left: 25px;
-                font-size: 1rem;
-            }
-            .logo {
-                font-size: 1.5rem;
-            }
-            .container {
-                padding: 30px;
-                margin: 20px;
-            }
-            h1 {
-                font-size: 2.8rem;
-            }
-        }
-    </style>
-    <link rel="stylesheet" href="robotics-theme.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank you | Thanisorn J.</title>
+  <meta name="description" content="Message sent.">
+  <meta name="theme-color" content="#060a14">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&amp;family=Roboto+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="robotics-site.css">
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
-    <header>
-        <a href="index.html" class="logo">THANISORN J.</a>
-        <nav>
-            <a href="robotics-home.html">Home</a>
-            <a href="robotics.html" class="nav-garage">Robot Garage</a>
-            <a href="about.html">About</a>
-            <a href="projects.html">Projects</a>
-            <a href="contact.html">Contact</a>
-            <a href="quant.html" class="nav-cross">Quant</a>
-        </nav>
-    </header>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-    <div class="container">
-        <h1>Thank You!</h1>
-        <p>Your message has been sent. I will respond as soon as I can.</p>
-        <a href="robotics-home.html" class="btn">Return to Home</a>
+  <header class="site-header">
+    <div class="shell">
+      <a href="robotics-home.html" class="brand" aria-label="Thanisorn J., robotics portfolio">
+        <svg class="brand-mark" viewBox="0 0 26 26" fill="none" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 23h11"/><path d="M9.5 22.5 7.5 14l9-5.5"/><path d="m18 7.5 3.5-2.5M18.5 9.5l4 .5"/><circle cx="7.5" cy="14" r="2.2" fill="#060a14"/><circle cx="16.5" cy="8.5" r="2.2" fill="#060a14"/></svg>
+        THANISORN J.
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        Menu
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a href="robotics-home.html#humanoid">Humanoid</a>
+        <a href="robotics-home.html#work">Projects</a>
+        <a href="robotics-home.html#skills">Skills</a>
+        <a href="robotics-home.html#about">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="robotics.html" class="nav-garage">Robot Garage</a>
+        <a href="quant.html" class="nav-cross">Quant &#8599;</a>
+      </nav>
     </div>
+  </header>
+
+  <main id="main" class="shell center-page">
+    <p class="eyebrow">Message sent</p>
+    <h1>Thank you!</h1>
+    <p>Your message has been sent. I will respond as soon as I can.</p>
+    <a href="robotics-home.html" class="btn btn--primary">Back to the portfolio</a>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <nav aria-label="Footer">
+        <a href="index.html">&larr; Gateway</a>
+        <a href="robotics-home.html">Robotics portfolio</a>
+        <a href="quant.html" class="footer-cross">Quant track &#8599;</a>
+      </nav>
+      <span>&copy; 2026 Thanisorn J.</span>
+    </div>
+  </footer>
+
+  <script src="robotics-site.js" defer></script>
 </body>
 </html>
