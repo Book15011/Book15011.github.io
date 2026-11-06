@@ -1,12 +1,12 @@
 {
  "tiles": [
   {
-   "value": "185,178",
+   "value": "191,178",
    "label": "hands evaluated: head-to-head, Local Best Response and Slumbot, all on the code the browser runs"
   },
   {
-   "value": "-36 \u00b1 51",
-   "label": "bb/100 against Slumbot over 4,500 hands"
+   "value": "+46 \u00b1 47",
+   "label": "bb/100 against Slumbot over 6,000 hands in the rematch"
   },
   {
    "value": "2.2 MB",
@@ -289,10 +289,10 @@
   },
   {
    "title": "Slumbot: the independent test",
-   "text": "Slumbot won the 2018 Annual Computer Poker Competition and has a public API. It is the only opponent here I did not write. These matches are 200 big blinds deep with no duplicate deals, so variance is far higher than in the tables above. The second row scores hands where both players were all-in before the river at their expected value over the remaining cards, a standard way to remove some of the luck. It uses the same hands.",
+   "text": "Slumbot won the 2018 Annual Computer Poker Competition and has a public API. It is the only opponent here I did not write. These matches are 200 big blinds deep with no duplicate deals, so variance is far higher than in the tables above. The all-in adjusted rows score hands where both players were all-in before the river at their expected value over the remaining cards, a standard way to remove some of the luck. They use the same hands. The first match solved the turn for 20 iterations and the river for 150, which turned out to leave the Expert betting the turn far too often. The rematch used 300 and 600, the most the site runs while you take your time, and the longer-trained 200bb blueprint, so it reflects both fixes together.",
    "table": {
     "headers": [
-     "Scoring",
+     "Match and scoring",
      "#Hands",
      "#bb/100",
      "#95% CI",
@@ -300,22 +300,36 @@
     ],
     "rows": [
      [
-      "Raw chips",
+      "First match, raw chips",
       "4,500",
       "-35.5",
       "\u00b150.6",
       "-355"
      ],
      [
-      "All-in adjusted (12 hands)",
+      "First match, all-in adjusted (12 hands)",
       "4,500",
       "-44.2",
       "\u00b147.8",
       "-442"
+     ],
+     [
+      "Rematch, raw chips",
+      "6,000",
+      "+45.7",
+      "\u00b147.1",
+      "+457"
+     ],
+     [
+      "Rematch, all-in adjusted (10 hands)",
+      "6,000",
+      "+49.3",
+      "\u00b144.6",
+      "+493"
      ]
     ]
    },
-   "note": "For scale, published results against Slumbot include ReBeL at +45 \u00b1 5 mbb/hand and Modicum at +11 \u00b1 5, both over far larger samples. A sample this size cannot separate results that close."
+   "note": "For scale, published wins against Slumbot run from Modicum at +11 \u00b1 5 mbb/hand and ReBeL at +45 \u00b1 5 to Supremus at +176 \u00b1 44, all over far larger samples and with far more compute. A true edge as large as the rematch result would be surprising, so the real margin is most likely smaller. The fair reading is that the Expert now holds its own against Slumbot, not that it is stronger."
   },
   {
    "title": "Local Best Response: how exploitable is it?",
