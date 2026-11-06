@@ -28,8 +28,9 @@ async function init(level) {
     rng,
     analysis: true,
     solver: new RealtimeSolver(store.core, {
-      turn: { budgetMs: 1500, minIterations: 8, iterations: 80 },
-      river: { budgetMs: 700, minIterations: 40, iterations: 400 },
+      // While the player decides, the solve keeps going up to ponderIterations (see ponder below).
+      turn: { budgetMs: 1500, minIterations: 8, iterations: 80, ponderIterations: 300 },
+      river: { budgetMs: 700, minIterations: 40, iterations: 400, ponderIterations: 600 },
       riverStride: 4,
       adaptive: true,
       analysis: true,
@@ -42,10 +43,29 @@ function compressRange(range) {
   return range ? Array.from(range) : undefined;
 }
 
+/**
+ * Thinking on the player's time. On the turn and river the Expert keeps solving the current street in short
+ * slices while the player decides, so its next decision starts from a more converged solve. Any new message
+ * stops it: the slices yield to the event loop, and a stale generation number ends the loop.
+ */
+let ponderGen = 0;
+/** @param {number} gen @param {any} obs */
+function ponderSlice(gen, obs) {
+  if (gen !== ponderGen) return;
+  let more = false;
+  try { more = bot?.ponder?.(obs, 40) ?? false; } catch { more = false; }
+  if (more) setTimeout(() => ponderSlice(gen, obs), 0);
+}
+
 self.onmessage = async (ev) => {
   const m = ev.data;
+  const gen = ++ponderGen;
   try {
     switch (m.type) {
+      case 'ponder':
+        self.postMessage({ id: m.id, type: 'ok' });
+        if (difficulty === 'expert') setTimeout(() => ponderSlice(gen, m.obs), 0);
+        break;
       case 'init':
         await init(m.difficulty);
         self.postMessage({ id: m.id, type: 'ready' });

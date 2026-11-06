@@ -436,6 +436,8 @@ class PokerGame {
       if (h.toAct === HUMAN) {
         this.awaitingHuman = true;
         this.#renderControls();
+        // On the turn and river the Expert keeps solving while you decide. It gets its own view only.
+        if (this.difficulty === 'expert' && h.board.length >= 4) this.ai?.call({ type: 'ponder', obs: h.observation(AI) }).catch(() => {});
         return;
       }
       this.awaitingHuman = false;
@@ -863,7 +865,7 @@ class PokerGame {
     const l = obs.legal;
     const odds = l.canCall ? l.callAmount / (obs.pot + l.callAmount) : 0;
     const source = !info ? { label: 'Rule-based', plain: true }
-      : info.source === 'solver' ? { label: `Live solve · ${info.iterations} it · ${Math.round(info.ms)} ms` }
+      : info.source === 'solver' ? { label: `Live solve · ${info.iterations} it · ${Math.round(info.ms)} ms${info.pondered ? ` (${info.pondered} it on your time)` : ''}` }
       : info.source === 'blueprint' ? { label: 'Trained strategy' }
       : { label: 'Fallback', plain: true };
     const equity = info?.equity;

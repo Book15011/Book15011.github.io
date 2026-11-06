@@ -80,7 +80,8 @@ The table for the stack depth nearest the effective stack is used, chosen by rat
 - A small share of the earlier range always survives, so an unexpected line can never empty a range.
 - The opponent's actual bet size is added to the tree as an exact option.
 - The AI's own earlier actions on the street are pinned to the strategy it actually used, as Pluribus does.
-- If the next action is already in the solved tree, the existing solution is reused and the decision is instant.
+- If the next action is already in the solved tree, the existing solution is reused, topped up to the iteration target if the time budget cut it short.
+- **It thinks on your time.** While you decide on the turn or river, the worker keeps iterating the current tree in 40 ms slices, up to 300 turn or 600 river iterations, and stops as soon as any message arrives. If your action is in the tree (check, call, fold, or the ½-pot, pot and all-in buttons as a first bet), its reply starts from that work. Its own earlier decisions on the tree are pinned first, so extra iterations cannot change what it already played. The worker still sees only its own observation. Short solves leave the Expert too aggressive on the turn (see [BENCHMARKS.md](BENCHMARKS.md#turn-aggression-and-solve-length)), so this matters most for strength, not speed.
 
 The solver core (`research/solver/solver.c`) updates every hand in the range in one pass, computing showdowns in O(hands) using sorted hand strength with a card-removal correction. It compiles to about 50 KB of WebAssembly with SIMD.
 

@@ -113,6 +113,54 @@ test('expert plays legally, including short stacks and odd bet sizes', { skip: !
   }
 });
 
+test('the expert keeps solving on the opponent\'s time without changing what it already played', { skip: !hasModels && 'models are not in poker/models yet' }, async () => {
+  const manifest = JSON.parse(readFileSync(`${models}manifest.json`, 'utf8'));
+  const load = (f) => { const b = gunzipSync(readFileSync(`${models}${f}`)); return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength); };
+  const bps = new Map(manifest.depths.map((d) => [d, new Blueprint(load(`bp_${d}.bin.gz`))]));
+  const table = new BucketTable(3, new Uint16Array(load('flop_buckets.bin.gz')));
+  const core = await loadSolverCore(readFileSync(new URL('../js/ai/solver.wasm', import.meta.url)));
+  const rng = seededRng(91);
+  const bot = new ExpertBot({
+    blueprintFor: (bb) => bps.get(nearestDepth(manifest.depths, bb)),
+    bucketsFor: (s, b, o) => { if (s !== 1) return false; table.fill(b, o); return true; },
+    rng,
+    solver: new RealtimeSolver(core, { turn: { iterations: 3, ponderIterations: 10 }, river: { iterations: 10, ponderIterations: 40 } }),
+  });
+  const rand = new CallStationBot();
+  let pondered = 0, checked = 0;
+  for (let i = 0; i < 60; i++) {
+    const me = i % 2;
+    const bots = me === 0 ? [bot, rand] : [rand, bot];
+    const h = new HandState({ stacks: [10000, 10000], smallBlind: 50, bigBlind: 100, button: rng.int(2), randInt: rng.int });
+    bots.forEach((b, s) => b.onHandStart?.(h.observation(s)));
+    /** @type {any} */
+    let played = null;
+    let guard = 0;
+    while (!h.finished) {
+      assert.ok(++guard < 300, 'hand terminates');
+      if (h.toAct !== me && h.street >= 2) {
+        const mine = h.observation(me);
+        while (bot.ponder(mine, 1000));
+        if (played && bot.solver.sg === played.sg) {
+          assert.deepEqual(played.sg.strategy(played.node), played.sigma, 'a decision already played stays pinned');
+          checked++;
+        }
+      }
+      const action = bots[h.toAct].act(h.observation(h.toAct));
+      if (h.toAct === me && bot.lastDecision?.source === 'solver') {
+        pondered = Math.max(pondered, bot.lastDecision.pondered);
+        const sg = bot.solver.sg;
+        const { node } = sg.pathReach();
+        played = { sg, node, sigma: sg.strategy(node) };
+      }
+      h.apply(action);
+    }
+    assert.equal(h.result.net[0] + h.result.net[1], 0);
+  }
+  assert.ok(pondered > 0, 'some decisions used iterations run on the opponent\'s time');
+  assert.ok(checked > 0, 'the pinned-decision check ran');
+});
+
 test('a whole quick match always finishes with one player over the goal or out of chips', () => {
   const rng = seededRng(404);
   const blinds = [[50, 100], [75, 150], [100, 200], [150, 300], [200, 400], [300, 600], [400, 800], [500, 1000]].map(([small, big]) => ({ small, big }));

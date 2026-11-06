@@ -111,6 +111,16 @@ export class ExpertBot {
     return /** @type {BlueprintWalker} */ (this.walker);
   }
 
+  /**
+   * Keep solving the current turn or river while the opponent decides. Takes the agent's own observation, so
+   * it uses nothing more than act() does. Returns true while more work would help. @param {Observation} obs @param {number} chunkMs
+   */
+  ponder(obs, chunkMs) {
+    if (!this.solver || !this.walker || obs.street < TURN) return false;
+    this.#sync(obs);
+    return this.solver.ponder({ obs, walker: this.walker }, chunkMs);
+  }
+
   /** @param {Observation} obs */
   act(obs) {
     if (!this.walker) this.onHandStart(obs);

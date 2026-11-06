@@ -51,8 +51,8 @@ export function equityVsRange(hand, board, range) {
 export class RealtimeSolver {
   /**
    * @param {any} core wasm exports
-   * @param {{turn:{iterations?:number,budgetMs?:number,minIterations?:number},
-   *          river:{iterations?:number,budgetMs?:number,minIterations?:number},
+   * @param {{turn:{iterations?:number,budgetMs?:number,minIterations?:number,ponderIterations?:number},
+   *          river:{iterations?:number,budgetMs?:number,minIterations?:number,ponderIterations?:number},
    *          sizes?:any, purifyBelow?:number, rangeFloor?:number, analysis?:boolean, riverStride?:number, adaptive?:boolean, handFloor?:number}} cfg
    */
   constructor(core, cfg) {
@@ -131,10 +131,12 @@ export class RealtimeSolver {
 
   /**
    * Make sure a solved tree exists for the current street and betting line. Reuses the last solve when the
-   * line is still on its tree, so a follow-up decision on the same street is instant.
+   * line is still on its tree, adding iterations if it has fewer than the budget allows (the AI's own past
+   * decisions on it are pinned, so they stay what was played). With `ponder`, only builds the tree.
    * @param {any} obs @param {any} walker @param {number} keepHand a hand that must stay in the solve
+   * @param {boolean} [ponder]
    */
-  prepare(obs, walker, keepHand) {
+  prepare(obs, walker, keepHand, ponder = false) {
     const street = obs.street;
     const start = this.#streetStart(obs, street);
     if (start.behind <= 0) return null;
@@ -145,6 +147,7 @@ export class RealtimeSolver {
     if (usable) {
       /** @type {Subgame} */ (this.sg).path = path;
       reused = true;
+      if (!ponder) this.#solve(budget, street);
     } else {
       if (this.sgStreet !== street) {
         this.ranges = this.#rangesAfter(obs, walker);
@@ -161,17 +164,52 @@ export class RealtimeSolver {
         const nodeIdx = this.sg.pathNodes[pos];
         if (nodeIdx !== undefined && this.sg.nodes[nodeIdx].na * this.sg.H === sigma.length) this.sg.lockNode(nodeIdx, sigma);
       }
-      this.sg.run(budget);
-      // On a slow device, a smaller turn tree gives a better answer inside the time budget (see BENCHMARKS.md):
-      // fewer modelled rivers, and on very slow devices fewer low-weight hands. Takes effect from the next hand,
-      // so pinned decisions within a street always match the tree they came from.
-      if (this.cfg.adaptive && street === 2) {
-        const msPerIter = (this.sg.lastRunMs ?? 0) / Math.max(1, this.sg.iterations);
-        if (msPerIter > 120) this.nextTier = { riverStride: 8, handFloor: 0.02 };
-        else if (msPerIter > 45) this.nextTier = { riverStride: 6, handFloor: this.cfg.handFloor };
-      }
+      if (!ponder) this.#solve(budget, street);
     }
     return { sg: /** @type {Subgame} */ (this.sg), path, reused };
+  }
+
+  /** Run the current tree up to the budget's iteration count, within its time budget. @param {any} budget @param {number} street */
+  #solve(budget, street) {
+    const sg = /** @type {Subgame} */ (this.sg);
+    const target = budget.iterations ?? 100000;
+    if (sg.iterations >= target) return;
+    sg.run({ iterations: target - sg.iterations, budgetMs: budget.budgetMs, minIterations: Math.max(1, (budget.minIterations ?? 1) - sg.iterations) });
+    this.#measure(street);
+  }
+
+  /**
+   * On a slow device, a smaller turn tree gives a better answer inside the time budget (see BENCHMARKS.md):
+   * fewer modelled rivers, and on very slow devices fewer low-weight hands. Takes effect from the next hand,
+   * so pinned decisions within a street always match the tree they came from. @param {number} street
+   */
+  #measure(street) {
+    const sg = /** @type {Subgame} */ (this.sg);
+    if (!this.cfg.adaptive || street !== 2 || sg.iterations < 3) return;
+    const msPerIter = sg.totalMs / sg.iterations;
+    if (msPerIter > 120) this.nextTier = { riverStride: 8, handFloor: 0.02 };
+    else if (msPerIter > 45) this.nextTier = { riverStride: 6, handFloor: this.cfg.handFloor };
+  }
+
+  /**
+   * Use the opponent's thinking time: build this street's tree if needed and run a few more iterations on it.
+   * When the opponent then acts on the tree, the next decision starts from this work. Stops at the street's
+   * `ponderIterations`. Returns true while more iterations would still help.
+   * @param {{obs:any, walker:any}} ctx @param {number} chunkMs
+   */
+  ponder({ obs, walker }, chunkMs) {
+    const street = obs.street;
+    if (street < 2) return false;
+    const budget = street === 2 ? this.cfg.turn : this.cfg.river;
+    const cap = budget.ponderIterations ?? 0;
+    if (cap <= 0) return false;
+    const ready = this.prepare(obs, walker, pairIdx(obs.hole[0], obs.hole[1]), true);
+    if (!ready) return false;
+    const sg = ready.sg;
+    if (sg.iterations >= cap) return false;
+    sg.pondered += sg.run({ iterations: cap - sg.iterations, budgetMs: chunkMs, minIterations: 1 });
+    this.#measure(street);
+    return sg.iterations < cap;
   }
 
   /**
@@ -192,7 +230,11 @@ export class RealtimeSolver {
     const sigma = sg.handStrategy(node, hand);
     const a = this.#sample(sigma, rng);
     const opt = n.opts[a];
-    this.locks.set(path.length, sg.strategy(node));
+    // Pin what was just played, so any later iterations on this tree (topping up, or while the opponent
+    // decides) cannot change the strategy this action was drawn from.
+    const played = sg.strategy(node);
+    this.locks.set(path.length, played);
+    sg.lockNode(node, played);
 
     const l = obs.legal;
     let action;
@@ -204,7 +246,7 @@ export class RealtimeSolver {
 
     const info = {
       source: 'solver', street, reused,
-      iterations: sg.iterations, ms: sg.lastRunMs ?? 0, hands: sg.H,
+      iterations: sg.iterations, ms: sg.totalMs, pondered: sg.pondered, hands: sg.H,
       options: n.opts.map((o, i) => ({ type: o.type, to: o.to, allIn: o.type === ACT_RAISE && o.to >= sg.behind, prob: sigma[i] })),
       chosen: a,
     };

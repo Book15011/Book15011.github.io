@@ -121,7 +121,27 @@ The all-in adjusted row scores the 12 hands where both players were all-in befor
 
 **Reading it honestly:** the Expert most likely loses to Slumbot. The interval runs from about −86 to +15 bb/100, so a small win can't be ruled out, but it would be a surprise. For scale, ReBeL beat Slumbot by 4.5 ± 0.5 bb/100 and Modicum by 1.1 ± 0.5, both with far more compute and far larger samples. The likely causes are the under-trained 200bb blueprint (see the training table) and the coarse deep-stack abstraction. The fixes are more training time and the potential-aware abstraction from [RESEARCH.md](RESEARCH.md).
 
-The hand logs also show what looked like over-aggressive turn shoves with draws when deep. That could be correct mixed play or a symptom of mis-estimated ranges. 4,500 hands can't tell those apart, and it is the first thing I would investigate next.
+The hand logs also showed the Expert betting or raising far more often on the turn than Slumbot (51.8% of its turn decisions, against 21.4%). The next section traces that to the short turn solves used in this match (20 iterations).
+
+## Turn aggression and solve length
+
+`research/bench/slumbot_actions.py` splits the Slumbot logs by street and by each hand's last aggressive action. Hands that ended with an Expert turn raise cost 9.9 bb/100, and turn all-ins another 9.0, out of the 35.5 lost. To test whether short solves cause the extra aggression, `research/bench/turn_profile.js` plays the Expert against the blueprint alone (duplicate deals, 300 pairs, 150 for the slowest run) and counts every action by street:
+
+| Depth | Turn iterations | Expert: turn bets and raises | Blueprint: turn bets and raises | Expert vs blueprint (bb/100) |
+|---|---|---|---|---|
+| 200bb | 20 | 61.5% | 23.8% | +196.6 ± 220.7 |
+| 200bb | 80 | 45.9% | 27.7% | +123.6 ± 206.7 |
+| 200bb | 300 | 28.8% | 29.4% | +50.6 ± 208.5 |
+| 100bb | 80 | 38.2% | 27.1% | +29.0 ± 138.2 |
+| 100bb | 300 | 31.8% | 27.4% | +48.0 ± 152.1 |
+| 20bb | 80 | 30.6% | 24.5% | +47.6 ± 67.2 |
+| 20bb | 300 | 26.7% | 22.5% | +30.8 ± 66.2 |
+
+River iterations were scaled with the turn (150, 400 and 600). Deep stacks need the most iterations: at 200bb, 20 iterations leave the Expert betting or raising more than twice as often as the trained tables, and by 300 it matches them. A likely reason is that an under-converged average strategy still carries the early, nearly uniform iterations, and most options in a deep tree are bets and raises. Dropping actions under 15% instead of 2% only moved 200bb at 80 iterations from 45.9% to 38.9%, and 100bb from 38.2% to 36.2%, so the fix is more iterations, not more pruning.
+
+The win rates against the blueprint don't show this: every interval includes zero. A passive, exploitable opponent may even pay off the extra bets, which is a reason to judge the fix on a strong opponent instead. The earlier head-to-head benchmarks used 30 to 40 turn iterations, so their Expert was also more aggressive than intended. They were not rerun.
+
+**What changed on the site.** The Expert now keeps solving while you decide, up to 300 turn and 600 river iterations, and answers from that solve if your action is in its tree (see [ARCHITECTURE.md](ARCHITECTURE.md#expert-turn-and-river)). When it acts first on the turn it still has its 1.5 s budget, about 60 iterations on a laptop.
 
 
 ## Training

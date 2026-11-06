@@ -74,6 +74,8 @@ export class Subgame {
     this.#buildRoot();
     this.#writeToWasm(p.ranges);
     this.iterations = 0;
+    this.totalMs = 0;     // solving time spent on this tree, across every run
+    this.pondered = 0;    // iterations run while the opponent was deciding
   }
 
   // ---------- tree ----------
@@ -310,6 +312,7 @@ export class Subgame {
       if (i >= minI && performance.now() - t0 > budget) break;
     }
     this.lastRunMs = performance.now() - t0;
+    this.totalMs += this.lastRunMs;
     return i;
   }
 

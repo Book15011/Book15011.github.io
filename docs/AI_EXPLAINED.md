@@ -25,7 +25,7 @@ Late in a hand the remaining game is small enough to solve properly, so the AI d
 
 1. Estimates which hands you could hold, based on how you bet and how the blueprint would have played.
 2. Builds a betting tree for the rest of the hand, including the exact bet you just made.
-3. Runs Discounted CFR on it for a second or two, in a background thread, so the page stays responsive.
+3. Runs Discounted CFR on it for a second or two, in a background thread, so the page stays responsive. While you are deciding, it keeps solving, so when you check, call or use one of the standard bet buttons it answers from a longer solve. The review panel shows how many iterations ran on your time.
 4. Reads the strategy for its actual cards and rolls the dice to pick an action.
 
 The solver works out a strategy for *every* hand it could hold, not just the real one. That is what keeps it balanced: it acts the same way with its bluffs as with its strong hands.

@@ -92,7 +92,7 @@
       <tr><td>Blueprint</td><td>Offline</td><td>Average strategy from self-play, one table per stack depth</td></tr>
       <tr><td>Range tracking</td><td>Live</td><td>Updates what each player could hold, from public betting only</td></tr>
       <tr><td>Preflop and flop</td><td>Live</td><td>Looks up the trained strategy, translating unusual bet sizes</td></tr>
-      <tr><td>Turn and river</td><td>Live</td><td>Solves the rest of the hand with Discounted CFR, about a second or two</td></tr>
+      <tr><td>Turn and river</td><td>Live</td><td>Solves the rest of the hand with Discounted CFR, about a second or two, and keeps solving while you decide</td></tr>
     </table></div>
     <p>The AI runs in a Web Worker that only ever receives its own view of the table: its two cards, the board and the betting. It has no route to your cards or the deck. There is no language model and no paid API, and nothing leaves your browser.</p>
   </section>
