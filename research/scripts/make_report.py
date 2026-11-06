@@ -114,7 +114,7 @@ if lbr:
         rows.append(['Expert' if r['mode'] == 'expert' else 'Blueprint only', f"{r['stackBB']}bb", start, f"{r['hands']:,}", f"{-r['lbrMbb']:+.0f}", f"±{r['ci95']:.0f}"])
     sections.append({
         'title': 'Local Best Response: how exploitable is it?',
-        'text': 'LBR is told the exact strategy, then attacks it greedily, assuming the hand checks down afterwards. If LBR won, that would prove a minimum amount the bot can be exploited by. The table shows the bot's winnings against LBR, as in the ReBeL paper: positive means the attack failed. That is evidence, not proof, that the bot is hard to exploit.',
+        'text': 'LBR is told the exact strategy, then attacks it greedily, assuming the hand checks down afterwards. If LBR won, that would prove a minimum amount the bot can be exploited by. The table shows how much the bot won against LBR, as in the ReBeL paper: positive means the attack failed. That is evidence, not proof, that the bot is hard to exploit.',
         'table': {'headers': ['Agent', 'Stack', 'LBR plays from', '#Hands', '#Agent mbb/hand', '#95% CI'], 'rows': rows},
         'note': 'For scale, ReBeL beat LBR by 881 ± 94 and DeepStack by 383 ± 112, when LBR had to call through preflop and flop at 200bb (the "turn" rows here).',
     })
