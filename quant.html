@@ -471,6 +471,8 @@
   .poker-hand i:nth-child(2){ transform:translate(-22%,-52%) rotate(9deg); }
   .poker-break:hover .poker-hand i:nth-child(1){ transform:translate(-86%,-54%) rotate(-15deg); }
   .poker-break:hover .poker-hand i:nth-child(2){ transform:translate(-14%,-56%) rotate(13deg); }
+  .poker-stats{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; max-width:640px; margin:24px 0 4px; padding-top:18px; border-top:1px solid var(--hairline); }
+  @media (max-width:560px){ .poker-stats{ grid-template-columns:1fr 1fr; } }
   .poker-pill{ position:fixed; right:clamp(14px,3vw,28px); bottom:clamp(14px,3vw,28px); z-index:40; display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:999px; border:1px solid rgba(62,207,142,.45); background:rgba(13,19,31,.94); backdrop-filter:blur(10px); color:var(--paper); font:600 .84rem 'Inter',sans-serif; cursor:pointer; box-shadow:0 10px 30px rgba(0,0,0,.5); opacity:0; transform:translateY(14px); pointer-events:none; transition:opacity .3s ease, transform .3s ease, border-color .2s ease; }
   .poker-pill.is-visible{ opacity:1; transform:none; pointer-events:auto; }
   .poker-pill:hover{ border-color:var(--signal); }
@@ -701,6 +703,12 @@
         <p class="poker-text">Wanna play a quick hand? It runs right here, first to 3,000 chips, and takes about five minutes. The bot is an experiment in game theory and decisions with hidden information: a strategy trained by self-play with counterfactual regret minimization, plus a solver that runs in your browser on the turn and river.</p>
         <div class="poker-actions">
           <button type="button" class="poker-play" data-poker-open>Wanna play poker? <span aria-hidden="true">&#9824;</span></button>
+        </div>
+        <div class="poker-stats">
+          <div class="stat"><span class="stat-label">Hands Tested</span><span class="stat-value">185,178</span></div>
+          <div class="stat"><span class="stat-label">vs Rule-Based Bot</span><span class="stat-value">+21.5 bb/100</span></div>
+          <div class="stat"><span class="stat-label">LBR Exploit Found</span><span class="stat-value">None</span></div>
+          <div class="stat"><span class="stat-label">vs Slumbot</span><span class="stat-value stat-value--down">&minus;35.5 &plusmn; 50.6</span></div>
         </div>
         <div class="poker-links">
           <a href="poker/how-it-works.html">How the AI works</a>

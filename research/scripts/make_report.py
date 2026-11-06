@@ -105,13 +105,27 @@ if os.path.exists(sp):
         'note': 'For scale, published results against Slumbot include ReBeL at +45 ± 5 mbb/hand and Modicum at +11 ± 5, both over far larger samples. A sample this size cannot separate results that close.',
     })
 
-# Local Best Response
+# Local Best Response. A run stopped early has no final line, so its last progress line is used and marked.
 lbr = read_jsonl('lbr*.json')
+done = {(r['mode'], r['stackBB'], r['fromStreet']) for r in lbr}
+for path in glob.glob(os.path.join(results_dir, 'lbr_*.err')):
+    import re
+    m = re.match(r'lbr_(\w+?)_(\d+)_f(\d)\.err', os.path.basename(path))
+    if not m or (m.group(1), int(m.group(2)), int(m.group(3))) in done:
+        continue
+    last = None
+    for line in open(path, encoding='utf-8'):
+        mm = re.match(r'(\d+) hands: LBR (-?\d+) \+- (\d+) mbb/hand', line)
+        if mm:
+            last = mm
+    if last:
+        lbr.append({'mode': m.group(1), 'stackBB': int(m.group(2)), 'fromStreet': int(m.group(3)), 'hands': int(last.group(1)),
+                    'lbrMbb': float(last.group(2)), 'ci95': float(last.group(3)), 'partial': True})
 if lbr:
     rows = []
     for r in sorted(lbr, key=lambda x: (x['stackBB'], x['fromStreet'], x['mode'])):
         start = {0: 'preflop', 1: 'flop', 2: 'turn'}[r['fromStreet']]
-        rows.append(['Expert' if r['mode'] == 'expert' else 'Blueprint only', f"{r['stackBB']}bb", start, f"{r['hands']:,}", f"{-r['lbrMbb']:+.0f}", f"±{r['ci95']:.0f}"])
+        rows.append(['Expert' if r['mode'] == 'expert' else 'Blueprint only', f"{r['stackBB']}bb", start, f"{r['hands']:,}" + (' (stopped early)' if r.get('partial') else ''), f"{-r['lbrMbb']:+.0f}", f"±{r['ci95']:.0f}"])
     sections.append({
         'title': 'Local Best Response: how exploitable is it?',
         'text': 'LBR is told the exact strategy, then attacks it greedily, assuming the hand checks down afterwards. If LBR won, that would prove a minimum amount the bot can be exploited by. The table shows how much the bot won against LBR, as in the ReBeL paper: positive means the attack failed. That is evidence, not proof, that the bot is hard to exploit.',
@@ -134,7 +148,8 @@ sections.append({
 })
 
 perf_path = os.path.join(results_dir, 'perf.json')
-tiles = [{'value': f'{total_hands:,}', 'label': 'hands in the benchmark suite, using the same code the browser runs'}]
+all_hands = total_hands + sum(r['hands'] for r in lbr) + (slumbot_summary['hands'] if slumbot_summary else 0)
+tiles = [{'value': f'{all_hands:,}', 'label': 'hands evaluated: head-to-head, Local Best Response and Slumbot, all on the code the browser runs'}]
 if slumbot_summary:
     tiles.append({'value': f"{slumbot_summary['bb100']:+.0f} ± {slumbot_summary['ci']:.0f}", 'label': f"bb/100 against Slumbot over {slumbot_summary['hands']:,} hands"})
 tiles.append({'value': f'{(quick_bytes + solver_bytes) / 1048576:.1f} MB', 'label': 'download for a quick match, loaded only when you start'})

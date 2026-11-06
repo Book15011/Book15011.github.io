@@ -1,8 +1,12 @@
 {
  "tiles": [
   {
-   "value": "39,478",
-   "label": "hands in the benchmark suite, using the same code the browser runs"
+   "value": "185,178",
+   "label": "hands evaluated: head-to-head, Local Best Response and Slumbot, all on the code the browser runs"
+  },
+  {
+   "value": "-36 \u00b1 51",
+   "label": "bb/100 against Slumbot over 4,500 hands"
   },
   {
    "value": "2.2 MB",
@@ -26,19 +30,19 @@
       "ci": 16.691641764916703
      },
      {
-      "label": "Tight-passive",
-      "value": 13.600416666666666,
-      "ci": 22.898173508926092
-     },
-     {
       "label": "Equity / pot odds",
       "value": 15.980416666666667,
       "ci": 46.81124308064471
      },
      {
+      "label": "Tight-passive",
+      "value": 18.13125,
+      "ci": 10.30528515098445
+     },
+     {
       "label": "Competitive (site bot)",
-      "value": 20.650833333333335,
-      "ci": 27.88924897375117
+      "value": 21.537019230769232,
+      "ci": 13.086313249097456
      },
      {
       "label": "Casual (site bot)",
@@ -87,22 +91,22 @@
       "\u00b116.7"
      ],
      [
-      "Tight-passive",
-      "2,400",
-      "+13.6",
-      "\u00b122.9"
-     ],
-     [
       "Equity / pot odds",
       "2,400",
       "+16.0",
       "\u00b146.8"
      ],
      [
+      "Tight-passive",
+      "10,400",
+      "+18.1",
+      "\u00b110.3"
+     ],
+     [
       "Competitive (site bot)",
-      "2,400",
-      "+20.7",
-      "\u00b127.9"
+      "10,400",
+      "+21.5",
+      "\u00b113.1"
      ],
      [
       "Casual (site bot)",
@@ -151,6 +155,103 @@
    "note": "Blueprint only is the same trained model with no live solving, the most direct measure of what the solver adds. The other opponents are hand-written and were never used in training."
   },
   {
+   "title": "Expert against each opponent, 100 big blinds deep",
+   "chart": {
+    "title": "Expert win rate at 100bb, in bb/100, with 95% intervals",
+    "unit": "bb/100",
+    "rows": [
+     {
+      "label": "Blueprint only",
+      "value": 10.414999999999997,
+      "ci": 45.83962623471158
+     },
+     {
+      "label": "Competitive (site bot)",
+      "value": 45.9275,
+      "ci": 90.62360009269783
+     },
+     {
+      "label": "Tight-passive",
+      "value": 55.8275,
+      "ci": 79.09175380870101
+     },
+     {
+      "label": "Casual (site bot)",
+      "value": 104.36166666666666,
+      "ci": 166.44478168266812
+     },
+     {
+      "label": "Equity / pot odds",
+      "value": 108.43416666666667,
+      "ci": 179.21136363629654
+     },
+     {
+      "label": "Loose-aggressive",
+      "value": 199.305,
+      "ci": 224.79372342927678
+     },
+     {
+      "label": "Call station",
+      "value": 287.865,
+      "ci": 170.8744546374264
+     }
+    ]
+   },
+   "table": {
+    "headers": [
+     "Opponent",
+     "#Hands",
+     "#bb/100",
+     "#95% CI"
+    ],
+    "rows": [
+     [
+      "Blueprint only",
+      "6,000",
+      "+10.4",
+      "\u00b145.8"
+     ],
+     [
+      "Competitive (site bot)",
+      "1,200",
+      "+45.9",
+      "\u00b190.6"
+     ],
+     [
+      "Tight-passive",
+      "1,200",
+      "+55.8",
+      "\u00b179.1"
+     ],
+     [
+      "Casual (site bot)",
+      "1,200",
+      "+104.4",
+      "\u00b1166.4"
+     ],
+     [
+      "Equity / pot odds",
+      "1,200",
+      "+108.4",
+      "\u00b1179.2"
+     ],
+     [
+      "Loose-aggressive",
+      "1,200",
+      "+199.3",
+      "\u00b1224.8"
+     ],
+     [
+      "Call station",
+      "1,200",
+      "+287.9",
+      "\u00b1170.9"
+     ]
+    ]
+   },
+   "note": "Blueprint only is the same trained model with no live solving, the most direct measure of what the solver adds. The other opponents are hand-written and were never used in training."
+  },
+  {
    "title": "Whole quick matches: first to 3,000 chips",
    "text": "This is the format on the site. Short matches carry a lot of luck, so even a strong player loses some of them.",
    "table": {
@@ -185,6 +286,36 @@
      ]
     ]
    }
+  },
+  {
+   "title": "Slumbot: the independent test",
+   "text": "Slumbot won the 2018 Annual Computer Poker Competition and has a public API. It is the only opponent here I did not write. These matches are 200 big blinds deep with no duplicate deals, so variance is far higher than in the tables above. The second row scores hands where both players were all-in before the river at their expected value over the remaining cards, a standard way to remove some of the luck. It uses the same hands.",
+   "table": {
+    "headers": [
+     "Scoring",
+     "#Hands",
+     "#bb/100",
+     "#95% CI",
+     "#mbb/hand"
+    ],
+    "rows": [
+     [
+      "Raw chips",
+      "4,500",
+      "-35.5",
+      "\u00b150.6",
+      "-355"
+     ],
+     [
+      "All-in adjusted (12 hands)",
+      "4,500",
+      "-44.2",
+      "\u00b147.8",
+      "-442"
+     ]
+    ]
+   },
+   "note": "For scale, published results against Slumbot include ReBeL at +45 \u00b1 5 mbb/hand and Modicum at +11 \u00b1 5, both over far larger samples. A sample this size cannot separate results that close."
   },
   {
    "title": "Local Best Response: how exploitable is it?",
@@ -224,6 +355,14 @@
       "\u00b1141"
      ],
      [
+      "Expert",
+      "20bb",
+      "turn",
+      "2,000 (stopped early)",
+      "+954",
+      "\u00b1461"
+     ],
+     [
       "Blueprint only",
       "100bb",
       "preflop",
@@ -248,12 +387,28 @@
       "\u00b1367"
      ],
      [
+      "Expert",
+      "100bb",
+      "turn",
+      "1,500 (stopped early)",
+      "+2922",
+      "\u00b11595"
+     ],
+     [
       "Blueprint only",
       "200bb",
       "turn",
       "20,000",
       "+1980",
       "\u00b1581"
+     ],
+     [
+      "Expert",
+      "200bb",
+      "turn",
+      "1,500 (stopped early)",
+      "+5566",
+      "\u00b12680"
      ]
     ]
    },

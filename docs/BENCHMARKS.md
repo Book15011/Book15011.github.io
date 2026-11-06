@@ -2,7 +2,13 @@
 
 Every number here was measured. Raw results are in [`research/results/`](../research/results), and the tables come from [`research/scripts/make_report.py`](../research/scripts/make_report.py), which also writes the data behind the [results page](https://book15011.github.io/poker/how-it-works.html#benchmarks).
 
-> **Status:** 100bb head-to-head matches, more 20bb hands and the Slumbot match are still running. This page will be updated when they finish.
+## Summary
+
+185,178 hands were evaluated: 68,678 head-to-head, 112,000 against Local Best Response and 4,500 against Slumbot.
+
+- **Against the hand-written bots, the Expert wins, significantly at 20bb**: +21.5 ± 13.1 bb/100 against the Competitive bot on the site, and +18.1 ± 10.3 against Tight-passive. At 100bb every result is positive, but most intervals are still too wide.
+- **Local Best Response never beat it.** At 100bb and 200bb the Expert did measurably better against LBR than the same blueprint without live solving. That is the clearest evidence the solver earns its place: it makes the bot more robust, more than it wins extra chips from these opponents.
+- **Against Slumbot it lost: −35.5 ± 50.6 bb/100 over 4,500 hands.** The interval includes zero, but the most likely reading is that Slumbot is stronger. Slumbot took about 250,000 core hours to compute; this project's training used about 55 (253 minutes on 12 threads, plus card abstraction).
 
 ## Setup
 
@@ -33,9 +39,9 @@ This is the stack depth the quick match on the site starts at.
 | Expert against | Hands | bb/100 | 95% CI |
 |---|---|---|---|
 | Blueprint only | 9,600 | +10.5 | ±16.7 |
-| Tight-passive | 2,400 | +13.6 | ±22.9 |
 | Equity / pot odds | 2,400 | +16.0 | ±46.8 |
-| Competitive (site bot) | 2,400 | +20.7 | ±27.9 |
+| Tight-passive | 10,400 | +18.1 | ±10.3 |
+| Competitive (site bot) | 10,400 | +21.5 | ±13.1 |
 | Casual (site bot) | 2,400 | +49.5 | ±39.6 |
 | Random shover | 2,400 | +66.7 | ±32.2 |
 | Loose-aggressive | 2,400 | +95.1 | ±56.3 |
@@ -47,8 +53,8 @@ This is the stack depth the quick match on the site starts at.
 What this shows:
 
 - The Expert wins clearly against the weaker styles and against all three stress tests. Odd bet sizes and constant aggression don't break it.
-- **Against the stronger hand-written bots, the edge is positive but not yet significant at 2,400 hands.** Short stacks leave less room for skill, since many hands end preflop. More hands are being added.
-- **Live solving vs the blueprint alone: +10.5 ± 16.7.** The sign is in favour of solving, but the interval includes zero, so at 20bb I can't claim the solver adds measurable strength in head-to-head play. Its clearer value is in handling bets the blueprint never saw and in producing the explanations on the site.
+- Against the two strongest hand-written bots, the edge is about 0.2 big blinds per hand. That is small but significant over 10,400 hands each. Short stacks leave less room for skill, because many hands end preflop.
+- **Live solving vs the blueprint alone: +10.5 ± 16.7.** The interval includes zero, so in head-to-head play I can't claim the solver adds measurable strength at this depth. Its value shows up against LBR instead (below), and in handling bets the blueprint never saw.
 
 ## Quick matches
 
@@ -71,16 +77,52 @@ LBR is told the exact strategy, then attacks it greedily, assuming the hand chec
 | Blueprint only | 20bb | preflop | 20,000 | +123 | ±119 |
 | Expert | 20bb | preflop | 4,000 | +53 | ±272 |
 | Blueprint only | 20bb | turn | 20,000 | +513 | ±141 |
+| Expert | 20bb | turn | 2,000* | +954 | ±461 |
 | Blueprint only | 100bb | preflop | 20,000 | +765 | ±367 |
 | Expert | 100bb | preflop | 3,000 | +1,410 | ±955 |
 | Blueprint only | 100bb | turn | 20,000 | +806 | ±367 |
+| Expert | 100bb | turn | 1,500* | +2,922 | ±1,595 |
 | Blueprint only | 200bb | turn | 20,000 | +1,980 | ±581 |
+| Expert | 200bb | turn | 1,500* | +5,566 | ±2,680 |
 
-For scale, the ReBeL paper reports ReBeL beating LBR by 881 ± 94 and DeepStack by 383 ± 112, when LBR had to call through preflop and flop at 200bb (the "turn" rows here). In no setting I tried did LBR find a positive bound. That is evidence that the bot is not trivially exploitable. It is not proof: LBR only tries a few bet sizes and assumes the hand checks down afterwards.
+\* Stopped early, because live solving at every LBR decision runs at about 0.5 hands per second. The row uses the last progress report, and every value in it is already well above zero.
 
-<!-- DEEP -->
+For scale, the ReBeL paper reports ReBeL beating LBR by 881 ± 94 and DeepStack by 383 ± 112, when LBR had to call through preflop and flop at 200bb (the "turn" rows here). Note that the Expert and blueprint rows are not identical tests: LBR may only bet sizes that exist in the agent's own tree, and the live solver's menu differs from the blueprint's.
 
-<!-- SLUMBOT -->
+In no setting did LBR find a positive bound. At 100bb and 200bb the Expert beat LBR by clearly more than the blueprint alone did, with intervals that don't overlap. That is evidence that live solving makes the bot harder to exploit. It is not proof: LBR is a weak attacker that tries a few bet sizes and assumes the hand checks down afterwards.
+
+## Results at 100 big blinds
+
+This is the Deep stacks mode on the site.
+
+| Expert against | Hands | bb/100 | 95% CI |
+|---|---|---|---|
+| Blueprint only | 6,000 | +10.4 | ±45.8 |
+| Competitive (site bot) | 1,200 | +45.9 | ±90.6 |
+| Tight-passive | 1,200 | +55.8 | ±79.1 |
+| Casual (site bot) | 1,200 | +104.4 | ±166.4 |
+| Equity / pot odds | 1,200 | +108.4 | ±179.2 |
+| Loose-aggressive | 1,200 | +199.3 | ±224.8 |
+| Call station | 1,200 | +287.9 | ±170.9 |
+
+Deep stacks swing much more, and live solving is slower, so these samples are smaller. Every point estimate is positive, but only the Call station result is significant. I treat this table as consistent with the 20bb results, not as further proof.
+
+
+## Slumbot
+
+[Slumbot](https://slumbot.com) won the 2018 Annual Computer Poker Competition. Its authors report about 250,000 core hours and 2 TB of RAM to compute it. It plays 200bb deep through a public API, so this is the one test against a strong bot I didn't write. Three sessions of 1,500 hands ran one request at a time (`research/bench/slumbot.js`). The Expert used its 200bb blueprint for preflop and flop, and live solving after that.
+
+| Scoring | Hands | bb/100 | 95% CI | mbb/hand |
+|---|---|---|---|---|
+| Raw chips | 4,500 | −35.5 | ±50.6 | −355 |
+| All-in adjusted | 4,500 | −44.2 | ±47.8 | −442 |
+
+The all-in adjusted row scores the 12 hands where both players were all-in before the river at their expected value over the remaining cards. That is a standard way to remove some luck, and it uses the same hands. The sessions came out at +22, −557 and −531 mbb/hand, which shows how noisy 1,500 deep-stacked hands are.
+
+**Reading it honestly:** the Expert most likely loses to Slumbot. The interval runs from about −86 to +15 bb/100, so a small win can't be ruled out, but it would be a surprise. For scale, ReBeL beat Slumbot by 4.5 ± 0.5 bb/100 and Modicum by 1.1 ± 0.5, both with far more compute and far larger samples. The likely causes are the under-trained 200bb blueprint (see the training table) and the coarse deep-stack abstraction. The fixes are more training time and the potential-aware abstraction from [RESEARCH.md](RESEARCH.md).
+
+The hand logs also show what looked like over-aggressive turn shoves with draws when deep. That could be correct mixed play or a symptom of mis-estimated ranges. 4,500 hands can't tell those apart, and it is the first thing I would investigate next.
+
 
 ## Training
 
@@ -154,8 +196,10 @@ A quick match downloads about 2.2 MB the first time a visitor plays Expert, and 
 
 ## Known limitations
 
-- Head-to-head intervals at 20bb are still wide against the strongest hand-written bots.
+- The Expert most likely loses to Slumbot, an independent and much more heavily trained bot.
+- Live solving shows no significant head-to-head gain over the blueprint alone. Its measured benefit is robustness against LBR.
 - The deep blueprints are under-trained, and that shows in the convergence estimates above.
+- 100bb head-to-head samples are small.
 - The solver uses estimated ranges and a small set of bet sizes, and has no safety guarantee.
 - No AIVAT. Duplicate deals reduce variance, but far less than AIVAT would.
 - No tests against human players.
