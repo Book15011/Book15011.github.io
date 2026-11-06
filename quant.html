@@ -454,6 +454,28 @@
     .scroll-cue span{ animation:none; }
     *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
   }
+  /* ================= Poker break ================= */
+  .poker-break{ display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr); gap:clamp(24px,5vw,64px); align-items:center; }
+  .poker-title{ font-family:'Playfair Display', serif; font-size:clamp(1.9rem,4.4vw,3.1rem); line-height:1.08; margin-bottom:16px; }
+  .poker-text{ color:var(--slate); max-width:560px; margin-bottom:22px; }
+  .poker-actions{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+  .poker-play{ display:inline-flex; align-items:center; gap:10px; min-height:50px; padding:0 26px; border-radius:10px; border:none; cursor:pointer; background:linear-gradient(180deg,#3ecf8e,#27a970); color:#04140d; font:700 1rem 'Inter',sans-serif; transition:transform .15s ease, filter .15s ease; }
+  .poker-play:hover{ transform:translateY(-2px); filter:brightness(1.08); }
+  .poker-links{ display:flex; flex-wrap:wrap; gap:18px; margin-top:18px; font-size:.84rem; }
+  .poker-links a{ color:var(--slate); text-decoration:underline; text-underline-offset:3px; }
+  .poker-links a:hover{ color:var(--paper); }
+  .poker-hand{ position:relative; height:clamp(190px,24vw,270px); }
+  .poker-hand i{ position:absolute; left:50%; top:50%; width:clamp(104px,13vw,150px); aspect-ratio:5/7; border-radius:10px; background:linear-gradient(160deg,#fff,#eceff4); box-shadow:0 18px 40px rgba(0,0,0,.5); display:block; font:800 clamp(1.6rem,3vw,2.3rem)/1 'Inter',sans-serif; font-style:normal; padding:10px 12px; color:#141821; transition:transform .35s ease; }
+  .poker-hand i.red{ color:#cf2f3e; }
+  .poker-hand i:nth-child(1){ transform:translate(-78%,-50%) rotate(-11deg); }
+  .poker-hand i:nth-child(2){ transform:translate(-22%,-52%) rotate(9deg); }
+  .poker-break:hover .poker-hand i:nth-child(1){ transform:translate(-86%,-54%) rotate(-15deg); }
+  .poker-break:hover .poker-hand i:nth-child(2){ transform:translate(-14%,-56%) rotate(13deg); }
+  .poker-pill{ position:fixed; right:clamp(14px,3vw,28px); bottom:clamp(14px,3vw,28px); z-index:40; display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:999px; border:1px solid rgba(62,207,142,.45); background:rgba(13,19,31,.94); backdrop-filter:blur(10px); color:var(--paper); font:600 .84rem 'Inter',sans-serif; cursor:pointer; box-shadow:0 10px 30px rgba(0,0,0,.5); opacity:0; transform:translateY(14px); pointer-events:none; transition:opacity .3s ease, transform .3s ease, border-color .2s ease; }
+  .poker-pill.is-visible{ opacity:1; transform:none; pointer-events:auto; }
+  .poker-pill:hover{ border-color:var(--signal); }
+  .poker-pill b{ color:var(--signal); font-size:1rem; line-height:1; }
+  @media (max-width:820px){ .poker-break{ grid-template-columns:1fr; } .poker-hand{ display:none; } }
 </style>
 </head>
 <body>
@@ -468,6 +490,7 @@
     <a href="#profile">Profile</a>
     <a href="#skills">Skillset</a>
     <a href="#projects">Work</a>
+    <a href="#poker">Play</a>
     <a href="#exposure">Book</a>
     <a href="#contact">Contact</a>
     <a href="robotics-home.html" class="nav-cross">Robotics ↗</a>
@@ -666,6 +689,27 @@
     </div>
 
     <p class="disclaimer reveal">The LOB execution system is a personal research project; all figures come from historical replay simulation, not a production trading environment. The simulator has no adversarial participants, so the predictability gap is a measured property of the two policies, not a demonstrated trading advantage. MiniMax traded a mock competition account; its −17.5% comes from a paper bot running the launch model on live quotes. Projects marked <em>Idea · Not Started</em> describe intended research builds, not completed work. None of this is investment advice.</p>
+  </div>
+</section>
+
+<section id="poker" class="section">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal">Bored of reading? | Interactive project</p>
+    <div class="poker-break reveal">
+      <div>
+        <h2 class="poker-title">Can You Beat My Poker AI?</h2>
+        <p class="poker-text">Wanna play a quick hand? It runs right here, first to 3,000 chips, and takes about five minutes. The bot is an experiment in game theory and decisions with hidden information: a strategy trained by self-play with counterfactual regret minimization, plus a solver that runs in your browser on the turn and river.</p>
+        <div class="poker-actions">
+          <button type="button" class="poker-play" data-poker-open>Wanna play poker? <span aria-hidden="true">&#9824;</span></button>
+        </div>
+        <div class="poker-links">
+          <a href="poker/how-it-works.html">How the AI works</a>
+          <a href="poker/how-it-works.html#benchmarks">Benchmark results</a>
+          <a href="https://github.com/Book15011/Book15011.github.io/tree/main/poker" target="_blank" rel="noopener">Source on GitHub &#8599;</a>
+        </div>
+      </div>
+      <div class="poker-hand" aria-hidden="true"><i>A&#9824;</i><i class="red">K&#9829;</i></div>
+    </div>
   </div>
 </section>
 
@@ -1087,6 +1131,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderExposure();
 });
+</script>
+<button type="button" class="poker-pill" id="pokerPill" data-poker-open aria-label="Open the poker game"><b aria-hidden="true">&#9824;</b> Wanna play poker?</button>
+
+<script type="module">
+  // The game only loads when someone opens it, so it adds nothing to the weight of this page.
+  let openGame = null;
+  document.querySelectorAll('[data-poker-open]').forEach((el) => el.addEventListener('click', async () => {
+    openGame ??= (await import('./poker/js/ui/embed.js')).openPokerModal;
+    openGame();
+  }));
+  const pill = document.getElementById('pokerPill');
+  const hero = document.getElementById('hero');
+  const pokerSection = document.getElementById('poker');
+  if (pill && hero && pokerSection && 'IntersectionObserver' in window) {
+    let heroVisible = true, sectionVisible = false;
+    const refresh = () => pill.classList.toggle('is-visible', !heroVisible && !sectionVisible);
+    new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; refresh(); }).observe(hero);
+    new IntersectionObserver(([e]) => { sectionVisible = e.isIntersecting; refresh(); }).observe(pokerSection);
+  }
 </script>
 </body>
 </html>

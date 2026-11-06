@@ -11,6 +11,7 @@ A personal portfolio split into two tracks from a single Gateway: a **Quantitati
 - **`index.html`**: the Gateway. Split-screen chooser between the two tracks.
 - **Quant track**: `quant.html` (single scrolling page: hero, profile, skillset, projects, tracked exposure, contact)
 - **Robotics track**: `robotics.html` (the original interactive 3D robot experience, formerly `index.html`) → `about.html` → `projects.html` → `contact.html` → `thanks.html`
+- **Poker AI**: `poker/` (a playable heads-up No-Limit Hold'em game against a CFR-trained AI, opened from the Quant page or at `/poker/`). See [`poker/README.md`](poker/README.md).
 
 ## ✨ Key Features
 
@@ -27,6 +28,12 @@ A personal portfolio split into two tracks from a single Gateway: a **Quantitati
 - Interactive 3D robot model with cursor head-tracking (Three.js + GLTFLoader), model switching, color-shift, dance mode
 - Typography refreshed to Inter / Roboto Mono (from the system font stack) to match the Quant track's type system, plus small HUD-style eyebrow/control labels; the Three.js/GSAP engine underneath is untouched.
 - Cross-track nav pill to Quant, same wayfinding convention
+
+**Poker AI** (on the Quant page)
+- A "Wanna play poker?" section and floating button open the game in a modal, so visitors don't lose their place
+- Quick match format: first to 3,000 chips, with blinds rising every 5 hands
+- Expert bot: Monte Carlo CFR blueprint trained in C++, plus a Discounted CFR solver compiled to WebAssembly that runs on the visitor's device
+- Measured against baselines, Local Best Response and Slumbot: [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md)
 
 ## 🛠 Technical Implementation
 
@@ -50,6 +57,9 @@ A personal portfolio split into two tracks from a single Gateway: a **Quantitati
 - contact.html    # Robotics track: contact form
 - thanks.html     # Robotics track: submission confirmation
 - robot_1.glb, robot_2.glb, robot_3.glb   # 3D robot models
+- poker/           # Poker game, AI inference and tests
+- research/        # Training, solver source, benchmarks and browser tests
+- docs/            # Research, architecture, training and benchmark write-ups
 - style.css, script.js   # Legacy assets; not currently linked from any page
 
 ## 📝 Notes for next cleanup
