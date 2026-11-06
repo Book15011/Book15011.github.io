@@ -4,6 +4,7 @@
 // Modes:
 //   train tree   <depthBB>
 //   train run    <depthBB> <dataDir> <outDir> <threads> <minutes> [seed]
+//   train resume <depthBB> <dataDir> <checkpoint> <outDir> <threads> <minutes> [seed]
 //   train br     <depthBB> <dataDir> <checkpoint> <threads> <samples>   (Monte Carlo best response)
 //   train export <depthBB> <dataDir> <checkpoint> <out.bin> [full]
 //   train h2h    <depthBB> <dataDir> <ckptA> <ckptB> <threads> <hands>
@@ -179,6 +180,7 @@ struct Trainer {
 
   void save(const std::string& path, int64_t iters) const {
     FILE* f = fopen((path + ".tmp").c_str(), "wb");
+    if (!f) { fprintf(stderr, "cannot write %s.tmp\n", path.c_str()); exit(1); }
     fwrite(&iters, 8, 1, f);
     fwrite(reg.data(), 4, reg.size(), f);
     fwrite(avg.data(), 4, avg.size(), f);
@@ -400,18 +402,28 @@ int main(int argc, char** argv) {
   Trainer M;
   M.init(depth, dataDir);
 
-  if (mode == "run") {
-    std::string outDir = argv[4];
-    int threads = atoi(argv[5]);
-    double minutes = atof(argv[6]);
-    uint64_t seed = argc > 7 ? strtoull(argv[7], nullptr, 10) : 1;
-    M.reg.assign(M.T.regSize, 0.0f);
-    M.avg.assign(M.T.avgSize, 0.0f);
-    std::atomic<int64_t> iters{0};
+  if (mode == "run" || mode == "resume") {
+    // resume continues a finished run from its checkpoint: the early phase (discounting, warm-up before
+    // averaging and pruning) is already behind it, so averaging and pruning are on from the start.
+    const bool resume = mode == "resume";
+    const int a = resume ? 5 : 4;
+    std::string outDir = argv[a];
+    int threads = atoi(argv[a + 1]);
+    double minutes = atof(argv[a + 2]);
+    uint64_t seed = argc > a + 3 ? strtoull(argv[a + 3], nullptr, 10) : 1;
+    int64_t startIters = 0;
+    if (resume) {
+      startIters = M.load(argv[4]);
+      fprintf(stderr, "resuming %s at %.1fM iterations\n", argv[4], startIters / 1e6);
+    } else {
+      M.reg.assign(M.T.regSize, 0.0f);
+      M.avg.assign(M.T.avgSize, 0.0f);
+    }
+    std::atomic<int64_t> iters{startIters};
     auto t0 = std::chrono::steady_clock::now();
     auto elapsed = [&]() { return std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() / 60.0; };
-    const double discountUntil = minutes * 0.15, discountEvery = discountUntil / 30.0;
-    const double avgFrom = minutes * 0.05, pruneFrom = minutes * 0.10;
+    const double discountUntil = resume ? 0.0 : minutes * 0.15, discountEvery = discountUntil / 30.0;
+    const double avgFrom = resume ? 0.0 : minutes * 0.05, pruneFrom = resume ? 0.0 : minutes * 0.10;
     double nextDiscount = discountEvery, nextReport = 1.0, nextCkpt = minutes / 8.0;
     int discountStep = 0, ckptNo = 0;
     std::atomic<bool> stop{false}, pause{false};
@@ -455,7 +467,7 @@ int main(int argc, char** argv) {
         nextDiscount += discountEvery;
       }
       if (m >= nextReport) {
-        fprintf(stderr, "[%.1f min] iters=%.1fM rate=%.0fk/s\n", m, iters.load() / 1e6, iters.load() / (m * 60) / 1e3);
+        fprintf(stderr, "[%.1f min] iters=%.1fM rate=%.0fk/s\n", m, iters.load() / 1e6, (iters.load() - startIters) / (m * 60) / 1e3);
         nextReport += 1.0;
       }
       if (m >= nextCkpt && m < minutes) {
@@ -472,7 +484,7 @@ int main(int argc, char** argv) {
     pause = false;
     for (auto& t : ts) t.join();
     M.save(outDir + "/d" + std::to_string(depth) + ".final", iters.load());
-    fprintf(stderr, "finished: %.1fM iterations in %.1f minutes\n", iters.load() / 1e6, elapsed());
+    fprintf(stderr, "finished: %.1fM iterations in total, %.1fM in this run of %.1f minutes\n", iters.load() / 1e6, (iters.load() - startIters) / 1e6, elapsed());
     return 0;
   }
 
