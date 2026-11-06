@@ -1,0 +1,22 @@
+stack 100bb, 8000 hands per match. Row's win rate against column, in bb/100 (+-95% CI).
+Random        vs CallStation        1.2 +- 195.7
+Random        vs Casual          -459.2 +- 92.2
+Random        vs TightPassive    -336.4 +- 58.1
+Random        vs LAG            -1661.9 +- 140.0
+Random        vs Equity          -916.1 +- 124.9
+Random        vs Strong          -396.0 +- 64.5
+CallStation   vs Casual           -36.4 +- 6.8
+CallStation   vs TightPassive     -20.6 +- 6.3
+CallStation   vs LAG             -604.0 +- 67.4
+CallStation   vs Equity          -194.0 +- 21.3
+CallStation   vs Strong          -218.4 +- 31.7
+Casual        vs TightPassive     -51.4 +- 24.8
+Casual        vs LAG              249.7 +- 106.7
+Casual        vs Equity           -99.0 +- 58.3
+Casual        vs Strong          -118.3 +- 36.7
+TightPassive  vs LAG              181.7 +- 47.2
+TightPassive  vs Equity            55.5 +- 39.5
+TightPassive  vs Strong            -0.3 +- 13.9
+LAG           vs Equity          -963.8 +- 137.1
+LAG           vs Strong          -263.9 +- 68.8
+Equity        vs Strong           -34.6 +- 53.6

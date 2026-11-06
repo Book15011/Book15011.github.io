@@ -11,7 +11,7 @@ const MODELS_URL = new URL('../../models/', import.meta.url);
 async function fetchGz(name) {
   const res = await fetch(new URL(name, MODELS_URL));
   if (!res.ok) throw new Error(`Could not load ${name}: HTTP ${res.status}`);
-  const stream = /** @type {ReadableStream<Uint8Array>} */ (res.body).pipeThrough(new DecompressionStream('gzip'));
+  const stream = /** @type {any} */ (res.body).pipeThrough(new DecompressionStream('gzip'));
   return new Response(stream).arrayBuffer();
 }
 

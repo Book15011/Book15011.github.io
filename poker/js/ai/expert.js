@@ -10,6 +10,7 @@ import { HAND_A, HAND_B, NUM_HANDS, pairIdx } from './hands.js';
 import { monteCarloEquity } from './bots.js';
 
 /** @typedef {ReturnType<import('../engine/game.js').HandState['observation']>} Observation */
+/** @typedef {import('./realtime.js').RealtimeSolver} RealtimeSolver */
 
 const PREFLOP = 0, TURN = 2;
 const STREET_BOARD = [0, 3, 4, 5];
@@ -61,7 +62,7 @@ export class ExpertBot {
    *   blueprintFor:(effectiveBB:number)=>import('./blueprint.js').Blueprint,
    *   bucketsFor:(street:number, board:number[], out:Int16Array)=>boolean,
    *   rng:{next:()=>number,int:(n:number)=>number},
-   *   solver?:{decide:(ctx:any)=>any}|null,
+   *   solver?:RealtimeSolver|null,
    *   purifyBelow?:number, analysis?:boolean }} opts
    */
   constructor(opts) {
@@ -84,7 +85,7 @@ export class ExpertBot {
     this.walker = new BlueprintWalker(bp, this.opts.bucketsFor, this.rng);
     this.real = new RealState(obs);
     this.processed = 0;
-    this.solver?.startHand?.(obs);
+    this.solver?.startHand();
     this.lastDecision = null;
   }
 

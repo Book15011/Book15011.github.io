@@ -53,7 +53,7 @@ export class RealtimeSolver {
    * @param {any} core wasm exports
    * @param {{turn:{iterations?:number,budgetMs?:number,minIterations?:number},
    *          river:{iterations?:number,budgetMs?:number,minIterations?:number},
-   *          sizes?:any, purifyBelow?:number, rangeFloor?:number, analysis?:boolean, riverStride?:number, adaptive?:boolean}} cfg
+   *          sizes?:any, purifyBelow?:number, rangeFloor?:number, analysis?:boolean, riverStride?:number, adaptive?:boolean, handFloor?:number}} cfg
    */
   constructor(core, cfg) {
     this.core = core;
@@ -64,6 +64,7 @@ export class RealtimeSolver {
   }
 
   startHand() {
+    if (this.nextTier) { Object.assign(this.cfg, this.nextTier); this.nextTier = null; }
     /** @type {Subgame|null} */
     this.sg = null;
     this.sgStreet = -1;
@@ -153,6 +154,7 @@ export class RealtimeSolver {
       this.sg = new Subgame(this.core, {
         board: obs.board, inv: start.inv, behind: start.behind, ranges, path,
         minBet: obs.bigBlind, sizes: this.cfg.sizes, keep: [keepHand], riverStride: street === 2 ? (this.cfg.riverStride ?? 4) : 1,
+        handFloor: this.cfg.handFloor,
       });
       this.sgStreet = street;
       for (const [pos, sigma] of this.locks) {
@@ -160,8 +162,14 @@ export class RealtimeSolver {
         if (nodeIdx !== undefined && this.sg.nodes[nodeIdx].na * this.sg.H === sigma.length) this.sg.lockNode(nodeIdx, sigma);
       }
       this.sg.run(budget);
-      // On a slow device, fewer modelled rivers gives a better answer inside the time budget (see BENCHMARKS.md).
-      if (this.cfg.adaptive && street === 2 && (this.sg.lastRunMs ?? 0) / Math.max(1, this.sg.iterations) > 45) this.cfg.riverStride = 6;
+      // On a slow device, a smaller turn tree gives a better answer inside the time budget (see BENCHMARKS.md):
+      // fewer modelled rivers, and on very slow devices fewer low-weight hands. Takes effect from the next hand,
+      // so pinned decisions within a street always match the tree they came from.
+      if (this.cfg.adaptive && street === 2) {
+        const msPerIter = (this.sg.lastRunMs ?? 0) / Math.max(1, this.sg.iterations);
+        if (msPerIter > 120) this.nextTier = { riverStride: 8, handFloor: 0.02 };
+        else if (msPerIter > 45) this.nextTier = { riverStride: 6, handFloor: this.cfg.handFloor };
+      }
     }
     return { sg: /** @type {Subgame} */ (this.sg), path, reused };
   }

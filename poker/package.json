@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Browser poker engine, AI inference and tests. No runtime dependencies and no build step.",
   "scripts": {
-    "test": "node --test tests/"
+    "test": "node --test tests/",
+    "typecheck": "npx -p typescript tsc -p tsconfig.json"
   }
 }

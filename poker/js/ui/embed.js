@@ -23,7 +23,7 @@ function ensureCss() {
 }
 
 export async function openPokerModal() {
-  if (modal) { modal.hidden = false; modal.querySelector('.pk-app')?.focus?.(); document.body.style.overflow = 'hidden'; return; }
+  if (modal) { modal.hidden = false; /** @type {HTMLElement|null} */ (modal.querySelector('.pk-app'))?.focus(); document.body.style.overflow = 'hidden'; return; }
   await ensureCss();
   const opener = /** @type {HTMLElement|null} */ (document.activeElement);
   modal = document.createElement('div');
