@@ -252,8 +252,8 @@
    "note": "Blueprint only is the same trained model with no live solving, the most direct measure of what the solver adds. The other opponents are hand-written and were never used in training."
   },
   {
-   "title": "Whole quick matches: 10 hands",
-   "text": "This is the format on the site: 10 hands, both players starting every hand with 20 big blinds, and the winner is whoever has won more chips. Matches were played in pairs with the same cards and the seats swapped. A draw counts as half a win. Ten hands carry a lot of luck, so even a much stronger player loses some matches.",
+   "title": "Earlier 10-hand version: 20 big blinds, reset every hand",
+   "text": "Briefly on the site: 10 hands, both players starting every hand with 20 big blinds, and the winner is whoever has won more chips.",
    "table": {
     "headers": [
      "Expert against",

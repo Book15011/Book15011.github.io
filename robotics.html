@@ -911,17 +911,22 @@
 
         // Glitch effect before navigation
         function glitchAndNavigate(url) {
-            if (isGlitching || danceState !== 0) return;
+            // Navigation must always happen. The glitch is only a flourish when the robot is loaded and idle;
+            // while a model is still loading, dancing, or mid-glitch, go straight there.
+            const go = () => { window.location.href = url; };
+            if (!robotModel || isGlitching || danceState !== 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                go();
+                return;
+            }
             isGlitching = true;
+            setTimeout(go, 900); // safety net in case the animation never completes
 
             gsap.to(robotModel.rotation, {
                 z: Math.PI / 6 * (Math.random() > 0.5 ? 1 : -1),
                 duration: 0.08,
                 repeat: 5,
                 yoyo: true,
-                onComplete: () => {
-                    window.location.href = url;
-                }
+                onComplete: go
             });
 
             if (robotModel) {

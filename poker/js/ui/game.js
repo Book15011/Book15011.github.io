@@ -49,9 +49,9 @@ const pct = (/** @type {number} */ x) => `${(x * 100).toFixed(x > 0.995 || x < 0
 /** Match formats. Quick is the short format for visitors; Deep is a full 100 big blind heads-up session. */
 export const FORMATS = {
   quick: {
-    label: 'Quick match', blurb: '10 hands, 20 big blinds each. Chips reset every hand; whoever wins more chips takes it. About 5 minutes.',
-    rules: 'Ten hands. Each hand starts with 2,000 chips each and blinds of 50/100, so one hand can swing the score by at most 2,000. Whoever has won more chips after hand 10 wins the match.',
-    startingStack: 2000, goalStack: 0, handsPerLevel: 0, handsInMatch: 10, resetStacks: true,
+    label: 'Quick match', blurb: '10 hands, 5,000 chips each. Chips carry over and losing them all ends it; otherwise most chips after 10 hands wins. About 5 minutes.',
+    rules: 'You each start with 5,000 chips (50 big blinds) and the blinds stay at 50/100. Chips carry over from hand to hand, like real money. If one player loses all their chips, the match ends there. Otherwise, whoever has more chips after hand 10 wins.',
+    startingStack: 5000, goalStack: 0, handsPerLevel: 0, handsInMatch: 10,
     blinds: [{ small: 50, big: 100 }],
   },
   deep: {
@@ -681,6 +681,8 @@ class PokerGame {
     const m = /** @type {Match} */ (this.match);
     const f = /** @type {any} */ (FORMATS)[this.format];
     if (!f.handsInMatch) return m.winner();
+    const out = m.winner(); // a player who runs out of chips loses at once
+    if (out !== null) return out;
     if (m.handNumber < f.handsInMatch || (m.hand && !m.hand.finished)) return null;
     return this.score > 0 ? HUMAN : this.score < 0 ? AI : -1;
   }
@@ -696,14 +698,15 @@ class PokerGame {
     const links = this.options.links ?? {};
     const bb = f.blinds[0].big;
     const title = draw ? 'Dead even.' : you ? (this.difficulty === 'expert' ? 'You beat the Expert AI.' : 'You won the match.') : 'The AI takes this one.';
+    const early = f.handsInMatch && m.handNumber < f.handsInMatch;
     const sub = f.handsInMatch
-      ? `You finished ${signed(this.score)} chips (${signed(this.score / bb)} big blinds) over ${m.handNumber} hands.`
+      ? `You finished ${signed(this.score)} chips (${signed(this.score / bb)} big blinds) over ${m.handNumber} hands.${early ? ` The match ended early because ${you ? 'the AI' : 'you'} ran out of chips.` : ''}`
       : you ? (this.difficulty === 'expert' ? 'One match has a lot of luck in it, so it may take a few more to know for sure.' : 'Ready for a stronger opponent?') : 'Long matches still swing a lot. It is rarely over in one try.';
     // Luck check: score each all-in hand at the odds when the chips went in, instead of the cards that came.
     const lucky = this.luck.actual - this.luck.expected;
     const luckHtml = this.luck.hands
-      ? `<p class="pk-luck" data-test="luck"><b>Luck check.</b> ${this.luck.hands === 1 ? 'One hand was' : `${this.luck.hands} hands were`} decided by an all-in. At the odds when the chips went in, ${this.luck.hands === 1 ? 'it was' : 'they were'} worth ${signed(this.luck.expected)} to you on average; the cards that came gave you ${signed(this.luck.actual)}. Without that luck, you would have finished ${signed(this.score - lucky)}.</p>`
-      : `<p class="pk-luck" data-test="luck"><b>Luck check.</b> No hand was decided by an all-in, but which cards each player was dealt still matters a lot over a few hands.</p>`;
+      ? `<p class="pk-luck" data-test="luck"><b>Luck check.</b> ${this.luck.hands === 1 ? 'One hand' : `${this.luck.hands} hands`} went all in with cards still to come. At the odds when the chips went in, ${this.luck.hands === 1 ? 'it was' : 'they were'} worth ${signed(this.luck.expected)} to you on average; the cards that came gave you ${signed(this.luck.actual)}. Without that luck, you would have finished ${signed(this.score - lucky)}.</p>`
+      : `<p class="pk-luck" data-test="luck"><b>Luck check.</b> No one went all in with cards still to come, so there was no run-out luck to take out. Which cards each player was dealt still matters a lot over a few hands.</p>`;
     const sample = links.benchmarks
       ? `<p class="pk-luck">A few hands can't measure skill either way. The AI's strength is measured over hundreds of thousands of hands in the <a href="${links.benchmarks}">benchmarks</a>.</p>`
       : '';
@@ -736,11 +739,10 @@ class PokerGame {
     const you = hand && !hand.finished ? hand.stacks[0] + hand.totals[0] : m.stacks[0];
     const b = hand ? { small: hand.smallBlind, big: hand.bigBlind } : f.blinds[0];
     if (f.handsInMatch) {
-      // The bar is the running score: centred at even, full when you are three stacks ahead.
-      const s = this.score ?? 0;
-      this.els.goalFill.style.width = `${50 + 50 * Math.max(-1, Math.min(1, s / (3 * f.startingStack)))}%`;
-      this.els.goalYou.textContent = `You ${signed(s)}`;
-      this.els.goalAi.textContent = `AI ${signed(-s)}`;
+      // Chips carry over, so the bar is each player's share of the chips; the mark is where you started.
+      this.els.goalFill.style.width = `${(you / total) * 100}%`;
+      this.els.goalYou.textContent = `You ${fmt(you)}`;
+      this.els.goalAi.textContent = `AI ${fmt(total - you)}`;
       this.els.goalMid.textContent = `Hand ${Math.max(1, m.handNumber)} of ${f.handsInMatch}`;
       this.els.markA.style.left = '50%';
       this.els.markA.hidden = false; this.els.markB.hidden = true;

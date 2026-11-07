@@ -502,7 +502,7 @@
 <section id="hero" class="hero">
   <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
   <div class="hero-inner">
-    <p class="hero-eyebrow">CUHK | Mechanical &amp; Automation Engineering · Minor in Computer Science · Dean&rsquo;s List</p>
+    <p class="hero-eyebrow">CUHK | Mechanical &amp; Automation Engineering · Minor in Computer Science</p>
     <h1 class="hero-name">Thanisorn J.</h1>
     <p class="hero-role">Quantitative Strategist | Global Markets Trading</p>
     <p class="hero-bridge">I approach markets the same way I approach dynamical systems: by pricing derivatives, thinking carefully about execution risk, and building practical low-latency tools.</p>
@@ -632,6 +632,27 @@
       </article>
 
       <article class="project-card" tabindex="0">
+        <span class="card-ticker">CFR · GAME AI</span>
+        <span class="card-status card-status--active">Complete · Live</span>
+        <h3 class="card-title">Heads-Up No-Limit Hold'em AI: CFR Blueprint &amp; Live Solver [Poker_bot_web]</h3>
+        <p class="card-desc">A poker AI for decisions under hidden information, playable on this page. Its strategy was trained by self-play with Monte Carlo CFR in multithreaded C++, up to 14.8 billion iterations per stack depth. A Discounted CFR solver compiled to WebAssembly re-solves the turn and river live on the visitor's device. It sees only its own cards, and it was tested over 200,778 hands with duplicate deals, Local Best Response and Slumbot.</p>
+        <div class="card-tags">
+          <span class="card-tag">C++</span>
+          <span class="card-tag">WebAssembly</span>
+          <span class="card-tag">MCCFR / DCFR</span>
+          <span class="card-tag">Game Theory</span>
+        </div>
+        <div class="card-stats">
+          <div class="stat"><span class="stat-label">Hands Tested</span><span class="stat-value">200,778</span></div>
+          <div class="stat"><span class="stat-label">vs Slumbot</span><span class="stat-value">+45.7 &plusmn; 47.1</span></div>
+          <div class="stat"><span class="stat-label">vs Rule-Based Bot</span><span class="stat-value">+21.5 bb/100</span></div>
+          <div class="stat"><span class="stat-label">LBR Exploit Found</span><span class="stat-value">None</span></div>
+        </div>
+        <a href="https://github.com/Book15011/Poker_bot_web" target="_blank" rel="noopener" class="card-link">View on GitHub ↗</a>
+        <a href="#poker" class="card-link" style="margin-left:18px">Play it ↓</a>
+      </article>
+
+      <article class="project-card" tabindex="0">
         <span class="card-ticker">CRYPTO</span>
         <span class="card-status">Complete · Lost Money</span>
         <h3 class="card-title">Autonomous Crypto Trading Bot, Roostoo Hackathon [MiniMax]</h3>
@@ -690,7 +711,7 @@
       </article>
     </div>
 
-    <p class="disclaimer reveal">The LOB execution system is a personal research project; all figures come from historical replay simulation, not a production trading environment. The simulator has no adversarial participants, so the predictability gap is a measured property of the two policies, not a demonstrated trading advantage. MiniMax traded a mock competition account; its −17.5% comes from a paper bot running the launch model on live quotes. Projects marked <em>Idea · Not Started</em> describe intended research builds, not completed work. None of this is investment advice.</p>
+    <p class="disclaimer reveal">The LOB execution system is a personal research project; all figures come from historical replay simulation, not a production trading environment. The simulator has no adversarial participants, so the predictability gap is a measured property of the two policies, not a demonstrated trading advantage. MiniMax traded a mock competition account; its −17.5% comes from a paper bot running the launch model on live quotes. The poker AI's results are against other bots, with 95% intervals; its Slumbot match is 6,000 hands, so that interval is wide. Projects marked <em>Idea · Not Started</em> describe intended research builds, not completed work. None of this is investment advice.</p>
   </div>
 </section>
 
