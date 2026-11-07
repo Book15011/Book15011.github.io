@@ -51,9 +51,12 @@ A personal portfolio split into two tracks from a single Gateway: a **Quantitati
 ## 📂 Project Structure
 - index.html      # Gateway: choose Quant or Robotics
 - quant.html      # Quantitative Strategist portfolio (self-contained)
-- robotics.html   # Interactive 3D robot homepage (formerly index.html)
-- about.html      # Robotics track: professional background
-- projects.html   # Robotics track: project showcase
+- robotics-home.html  # Robotics track: the portfolio page (humanoid project, experience, projects, skills, about, contact)
+- robotics-site.css, robotics-site.js, robotics-arm.js  # Robotics track styles, menu and the hero's interactive IK arm
+- media/robotics/  # Robotics clips and portrait (web-sized)
+- cv/              # CV (PDF), linked from the robotics page
+- robotics.html   # Robot Garage: interactive 3D robot models
+- about.html, projects.html  # Redirects to sections of robotics-home.html, kept for old links
 - contact.html    # Robotics track: contact form
 - thanks.html     # Robotics track: submission confirmation
 - robot_1.glb, robot_2.glb, robot_3.glb   # 3D robot models
@@ -62,5 +65,4 @@ A personal portfolio split into two tracks from a single Gateway: a **Quantitati
 
 ## 📝 Notes for next cleanup
 - `robotics.html`'s model selector references a fourth model, `robot_4.glb` ("Heavy Bot"), which isn't in this repo; add the file or remove that entry from the `models` array.
-- The contact email (`thanisornjarudilokkil@gmail.com`) and LinkedIn slug (`thanisorn-jarudilokkul`) spell the surname differently; confirm which is correct.
 - The Tracked Exposure holdings/prices in `quant.html` are placeholder data; edit the `HOLDINGS` array near the bottom of the script to reflect a real or intentionally illustrative book.
