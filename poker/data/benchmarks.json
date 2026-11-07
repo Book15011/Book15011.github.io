@@ -252,6 +252,46 @@
    "note": "Blueprint only is the same trained model with no live solving, the most direct measure of what the solver adds. The other opponents are hand-written and were never used in training."
   },
   {
+   "title": "Whole quick matches: up to 10 hands, 50 big blinds",
+   "text": "This is the format on the site: 5,000 chips each (50 big blinds) that carry over, a player who runs out loses at once, and otherwise the one with more chips after 10 hands wins. Matches were played in pairs with the same cards and the seats swapped. A draw counts as half a win.",
+   "table": {
+    "headers": [
+     "Expert against",
+     "#Matches",
+     "#Expert wins",
+     "#95% CI",
+     "#Big blinds per match",
+     "#Ended early"
+    ],
+    "rows": [
+     [
+      "Tight-passive",
+      "320",
+      "67.3%",
+      "\u00b14.8",
+      "+1.1",
+      "6%"
+     ],
+     [
+      "Casual (site bot)",
+      "320",
+      "57.2%",
+      "\u00b14.6",
+      "+5.9",
+      "38%"
+     ],
+     [
+      "Competitive (site bot)",
+      "320",
+      "57.0%",
+      "\u00b14.8",
+      "+1.7",
+      "11%"
+     ]
+    ]
+   }
+  },
+  {
    "title": "Earlier 10-hand version: 20 big blinds, reset every hand",
    "text": "Briefly on the site: 10 hands, both players starting every hand with 20 big blinds, and the winner is whoever has won more chips.",
    "table": {
