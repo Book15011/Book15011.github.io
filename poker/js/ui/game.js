@@ -10,17 +10,53 @@ import { HAND_A, HAND_B, NUM_HANDS } from '../ai/hands.js';
 
 const HUMAN = 0, AI = 1;
 const fmt = (/** @type {number} */ n) => Math.round(n).toLocaleString('en-US');
+/** A chip amount with its sign, using a true minus sign. @param {number} n */
+const signed = (n) => (Math.round(n) > 0 ? '+' : Math.round(n) < 0 ? '\u2212' : '') + fmt(Math.abs(n));
+
+/**
+ * Probability that hole cards `a` beat `b` (ties count half), given the board so far. Exact when two or fewer
+ * cards are to come; with the whole board to come it samples 30,000 runouts, which is within about 0.5%.
+ * @param {number[]} a @param {number[]} b @param {number[]} board
+ */
+export function allInEquity(a, b, board) {
+  const known = new Set([...a, ...b, ...board]);
+  const deck = [];
+  for (let c = 0; c < 52; c++) if (!known.has(c)) deck.push(c);
+  const need = 5 - board.length;
+  let win = 0, n = 0;
+  const score = (/** @type {number[]} */ run) => {
+    const full = [...board, ...run];
+    const x = evaluate([...a, ...full]), y = evaluate([...b, ...full]);
+    win += x > y ? 1 : x === y ? 0.5 : 0;
+    n++;
+  };
+  if (need === 0) score([]);
+  else if (need === 1) for (const c of deck) score([c]);
+  else if (need === 2) for (let i = 0; i < deck.length; i++) for (let j = i + 1; j < deck.length; j++) score([deck[i], deck[j]]);
+  else {
+    for (let t = 0; t < 30000; t++) {
+      for (let k = 0; k < need; k++) { // partial Fisher-Yates: the first `need` cards become a random runout
+        const r = k + Math.floor(Math.random() * (deck.length - k));
+        [deck[k], deck[r]] = [deck[r], deck[k]];
+      }
+      score(deck.slice(0, need));
+    }
+  }
+  return win / n;
+}
 const pct = (/** @type {number} */ x) => `${(x * 100).toFixed(x > 0.995 || x < 0.005 ? 0 : 1)}%`;
 
 /** Match formats. Quick is the short format for visitors; Deep is a full 100 big blind heads-up session. */
 export const FORMATS = {
   quick: {
-    label: 'Quick match', blurb: 'First to 3,000 chips. Blinds rise every 5 hands. About 5 minutes.',
-    startingStack: 2000, goalStack: 3000, handsPerLevel: 5,
-    blinds: [[50, 100], [75, 150], [100, 200], [150, 300], [200, 400], [300, 600], [400, 800], [500, 1000]].map(([small, big]) => ({ small, big })),
+    label: 'Quick match', blurb: '10 hands, 20 big blinds each. Chips reset every hand; whoever wins more chips takes it. About 5 minutes.',
+    rules: 'Ten hands. Each hand starts with 2,000 chips each and blinds of 50/100, so one hand can swing the score by at most 2,000. Whoever has won more chips after hand 10 wins the match.',
+    startingStack: 2000, goalStack: 0, handsPerLevel: 0, handsInMatch: 10, resetStacks: true,
+    blinds: [{ small: 50, big: 100 }],
   },
   deep: {
     label: 'Deep stacks', blurb: '100 big blinds each with flat blinds. Play until someone is out of chips.',
+    rules: 'You each start with 10,000 chips (100 big blinds) and the blinds stay at 50/100. Chips carry over from hand to hand, and the match ends when one player has them all.',
     startingStack: 10000, goalStack: 0, handsPerLevel: 0, blinds: [{ small: 50, big: 100 }],
   },
 };
@@ -299,6 +335,7 @@ class PokerGame {
   // ---------- menu ----------
   #overlay(html) {
     this.#closeOverlay();
+    this.app.querySelectorAll('.pk-chip-fly').forEach((c) => c.remove()); // no chips flying over a menu
     const o = document.createElement('div');
     o.className = 'pk-overlay';
     o.innerHTML = html;
@@ -338,10 +375,13 @@ class PokerGame {
     this.ai?.destroy();
     this.ai = null;
     const f = /** @type {any} */ (FORMATS)[this.format];
-    this.match = new Match({ startingStack: f.startingStack, blinds: f.blinds, handsPerLevel: f.handsPerLevel, goalStack: f.goalStack || undefined, firstButton: Math.random() < 0.5 ? 0 : 1 });
+    this.match = new Match({ startingStack: f.startingStack, blinds: f.blinds, handsPerLevel: f.handsPerLevel, goalStack: f.goalStack || undefined, resetStacks: !!f.resetStacks, firstButton: Math.random() < 0.5 ? 0 : 1 });
     this.handsLog = [];
     this.review = [];
     this.stats = { hands: 0, won: 0, biggest: 0 };
+    this.score = 0; // your net chips over the match
+    this.luck = { hands: 0, actual: 0, expected: 0 }; // all-in hands: what you won, and what the odds said you would
+    this.allInAt = -1;
     this.handOver = false;
     this.els.aiName.textContent = /** @type {any} */ (LEVELS)[this.difficulty].name;
     this.els.title.textContent = /** @type {any} */ (FORMATS)[this.format].label;
@@ -399,9 +439,10 @@ class PokerGame {
 
   async #nextHand() {
     const m = /** @type {Match} */ (this.match);
-    if (m.winner() !== null) { this.#showMatchEnd(); return; }
+    if (this.#matchResult() !== null) { this.#showMatchEnd(); return; }
     const token = ++this.token;
     this.handOver = false;
+    this.allInAt = -1;
     this.#clearTable();
     const h = m.nextHand();
     this.currentLog = { number: m.handNumber, blinds: `${fmt(h.smallBlind)}/${fmt(h.bigBlind)}`, button: h.button, entries: [], result: null, board: [] };
@@ -491,6 +532,7 @@ class PokerGame {
     const plate = /** @type {HTMLElement} */ ((seat === HUMAN ? this.els.seatYou : this.els.seatAi).querySelector('.pk-plate'));
     const betSpot = seat === HUMAN ? this.els.betYou : this.els.betAi;
     const hadBets = /** @type {any} */ (m.hand).bets.some((/** @type {number} */ x) => x > 0);
+    const boardBefore = /** @type {any} */ (m.hand).board.length;
     try {
       m.act(action);
     } catch (err) {
@@ -501,6 +543,8 @@ class PokerGame {
     }
     if (action.type === 'raise' || action.type === 'call') { this.sound.chip(); this.#flyChip(plate, betSpot); }
     const handNow = /** @type {any} */ (m.hand);
+    // A showdown reached with board cards still to come means both players were all in.
+    if (handNow.finished && handNow.result?.reason === 'showdown' && boardBefore < 5) this.allInAt = boardBefore;
     if (hadBets && !handNow.bets.some((/** @type {number} */ x) => x > 0)) {
       // The street closed: the bets slide into the pot.
       const pot = /** @type {HTMLElement} */ (this.els.pot);
@@ -573,6 +617,14 @@ class PokerGame {
     this.els.seatYou.classList.remove('is-active');
     this.stats.hands++;
     this.stats.biggest = Math.max(this.stats.biggest, r.pot);
+    this.score += r.net[HUMAN];
+    if (this.allInAt >= 0 && r.showdown) {
+      // Refunds come first, so a heads-up all-in pot is split evenly between the two players.
+      const eq = allInEquity(r.showdown.holes[HUMAN], r.showdown.holes[AI], r.showdown.board.slice(0, this.allInAt));
+      this.luck.hands++;
+      this.luck.actual += r.net[HUMAN];
+      this.luck.expected += r.pot * (eq - 0.5);
+    }
     const youWon = r.net[HUMAN] > 0, tie = r.net[HUMAN] === 0;
     if (youWon) this.stats.won++;
     let line = '', detail = '';
@@ -602,7 +654,7 @@ class PokerGame {
     this.#renderState();
     this.#renderPanel();
     this.#renderTop();
-    const ended = m.winner() !== null;
+    const ended = this.#matchResult() !== null;
     const cls = youWon ? 'is-win' : tie ? '' : 'is-lose';
     this.els.controls.innerHTML = `
       <div class="pk-result ${cls}" data-test="hand-result">${line}<small>${detail}</small></div>
@@ -620,25 +672,52 @@ class PokerGame {
     const f = /** @type {any} */ (FORMATS)[this.format];
     const lv = f.handsPerLevel ? Math.floor(m.handNumber / f.handsPerLevel) : 0;
     const bb = f.blinds[Math.min(lv, f.blinds.length - 1)].big;
+    if (f.resetStacks) return f.startingStack / bb;
     return Math.max(1, Math.min(m.stacks[0], m.stacks[1])) / bb;
+  }
+
+  /** The winning seat, -1 for a drawn fixed-length match, or null while the match is still on. */
+  #matchResult() {
+    const m = /** @type {Match} */ (this.match);
+    const f = /** @type {any} */ (FORMATS)[this.format];
+    if (!f.handsInMatch) return m.winner();
+    if (m.handNumber < f.handsInMatch || (m.hand && !m.hand.finished)) return null;
+    return this.score > 0 ? HUMAN : this.score < 0 ? AI : -1;
   }
 
   #showMatchEnd() {
     const m = /** @type {Match} */ (this.match);
-    const you = m.winner() === HUMAN;
+    const f = /** @type {any} */ (FORMATS)[this.format];
+    const result = this.#matchResult();
+    const you = result === HUMAN, draw = result === -1;
     this.token++;
     const lvl = /** @type {any} */ (LEVELS)[this.difficulty].label;
     const harder = you && this.difficulty !== 'expert';
     const links = this.options.links ?? {};
+    const bb = f.blinds[0].big;
+    const title = draw ? 'Dead even.' : you ? (this.difficulty === 'expert' ? 'You beat the Expert AI.' : 'You won the match.') : 'The AI takes this one.';
+    const sub = f.handsInMatch
+      ? `You finished ${signed(this.score)} chips (${signed(this.score / bb)} big blinds) over ${m.handNumber} hands.`
+      : you ? (this.difficulty === 'expert' ? 'One match has a lot of luck in it, so it may take a few more to know for sure.' : 'Ready for a stronger opponent?') : 'Long matches still swing a lot. It is rarely over in one try.';
+    // Luck check: score each all-in hand at the odds when the chips went in, instead of the cards that came.
+    const lucky = this.luck.actual - this.luck.expected;
+    const luckHtml = this.luck.hands
+      ? `<p class="pk-luck" data-test="luck"><b>Luck check.</b> ${this.luck.hands === 1 ? 'One hand was' : `${this.luck.hands} hands were`} decided by an all-in. At the odds when the chips went in, ${this.luck.hands === 1 ? 'it was' : 'they were'} worth ${signed(this.luck.expected)} to you on average; the cards that came gave you ${signed(this.luck.actual)}. Without that luck, you would have finished ${signed(this.score - lucky)}.</p>`
+      : `<p class="pk-luck" data-test="luck"><b>Luck check.</b> No hand was decided by an all-in, but which cards each player was dealt still matters a lot over a few hands.</p>`;
+    const sample = links.benchmarks
+      ? `<p class="pk-luck">A few hands can't measure skill either way. The AI's strength is measured over hundreds of thousands of hands in the <a href="${links.benchmarks}">benchmarks</a>.</p>`
+      : '';
     this.#overlay(`<div class="pk-menu pk-load" data-test="match-end">
       <p class="pk-eyebrow">${lvl} · ${m.handNumber} hands</p>
-      <h2 class="pk-h1">${you ? (this.difficulty === 'expert' ? 'You beat the Expert AI.' : 'You won the match.') : 'The AI takes this one.'}</h2>
-      <p class="pk-sub">${you ? (this.difficulty === 'expert' ? 'One match has a lot of luck in it, so it may take a few more to know for sure.' : 'Ready for a stronger opponent?') : 'Short matches swing a lot. It is rarely over in one try.'}</p>
+      <h2 class="pk-h1">${title}</h2>
+      <p class="pk-sub">${sub}</p>
       <div class="pk-endstats">
-        <div class="pk-stat"><span>Hands</span><b>${m.handNumber}</b></div>
+        <div class="pk-stat"><span>${f.handsInMatch ? 'Your score' : 'Hands'}</span><b data-test="score">${f.handsInMatch ? signed(this.score) : m.handNumber}</b></div>
         <div class="pk-stat"><span>Hands won</span><b>${this.stats.won}</b></div>
         <div class="pk-stat"><span>Biggest pot</span><b>${fmt(this.stats.biggest)}</b></div>
       </div>
+      ${luckHtml}
+      ${sample}
       <div class="pk-end-actions">
         <button class="pk-btn pk-btn--next" style="grid-column:auto" data-act="rematch" data-test="rematch">Play again</button>
         <button class="pk-btn pk-btn--ghost" data-act="menu">${harder ? 'Try a harder bot' : 'Change opponent'}</button>
@@ -656,6 +735,18 @@ class PokerGame {
     const hand = m.hand;
     const you = hand && !hand.finished ? hand.stacks[0] + hand.totals[0] : m.stacks[0];
     const b = hand ? { small: hand.smallBlind, big: hand.bigBlind } : f.blinds[0];
+    if (f.handsInMatch) {
+      // The bar is the running score: centred at even, full when you are three stacks ahead.
+      const s = this.score ?? 0;
+      this.els.goalFill.style.width = `${50 + 50 * Math.max(-1, Math.min(1, s / (3 * f.startingStack)))}%`;
+      this.els.goalYou.textContent = `You ${signed(s)}`;
+      this.els.goalAi.textContent = `AI ${signed(-s)}`;
+      this.els.goalMid.textContent = `Hand ${Math.max(1, m.handNumber)} of ${f.handsInMatch}`;
+      this.els.markA.style.left = '50%';
+      this.els.markA.hidden = false; this.els.markB.hidden = true;
+      this.els.blinds.textContent = `Most chips after ${f.handsInMatch} hands · ${fmt(b.small)}/${fmt(b.big)}`;
+      return;
+    }
     this.els.goalFill.style.width = `${(you / total) * 100}%`;
     this.els.goalYou.textContent = `You ${fmt(you)}`;
     this.els.goalAi.textContent = `AI ${fmt(total - you)}`;
@@ -815,7 +906,10 @@ class PokerGame {
       ['Flush', 'Five of the same suit'], ['Straight', 'Five in a row'], ['Three of a kind', 'Three cards of one rank'],
       ['Two pair', 'Two different pairs'], ['Pair', 'Two cards of one rank'], ['High card', 'None of the above'],
     ];
-    return `<p style="margin:0 0 8px"><b>Never played? It takes a minute.</b></p>
+    const f = /** @type {any} */ (FORMATS)[this.format];
+    return `<p style="margin:0 0 4px"><b>This match</b></p>
+      <p class="pk-muted" style="margin:0 0 14px">${f.rules}</p>
+      <p style="margin:0 0 8px"><b>Never played? It takes a minute.</b></p>
       <p class="pk-muted" style="margin:0 0 10px">You and the AI each get two private cards, then five shared cards are dealt in stages. Whoever makes the best five-card hand wins the pot, unless someone folds first. So you can win with the best cards, or by betting enough that the AI gives up.</p>
       <p style="margin:0 0 4px"><b>Your options</b></p>
       <div class="pk-log-line"><b>Fold</b>: give up the hand.</div>

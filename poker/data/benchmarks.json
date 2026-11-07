@@ -252,8 +252,8 @@
    "note": "Blueprint only is the same trained model with no live solving, the most direct measure of what the solver adds. The other opponents are hand-written and were never used in training."
   },
   {
-   "title": "Whole quick matches: first to 3,000 chips",
-   "text": "This is the format on the site. Short matches carry a lot of luck, so even a strong player loses some of them.",
+   "title": "Earlier quick-match format: first to 3,000 chips",
+   "text": "The site used this format before the 10-hand match. Blinds rose every 5 hands and one all-in could end a match in two or three hands, so it carried even more luck.",
    "table": {
     "headers": [
      "Expert against",
