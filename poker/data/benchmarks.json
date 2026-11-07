@@ -1,7 +1,7 @@
 {
  "tiles": [
   {
-   "value": "191,178",
+   "value": "200,778",
    "label": "hands evaluated: head-to-head, Local Best Response and Slumbot, all on the code the browser runs"
   },
   {
@@ -250,6 +250,46 @@
     ]
    },
    "note": "Blueprint only is the same trained model with no live solving, the most direct measure of what the solver adds. The other opponents are hand-written and were never used in training."
+  },
+  {
+   "title": "Whole quick matches: 10 hands",
+   "text": "This is the format on the site: 10 hands, both players starting every hand with 20 big blinds, and the winner is whoever has won more chips. Matches were played in pairs with the same cards and the seats swapped. A draw counts as half a win. Ten hands carry a lot of luck, so even a much stronger player loses some matches.",
+   "table": {
+    "headers": [
+     "Expert against",
+     "#Matches",
+     "#Expert wins",
+     "#95% CI",
+     "#Big blinds per match",
+     "#Draws"
+    ],
+    "rows": [
+     [
+      "Tight-passive",
+      "320",
+      "63.4%",
+      "\u00b14.6",
+      "+2.3",
+      "2"
+     ],
+     [
+      "Competitive (site bot)",
+      "320",
+      "57.2%",
+      "\u00b14.3",
+      "+2.8",
+      "4"
+     ],
+     [
+      "Casual (site bot)",
+      "320",
+      "56.9%",
+      "\u00b14.7",
+      "+4.6",
+      "0"
+     ]
+    ]
+   }
   },
   {
    "title": "Earlier quick-match format: first to 3,000 chips",
