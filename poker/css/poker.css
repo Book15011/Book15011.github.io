@@ -182,6 +182,9 @@
 .pk-endstats .pk-stat { padding: 9px; text-align: center; }
 .pk-endstats .pk-stat b { font-size: 1.05rem; }
 .pk-end-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.pk-luck { margin: 0 0 10px; color: var(--pk-slate); font-size: .8rem; line-height: 1.5; text-align: left; }
+.pk-luck b { color: var(--pk-paper); }
+.pk-luck a { color: var(--pk-paper); text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- Responsive, based on the game's own width so the modal and full page behave alike ---------- */
 @container pkapp (max-width: 980px) {
